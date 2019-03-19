@@ -1,0 +1,12 @@
+Error 1 :
+Spring Boot – Cannot determine embedded database driver class for database type NONE
+PANKAJ 10 COMMENTS
+
+Sol 1 : Exclude auto configuration of DataSource in the Spring Boot application class. We can do this using EnableAutoConfiguration annotation as shown in below code.
+
+Sol 2 : Another way to fix this issue is to provide spring.datasource.url in the application.properties file. It worked for me, although I didn’t provided any database username and password.
+spring.datasource.url=jdbc:mysql://localhost/Test_DB
+Link : https://www.journaldev.com/13830/spring-boot-cannot-determine-embedded-database-driver-class-for-database-type-none
+
+===========================
+

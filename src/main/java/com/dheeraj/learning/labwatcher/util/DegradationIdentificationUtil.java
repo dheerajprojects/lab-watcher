@@ -1,6 +1,6 @@
 package com.dheeraj.learning.labwatcher.util;
 
-import com.dheeraj.learning.labwatcher.dto.ParamData;
+import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.PerfStatDTO;
 
 import java.util.HashMap;
@@ -10,10 +10,10 @@ import java.util.Map;
 
 public class DegradationIdentificationUtil {
 
-    public static Map<String, ParamData> getStandardDeviation(List<PerfStatDTO> resultDTOs, List<String> listOfParams) {
-        Map<String, ParamData> temp = new HashMap();
+    public static Map<String, ParamDataDTO> getStandardDeviation(List<PerfStatDTO> resultDTOs, List<String> listOfParams) {
+        Map<String, ParamDataDTO> temp = new HashMap();
         for (String param : listOfParams) {
-            temp.put(param, new ParamData(param));
+            temp.put(param, new ParamDataDTO(param));
         }
 
         for (Iterator iterator = resultDTOs.iterator(); iterator.hasNext(); ) {
@@ -54,7 +54,7 @@ public class DegradationIdentificationUtil {
         return temp;
     }
 
-    public static boolean isDegraded(Map<String, ParamData> tempMap, String param, Double latestValue) {
+    public static boolean isDegraded(Map<String, ParamDataDTO> tempMap, String param, Double latestValue) {
         double mean = tempMap.get(param).getMean();
         double standardDeviation = tempMap.get(param).getStandardDeviation();
         double degradationPercentage;

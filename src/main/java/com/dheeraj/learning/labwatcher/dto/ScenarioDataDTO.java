@@ -2,10 +2,10 @@ package com.dheeraj.learning.labwatcher.dto;
 
 import java.util.Map;
 
-public class ScenarioData {
+public class ScenarioDataDTO {
     String testname;
     String latestbuild;
-    Map<String, ParamData> map;
+    Map<String, ParamDataDTO> map;
 
     public String getTestname() {
         return testname;
@@ -24,20 +24,20 @@ public class ScenarioData {
     }
 
     public void addParam(String paramName){
-        map.put(paramName, new ParamData(paramName));
+        map.put(paramName, new ParamDataDTO(paramName));
     }
 
-    public Map<String, ParamData> getMap() {
+    public Map<String, ParamDataDTO> getMap() {
         return map;
     }
 
-    public void setMap(Map<String, ParamData> map) {
+    public void setMap(Map<String, ParamDataDTO> map) {
         this.map = map;
     }
 
     @Override
     public String toString() {
-        return "ScenarioData{" +
+        return "ScenarioDataDTO{" +
                 "\n\ttestname='" + testname + '\'' + "," +
                 "\n\tlatestbuild='" + latestbuild + '\'' + "," +
                 "\n\tmap=" + map + "," +

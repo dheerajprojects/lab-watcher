@@ -1,19 +1,34 @@
-package com.dheeraj.learning.labwatcher.dto;
+package com.dheeraj.learning.labwatcher.entity;
 
+import javax.persistence.*;
 
-public class ParamData{
+@Entity
+@Table(name = "PARAMDATA")
+public class ParamData {
+    @Id
+    @GeneratedValue
+    int paramId;
     String name;
     Double mean;
     Double standardDeviation;
     Double latestBuildValue;
     Double noOfValidRecords = 0.0;
-    transient Double tempsum = 0.0;
-    transient Double tempSD = 0.0;
     Double degradationPercentage = 0.0;
     boolean isDegraded;
 
+    public ParamData() {
+    }
+
     public ParamData(String name) {
         this.name = name;
+    }
+
+    public int getId() {
+        return paramId;
+    }
+
+    public void setParamId(int paramId) {
+        this.paramId = paramId;
     }
 
     public String getName() {
@@ -56,22 +71,6 @@ public class ParamData{
         this.noOfValidRecords = noOfValidRecords;
     }
 
-    public Double getTempsum() {
-        return tempsum;
-    }
-
-    public void setTempsum(Double tempsum) {
-        this.tempsum = tempsum;
-    }
-
-    public Double getTempSD() {
-        return tempSD;
-    }
-
-    public void setTempSD(Double tempSD) {
-        this.tempSD = tempSD;
-    }
-
     public Double getDegradationPercentage() {
         return degradationPercentage;
     }
@@ -88,17 +87,9 @@ public class ParamData{
         isDegraded = degraded;
     }
 
-    public void calcMean(){
-        mean = tempsum / noOfValidRecords;
-    }
-
-    public void calcStandardDeviation(){
-        standardDeviation = Math.sqrt(tempSD / noOfValidRecords);
-    }
-
     @Override
     public String toString() {
-        return "ParamData{" +
+        return "ParamDataDTO{" +
                 "\n\t\tname='" + name + '\'' + "," +
                 "\n\t\tmean=" + mean + "," +
                 "\n\t\tstandardDeviation=" + standardDeviation + "," +
@@ -107,6 +98,6 @@ public class ParamData{
                 "\n\t\tdegradationPercentage=" + degradationPercentage + "," +
                 "\n\t" + '}';
     }
-    
-    
+
+
 }

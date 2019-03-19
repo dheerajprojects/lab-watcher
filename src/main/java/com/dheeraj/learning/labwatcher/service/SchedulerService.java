@@ -1,10 +1,14 @@
 package com.dheeraj.learning.labwatcher.service;
 
-import com.dheeraj.learning.labwatcher.dto.ParamData;
+import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.PerfStatDTO;
-import com.dheeraj.learning.labwatcher.dto.ScenarioData;
+import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
+import com.dheeraj.learning.labwatcher.entity.ScenarioData;
+import com.dheeraj.learning.labwatcher.repository.ScenarioDataRepository;
+import com.dheeraj.learning.labwatcher.util.DataUtil;
 import com.dheeraj.learning.labwatcher.util.DegradationIdentificationUtil;
 import com.dheeraj.learning.labwatcher.util.FormatUtil;
+import com.dheeraj.learning.labwatcher.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,26 +21,37 @@ public class SchedulerService {
 
     private static String START_DATE = "2018-11-14";
     private static String END_DATE = "2018-11-23";
-    private static String TEST_BUILD = "PRPC-HEAD-6577";
     private static String SCENARIO_NAME = "CCCASE";
     private static String PRPC_VERSION = "8.2.0";
 
     @Autowired
     private PerfStatService perfStatService;
 
+    @Autowired
+    private ScenarioDataRepository scenarioDataRepository;
+
+    public void testSaveMethod() {
+        ScenarioData scenarioData = DataUtil.getScenarioData();
+        scenarioDataRepository.save(scenarioData);
+    }
+
+    public void saveScenarioData(ScenarioData scenarioData){
+        scenarioDataRepository.save(scenarioData);
+    }
+
     public void analyseRangeOfData() {
         List<String> scenariosList = new ArrayList<>();
         populateScenariosList(scenariosList);
 
-        List<String> paramList = populateParamsList();
+        List<String> paramList = populateParamsList("totalreqtime", "rdbiocount");
 
         List<String> validBuildLabels = perfStatService.getValidBuildLabels(SCENARIO_NAME, PRPC_VERSION, START_DATE, END_DATE);
         System.out.println(validBuildLabels);
 
         for (String buildLabel :
                 validBuildLabels) {
-            ScenarioData scenarioData = callAScenario("CCCASE", paramList, PRPC_VERSION, buildLabel);
-            System.out.println("BuildLabel : "+ buildLabel + ", isDegraded : " + scenarioData.getMap().get("totalreqtime").isDegraded());
+            ScenarioDataDTO scenarioDataDTO = callAScenario("CCCASE", paramList, PRPC_VERSION, buildLabel);
+            System.out.println("BuildLabel : "+ buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
         }
     }
 
@@ -44,28 +59,28 @@ public class SchedulerService {
         String specificBuild = "PRPC-HEAD-6577";
         List<String> paramList = populateParamsList();
 
-        ScenarioData scenarioData = callAScenario("CCCASE", paramList, PRPC_VERSION, specificBuild);
-        System.out.println("BuildLabel : "+ specificBuild + ", isDegraded : " + scenarioData.getMap().get("totalreqtime").isDegraded());
+        ScenarioDataDTO scenarioDataDTO = callAScenario("CCCASE", paramList, PRPC_VERSION, specificBuild);
+        System.out.println("BuildLabel : "+ specificBuild + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
 
-        System.out.println(FormatUtil.convertToJSON(scenarioData));
+        System.out.println(FormatUtil.convertToJSON(scenarioDataDTO));
     }
 
-    public ScenarioData analyseAParticularBuild(String scenarioName, String testBuildLabel, String prpcVersion, String params) {
+    public ScenarioDataDTO analyseAParticularBuild(String scenarioName, String testBuildLabel, String prpcVersion, String params) {
         List<String> paramList = populateParamsList(params);
 
-        ScenarioData scenarioData = callAScenario(scenarioName, paramList, prpcVersion, testBuildLabel);
-        System.out.println("BuildLabel : "+ testBuildLabel + ", isDegraded : " + scenarioData.getMap().get("totalreqtime").isDegraded());
+        ScenarioDataDTO scenarioDataDTO = callAScenario(scenarioName, paramList, prpcVersion, testBuildLabel);
+        System.out.println("BuildLabel : "+ testBuildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
 
-        return scenarioData;
+        return scenarioDataDTO;
     }
 
     public String analyseAParticularBuildReturnString(String scenarioName, String testBuildLabel, String prpcVersion, String params) {
         List<String> paramList = populateParamsList(params);
 
-        ScenarioData scenarioData = callAScenario(scenarioName, paramList, prpcVersion, testBuildLabel);
-        System.out.println("BuildLabel : "+ testBuildLabel + ", isDegraded : " + scenarioData.getMap().get("totalreqtime").isDegraded());
+        ScenarioDataDTO scenarioDataDTO = callAScenario(scenarioName, paramList, prpcVersion, testBuildLabel);
+        System.out.println("BuildLabel : "+ testBuildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
 
-        String jsonString = FormatUtil.convertToJSON(scenarioData);
+        String jsonString = FormatUtil.convertToJSON(scenarioDataDTO);
 
         return jsonString;
     }
@@ -80,10 +95,10 @@ public class SchedulerService {
      * @param testBuild The build for which degradation analysis to be done.
      * @return This an object which contains all the degradation details.
      */
-    public ScenarioData callAScenario(String scenarioName, List<String> paramList, String prpcVersion, String testBuild) {
-        ScenarioData scenarioData = new ScenarioData();
-        scenarioData.setTestname(scenarioName);
-        scenarioData.setLatestbuild(testBuild);
+    public ScenarioDataDTO callAScenario(String scenarioName, List<String> paramList, String prpcVersion, String testBuild) {
+        ScenarioDataDTO scenarioDataDTO = new ScenarioDataDTO();
+        scenarioDataDTO.setTestname(scenarioName);
+        scenarioDataDTO.setLatestbuild(testBuild);
 
         //Bullet points
             //If the degradation continues for 5(This can be varied based on the scenario and parameter) builds, we dont need manual intervention to consider it as degraded.
@@ -99,8 +114,9 @@ public class SchedulerService {
                 //Say last degraded at build A with rank 2, then take mean of build A + (A+1) and current build and then verify if the value is beyond std. If yes, increase accuracy of the earlier degradation.
                     //If no, mark the deviation at build A as outlier and consider current build as valid build.
 
+
         List<PerfStatDTO> resultDTOs = perfStatService.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, testBuild, 50, true);
-        Map<String, ParamData> tempMap = DegradationIdentificationUtil.getStandardDeviation(resultDTOs, paramList);
+        Map<String, ParamDataDTO> tempMap = DegradationIdentificationUtil.getStandardDeviation(resultDTOs, paramList);
 
         PerfStatDTO perfStatDTO = perfStatService.getPerfStatForAGivenBuild(scenarioName, testBuild);
 
@@ -108,11 +124,15 @@ public class SchedulerService {
             DegradationIdentificationUtil.isDegraded(tempMap, param, perfStatDTO.getDouble(param));
         }
 
-        scenarioData.setMap(tempMap);
+        scenarioDataDTO.setMap(tempMap);
+
+        //Persist analysis to database
+        ScenarioData scenarioData = Mapper.convert(scenarioDataDTO);
+        saveScenarioData(scenarioData);
 
         //Map this scenario data into an entity and then save it to database.
 
-        return scenarioData;
+        return scenarioDataDTO;
     }
 
     public String getLastDegradedBuild() {
@@ -255,5 +275,20 @@ public class SchedulerService {
             list.add(params);
             return list;
         }
+    }
+
+    /**
+     * This is an utility method to construct list of parameters to be tested.
+     *
+     * @param params
+     * @return
+     */
+    public List<String> populateParamsList(String... params) {
+        List<String> list = new ArrayList<>();
+        for (String param : params
+             ) {
+            list.add(param);
+        }
+        return list;
     }
 }

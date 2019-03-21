@@ -9,6 +9,8 @@ import com.dheeraj.learning.labwatcher.util.DataUtil;
 import com.dheeraj.learning.labwatcher.util.DegradationIdentificationUtil;
 import com.dheeraj.learning.labwatcher.util.FormatUtil;
 import com.dheeraj.learning.labwatcher.util.Mapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,8 @@ import java.util.Map;
 
 @Service
 public class SchedulerService {
+
+    Logger logger = LoggerFactory.getLogger(SchedulerService.class);
 
     private static String START_DATE = "2018-11-14";
     private static String END_DATE = "2018-11-23";
@@ -41,6 +45,11 @@ public class SchedulerService {
 
     public void testMethod() {
         System.out.println("spring testing is working");
+        logger.trace("A TRACE Message");
+        logger.debug("A DEBUG Message");
+        logger.info("An INFO Message");
+        logger.warn("A WARN Message");
+        logger.error("An ERROR Message");
     }
 
     public void analyseRangeOfData() {

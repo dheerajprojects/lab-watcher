@@ -45,7 +45,8 @@ public class PerfStatDAO {
                 "order by teststart desc";
 
         Query query = em.createQuery(sql);
-        query.setMaxResults(maxResults);
+        // TODO : Verify here if the results size is  <= rank.
+        // query.setMaxResults(maxResults);
         List<PerfStat> list = query.getResultList();
         return list;
     }

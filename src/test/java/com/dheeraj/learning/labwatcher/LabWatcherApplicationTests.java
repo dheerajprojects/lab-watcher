@@ -24,8 +24,6 @@ public class LabWatcherApplicationTests {
     @Test
     public void contextLoads() {
         //System.out.println(perfStatDAO.getVariedBuildRankDetails("CCCASE", "totalreqtime", "PRPC-HEAD-6578"));
-        schedulerService.testMethod();
+        schedulerService.analyseAScenarioMultipleBuildsHardCoded();
     }
-
-
 }

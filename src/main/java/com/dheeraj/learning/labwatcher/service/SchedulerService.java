@@ -1,289 +1,114 @@
 package com.dheeraj.learning.labwatcher.service;
 
-import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
-import com.dheeraj.learning.labwatcher.dto.PerfStatDTO;
 import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
-import com.dheeraj.learning.labwatcher.entity.ScenarioData;
-import com.dheeraj.learning.labwatcher.repository.ScenarioDataRepository;
 import com.dheeraj.learning.labwatcher.util.DataUtil;
-import com.dheeraj.learning.labwatcher.util.DegradationIdentificationUtil;
 import com.dheeraj.learning.labwatcher.util.FormatUtil;
-import com.dheeraj.learning.labwatcher.util.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * This just mimics invocation of PerfStatService from a cron job.
+ *
+ * Methods plan
+ * 1.analyseAScenarioLatestBuild
+ * 2.analyseAScenarioMultipleBuilds
+ *
+ *
+ * Later
+ * 1.analyseMultipleScenarios
+ */
 @Service
 public class SchedulerService {
 
     Logger logger = LoggerFactory.getLogger(SchedulerService.class);
 
-    private static String START_DATE = "2018-11-14";
-    private static String END_DATE = "2018-11-23";
-    private static String SCENARIO_NAME = "CCCASE";
-    private static String PRPC_VERSION = "8.2.0";
-
     @Autowired
     private PerfStatService perfStatService;
 
-    @Autowired
-    private ScenarioDataRepository scenarioDataRepository;
+    /**
+     * This method is analyses the latest build of a scenario with the last n builds
+     * and identifies if the latest build is degraded or not.
+     */
+    public void analyseAScenarioLatestBuild() {
+        String scenarioName = "CCCASE";
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime");
+        String prpcVersion = "8.2.0";
+        String currentBuildLabel = "PRPC-HEAD-6657";
 
-    public void testSaveMethod() {
-        ScenarioData scenarioData = DataUtil.getScenarioData();
-        scenarioDataRepository.save(scenarioData);
+        perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel);
     }
 
-    public void saveScenarioData(ScenarioData scenarioData) {
-        scenarioDataRepository.save(scenarioData);
-    }
+    /**
+     * This method analyses degradations occurred in a scenario between the given dates.
+     */
+    public void analyseAScenarioMultipleBuilds() {
+        String scenarioName = "CCCASE";
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime");
+        String prpcVersion = "8.2.0";
+        String startDate = "2018-11-14";
+        String endDate = "2018-11-23";
+        List<String> validBuildLabels = perfStatService.getValidBuildLabelsBetweenGivenDates(scenarioName, prpcVersion, startDate, endDate);
 
-    public void testMethod() {
-        System.out.println("spring testing is working");
-        logger.trace("A TRACE Message");
-        logger.debug("A DEBUG Message");
-        logger.info("An INFO Message");
-        logger.warn("A WARN Message");
-        logger.error("An ERROR Message");
-    }
-
-    public void analyseRangeOfData() {
-        /*List<String> scenariosList = new ArrayList<>();
-        populateScenariosList(scenariosList);
-*/
-        List<String> paramList = populateParamsList("totalreqtime");
-
-        //List<String> validBuildLabels = perfStatService.getValidBuildLabels(SCENARIO_NAME, PRPC_VERSION, START_DATE, END_DATE);
-        //System.out.println(validBuildLabels);
-        List<String> validBuildLabels = new ArrayList<>();
-        validBuildLabels.add("PRPC-HEAD-6577");
-        validBuildLabels.add("PRPC-HEAD-6578");
-        validBuildLabels.add("PRPC-HEAD-6580");
-        validBuildLabels.add("PRPC-HEAD-6583");
-        validBuildLabels.add("PRPC-HEAD-6585");
-        validBuildLabels.add("PRPC-HEAD-6586");
-
-        for (String buildLabel :
-                validBuildLabels) {
-            ScenarioDataDTO scenarioDataDTO = callAScenario("CCCASE", paramList, PRPC_VERSION, buildLabel);
-            System.out.println("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
+        for (String buildLabel : validBuildLabels) {
+            ScenarioDataDTO scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, buildLabel);
+            logger.debug("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
         }
     }
 
-    public void analyseAParticularBuild(String buildLabel) {
-        List<String> paramList = populateParamsList("totalreqtime");
+    /**
+     * This method analyses degradations occurred in a scenario between the given dates.
+     */
+    public void analyseAScenarioMultipleBuildsHardCoded() {
+        String scenarioName = "CCCASE";
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime");
+        String prpcVersion = "8.2.0";
+        List<String> validBuildLabels = DataUtil.buildArrayList("PRPC-HEAD-6575,PRPC-HEAD-6577,PRPC-HEAD-6578,PRPC-HEAD-6580,PRPC-HEAD-6583,PRPC-HEAD-6585,PRPC-HEAD-6586,PRPC-HEAD-6587");
 
-        ScenarioDataDTO scenarioDataDTO = callAScenario("CCCASE", paramList, PRPC_VERSION, buildLabel);
-        System.out.println("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
-
-        System.out.println(FormatUtil.convertToJSON(scenarioDataDTO));
+        for (String buildLabel : validBuildLabels) {
+            ScenarioDataDTO scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, buildLabel);
+            logger.debug("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
+        }
     }
 
-    public ScenarioDataDTO analyseAParticularBuild(String scenarioName, String testBuildLabel, String prpcVersion, String params) {
-        List<String> paramList = populateParamsList(params);
+    /**
+     * This method is meant for invoking as a rest service from browser.
+     * @param scenarioName
+     * @param currentBuildLabel
+     * @param prpcVersion
+     * @param param
+     * @return
+     */
+    public ScenarioDataDTO analyseAScenarioLatestBuild(String scenarioName, String currentBuildLabel, String prpcVersion, String param) {
+        List<String> paramList = DataUtil.populateGivenParamsList(param);
 
-        ScenarioDataDTO scenarioDataDTO = callAScenario(scenarioName, paramList, prpcVersion, testBuildLabel);
-        System.out.println("BuildLabel : " + testBuildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
+        ScenarioDataDTO scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel);
+        logger.debug(scenarioDataDTO.toString());
 
         return scenarioDataDTO;
     }
 
-    public String analyseAParticularBuildReturnString(String scenarioName, String testBuildLabel, String prpcVersion, String params) {
-        List<String> paramList = populateParamsList(params);
-
-        ScenarioDataDTO scenarioDataDTO = callAScenario(scenarioName, paramList, prpcVersion, testBuildLabel);
-        System.out.println("BuildLabel : " + testBuildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
+    /**
+     * This is meant for printing the analysis logic in json format.
+     * @param scenarioName
+     * @param testBuildLabel
+     * @param prpcVersion
+     * @param param
+     * @return
+     */
+    public String analyseAParticularBuildReturnString(String scenarioName, String testBuildLabel, String prpcVersion, String param) {
+        ScenarioDataDTO scenarioDataDTO = analyseAScenarioLatestBuild(scenarioName, testBuildLabel, prpcVersion, param);
 
         String jsonString = FormatUtil.convertToJSON(scenarioDataDTO);
+        logger.debug(jsonString);
 
         return jsonString;
     }
 
-    /**
-     * This method analyzes last n (maxResults #50 for now) perfstats(previous to the #testBuild} and calculates mean and standard deviation for the given parameters.
-     * Then it calculates if the #testBuild metrics are degraded based on how far they are from standard deviation.
-     *
-     * @param scenarioName Scenario to be tested.
-     * @param paramList    Parameters to be tested.
-     * @param prpcVersion  Prpcversion of the testing builds.
-     * @param testBuild    The build for which degradation analysis to be done.
-     * @return This an object which contains all the degradation details.
-     */
-    public ScenarioDataDTO callAScenario(String scenarioName, List<String> paramList, String prpcVersion, String testBuild) {
-        ScenarioDataDTO scenarioDataDTO = new ScenarioDataDTO();
-        scenarioDataDTO.setTestname(scenarioName);
-        scenarioDataDTO.setLatestbuild(testBuild);
-
-        Map<String, ParamDataDTO> currentBuildParamMap = perfStatService.analyseData(scenarioName, paramList, prpcVersion, testBuild);
-
-        scenarioDataDTO.setMap(currentBuildParamMap);
-
-        //Persist analysis to database
-        ScenarioData scenarioData = Mapper.convert(scenarioDataDTO);
 
 
-        saveScenarioData(scenarioData);
 
-        //Map this scenario data into an entity and then save it to database.
-
-        return scenarioDataDTO;
-    }
-
-    public void populateScenariosList(List<String> list) {
-        list.add("SimpleSurvey");
-
-        /*list.add("SimpleSurvey");
-        list.add("CCCASE");
-        list.add("ChaseMidas");
-        list.add("Mortgage");
-        list.add("CallCenterJUnit");
-        list.add("DataEngineJUnit");
-        list.add("DevPerfJUnit");
-        list.add("Integration");
-        list.add("ISBANK");
-        list.add("MultiChannel");
-        list.add("Offline");
-        list.add("RBS");
-        /*list.add("PerfClip");*/
-    }
-
-    public List<String> populateParamsList() {
-        /*list.add("totalreqtime");
-        list.add("rdbiocount");
-        list.add("commitcount");*/
-        List<String> list = new ArrayList<>();
-
-        list.add("activationdatatimeelapsed");
-        list.add("activitycount");
-        list.add("alertcount");
-        list.add("buildnumber");
-        list.add("commitcount");
-        list.add("commitelapsed");
-        list.add("commitrowcount");
-        list.add("connectcount");
-        list.add("connectelapsed");
-        list.add("dbopexceedingthresholdcount");
-        list.add("declarativerulereadcount");
-        list.add("declarativerulesinvokedcount");
-        list.add("declarativerulesinvokedcpu");
-        list.add("declarativeruleslookupcount");
-        list.add("declarativeruleslookupcpu");
-        list.add("declexprctxfreeusecount");
-        list.add("declntwksbuildconstcpu");
-        list.add("declntwksbuildconstelapsed");
-        list.add("declntwksbuildhlcpu");
-        list.add("declntwksbuildhlelap");
-        list.add("declrulesinvokedelapsed");
-        list.add("declruleslookupelapsed");
-        list.add("errorcount");
-        list.add("flowcount");
-        list.add("gcmaxduration");
-        list.add("gcmaxgarbage");
-        list.add("gcmaxpostcollection");
-        list.add("gcmaxprecollection");
-        list.add("gctotalduration");
-        list.add("gctotalevents");
-        list.add("gctotalgarbage");
-        list.add("gctotalmajor");
-        list.add("gctotalminor");
-        list.add("gctotalother");
-        list.add("gctotalpostcollection");
-        list.add("gctotalprecollection");
-        list.add("indexcount");
-        list.add("infergeneratedjavacount");
-        list.add("infergeneratedjavacountcpu");
-        list.add("infergeneratedjavacpu");
-        list.add("infergeneratedjavaelapsed");
-        list.add("infergeneratedjavahlelapsed");
-        list.add("interactions");
-        list.add("javaassemblecount");
-        list.add("javaassemblecpu");
-        list.add("javaassembleelapsed");
-        list.add("javaassemblehlelapsed");
-        list.add("javacompilecount");
-        list.add("javacompilecpu");
-        list.add("javacompileelapsed");
-        list.add("javageneratecount");
-        list.add("javageneratecpu");
-        list.add("javagenerateelapsed");
-        list.add("javasyntaxcpu");
-        list.add("legacyruleapiusedcount");
-        list.add("listrowwithunfilteredstrmcnt");
-        list.add("listwithunfilteredstrmcnt");
-        list.add("loadedclasscount");
-        list.add("lookuplistdbfetches");
-        list.add("otherbrowsecpu");
-        list.add("otherbrowseelapsed");
-        list.add("othercount");
-        list.add("otherfromcachecount");
-        list.add("otheriocount");
-        list.add("otheriocpu");
-        list.add("otherioelapsed");
-        list.add("parserulecount");
-        list.add("peakthreadcount");
-        list.add("proceduralrulereadcount");
-        list.add("processcpu");
-        list.add("rdbiocount");
-        list.add("rdbioelapsed");
-        list.add("rdbrowwithoutstreamcount");
-        list.add("rdbwithoutstreamcount");
-        list.add("rulebrowsecpu");
-        list.add("rulebrowseelapsed");
-        list.add("rulecount");
-        list.add("rulecpu");
-        list.add("rulefromcachecount");
-        list.add("ruleioelapsed");
-        list.add("rulesexecuted");
-        list.add("ruleused");
-        list.add("runmodelcount");
-        list.add("runotherrulecount");
-        list.add("runstreamcount");
-        list.add("runwhencount");
-        list.add("testelapsedminutes");
-        list.add("threadcount");
-        list.add("totalloadedclasscount");
-        list.add("totalreqcpu");
-        list.add("totalreqtime");
-        list.add("totalstartedthreadcount");
-        list.add("unloadedclasscount");
-        list.add("wallseconds");
-
-        return list;
-    }
-
-    /**
-     * This is an utility method to construct list of parameters to be tested.
-     *
-     * @param params
-     * @return
-     */
-    public List<String> populateParamsList(String params) {
-        if ("ALL".equalsIgnoreCase(params))
-            return populateParamsList();
-        else {
-            List<String> list = new ArrayList<>();
-            list.add(params);
-            return list;
-        }
-    }
-
-    /**
-     * This is an utility method to construct list of parameters to be tested.
-     *
-     * @param params
-     * @return
-     */
-    public List<String> populateParamsList(String... params) {
-        List<String> list = new ArrayList<>();
-        for (String param : params
-        ) {
-            list.add(param);
-        }
-        return list;
-    }
 }

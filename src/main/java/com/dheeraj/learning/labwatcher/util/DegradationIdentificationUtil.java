@@ -2,6 +2,7 @@ package com.dheeraj.learning.labwatcher.util;
 
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.PerfStatDTO;
+import com.dheeraj.learning.labwatcher.entity.ParamData;
 import com.dheeraj.learning.labwatcher.entity.PerfStat;
 
 import java.util.HashMap;
@@ -239,5 +240,16 @@ public class DegradationIdentificationUtil {
         paramDataDTO.setStandardDeviation(standardDeviation);
 
         return standardDeviation;
+    }
+
+    public static boolean isAnyParamVaried(Map<String, ParamDataDTO> paramDataDTOMap) {
+        boolean varied=false;
+        for (ParamDataDTO paramDataDTO : paramDataDTOMap.values()) {
+            if (paramDataDTO.isImproved() || paramDataDTO.isDegraded()) {
+                varied = true;
+                break;
+            }
+        }
+        return varied;
     }
 }

@@ -14,7 +14,7 @@ public class LabWatcherController {
     @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{testBuild}/{param}")
     public ScenarioDataDTO analyseAParticularBuild(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
                                                    @PathVariable("testBuild") String testBuild, @PathVariable("param") String param){
-        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAParticularBuild(scenarioName, testBuild, prpcversion, param);
+        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, testBuild, prpcversion, param);
         return scenarioDataDTO;
     }
 

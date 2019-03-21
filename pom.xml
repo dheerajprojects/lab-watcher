@@ -11,7 +11,7 @@
     <groupId>com.dheeraj.learning</groupId>
     <artifactId>lab-watcher</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>lab-watcher</name>
+    <paramName>lab-watcher</paramName>
     <description>Project to identify degradation in performance lab</description>
 
     <properties>

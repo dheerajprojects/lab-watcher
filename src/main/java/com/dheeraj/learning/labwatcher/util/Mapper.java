@@ -23,12 +23,13 @@ public class Mapper {
         return resultDTOs;
     }
 
-    public static List<ParamData> copyResultsToDTO(Collection<ParamDataDTO> results) {
+    public static List<ParamData> copyResultsToEntity(Collection<ParamDataDTO> results, ScenarioData scenarioData) {
         List<ParamData> paramsData = new ArrayList<>();
 
         for (Object dto : results) {
             ParamData paramData = new ParamData();
             BeanUtils.copyProperties(dto, paramData);
+            paramData.setScenarioData(scenarioData);
             paramsData.add(paramData);
         }
 
@@ -38,15 +39,25 @@ public class Mapper {
     public static ScenarioData convert(ScenarioDataDTO scenarioDataDTO) {
         ScenarioData scenarioData = new ScenarioData();
         scenarioData.setTestname(scenarioDataDTO.getTestname());
-        scenarioData.setLatestbuild(scenarioDataDTO.getLatestbuild());
+        scenarioData.setBuildLabel(scenarioDataDTO.getLatestbuild());
 
         Set<ParamData> set = new HashSet<>();
-        set.addAll(copyResultsToDTO(scenarioDataDTO.getMap().values()));
+        set.addAll(copyResultsToEntity(scenarioDataDTO.getMap().values(), scenarioData));
 
         scenarioData.setSet(set);
 
         return scenarioData;
     }
 
+    public static ParamDataDTO convert(ParamData paramData) {
+        ParamDataDTO paramDataDTO = new ParamDataDTO();
+
+        BeanUtils.copyProperties(paramData, paramDataDTO);
+
+        paramDataDTO.setScenarioName(paramData.getScenarioData().getTestname());
+        paramDataDTO.setBuildLabel(paramData.getScenarioData().getBuildLabel());
+
+        return paramDataDTO;
+    }
 
 }

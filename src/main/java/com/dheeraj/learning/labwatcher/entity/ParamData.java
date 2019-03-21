@@ -8,22 +8,27 @@ public class ParamData {
     @Id
     @GeneratedValue
     int paramId;
-    String name;
+    String paramName;
     Double mean;
     Double standardDeviation;
-    Double latestBuildValue;
+    Double paramValue;
     Double noOfValidRecords = 0.0;
-    Double degradationPercentage = 0.0;
+    Double variedBy = 0.0;
+    int variedBuildRank;
     boolean isDegraded;
+    boolean isImproved;
+    Double accuracy;
+    @ManyToOne(cascade = CascadeType.ALL)
+    ScenarioData scenarioData;
 
     public ParamData() {
     }
 
-    public ParamData(String name) {
-        this.name = name;
+    public ParamData(String paramName) {
+        this.paramName = paramName;
     }
 
-    public int getId() {
+    public int getParamId() {
         return paramId;
     }
 
@@ -31,12 +36,12 @@ public class ParamData {
         this.paramId = paramId;
     }
 
-    public String getName() {
-        return name;
+    public String getParamName() {
+        return paramName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setParamName(String paramName) {
+        this.paramName = paramName;
     }
 
     public Double getMean() {
@@ -55,12 +60,12 @@ public class ParamData {
         this.standardDeviation = standardDeviation;
     }
 
-    public Double getLatestBuildValue() {
-        return latestBuildValue;
+    public Double getParamValue() {
+        return paramValue;
     }
 
-    public void setLatestBuildValue(Double latestBuildValue) {
-        this.latestBuildValue = latestBuildValue;
+    public void setParamValue(Double paramValue) {
+        this.paramValue = paramValue;
     }
 
     public Double getNoOfValidRecords() {
@@ -71,12 +76,20 @@ public class ParamData {
         this.noOfValidRecords = noOfValidRecords;
     }
 
-    public Double getDegradationPercentage() {
-        return degradationPercentage;
+    public Double getVariedBy() {
+        return variedBy;
     }
 
-    public void setDegradationPercentage(Double degradationPercentage) {
-        this.degradationPercentage = degradationPercentage;
+    public void setVariedBy(Double variedBy) {
+        this.variedBy = variedBy;
+    }
+
+    public int getVariedBuildRank() {
+        return variedBuildRank;
+    }
+
+    public void setVariedBuildRank(int variedBuildRank) {
+        this.variedBuildRank = variedBuildRank;
     }
 
     public boolean isDegraded() {
@@ -87,17 +100,46 @@ public class ParamData {
         isDegraded = degraded;
     }
 
-    @Override
-    public String toString() {
-        return "ParamDataDTO{" +
-                "\n\t\tname='" + name + '\'' + "," +
-                "\n\t\tmean=" + mean + "," +
-                "\n\t\tstandardDeviation=" + standardDeviation + "," +
-                "\n\t\tlatestBuildValue=" + latestBuildValue + "," +
-                "\n\t\tnoOfValidRecords=" + noOfValidRecords + "," +
-                "\n\t\tdegradationPercentage=" + degradationPercentage + "," +
-                "\n\t" + '}';
+    public boolean isImproved() {
+        return isImproved;
     }
 
+    public void setImproved(boolean improved) {
+        isImproved = improved;
+    }
 
+    public Double getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(Double accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    public ScenarioData getScenarioData() {
+        return scenarioData;
+    }
+
+    public void setScenarioData(ScenarioData scenarioData) {
+        this.scenarioData = scenarioData;
+    }
+
+    @Override
+    public String toString() {
+        return "ParamData{" +
+                "paramId=" + paramId +
+                ", paramName='" + paramName + '\'' +
+                ", mean=" + mean +
+                ", standardDeviation=" + standardDeviation +
+                ", paramValue=" + paramValue +
+                ", noOfValidRecords=" + noOfValidRecords +
+                ", variedBy=" + variedBy +
+                ", variedBuildRank=" + variedBuildRank +
+                ", isDegraded=" + isDegraded +
+                ", isImproved=" + isImproved +
+                ", accuracy=" + accuracy +
+                ", buildLabel=" + scenarioData.getBuildLabel() +
+                ", testname="+ scenarioData.getTestname() +
+                '}';
+    }
 }

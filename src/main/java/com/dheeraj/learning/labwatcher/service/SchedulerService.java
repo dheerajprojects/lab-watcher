@@ -35,32 +35,42 @@ public class SchedulerService {
         scenarioDataRepository.save(scenarioData);
     }
 
-    public void saveScenarioData(ScenarioData scenarioData){
+    public void saveScenarioData(ScenarioData scenarioData) {
         scenarioDataRepository.save(scenarioData);
     }
 
+    public void testMethod() {
+        System.out.println("spring testing is working");
+    }
+
     public void analyseRangeOfData() {
-        List<String> scenariosList = new ArrayList<>();
+        /*List<String> scenariosList = new ArrayList<>();
         populateScenariosList(scenariosList);
+*/
+        List<String> paramList = populateParamsList("totalreqtime");
 
-        List<String> paramList = populateParamsList("totalreqtime", "rdbiocount");
-
-        List<String> validBuildLabels = perfStatService.getValidBuildLabels(SCENARIO_NAME, PRPC_VERSION, START_DATE, END_DATE);
-        System.out.println(validBuildLabels);
+        //List<String> validBuildLabels = perfStatService.getValidBuildLabels(SCENARIO_NAME, PRPC_VERSION, START_DATE, END_DATE);
+        //System.out.println(validBuildLabels);
+        List<String> validBuildLabels = new ArrayList<>();
+        validBuildLabels.add("PRPC-HEAD-6577");
+        validBuildLabels.add("PRPC-HEAD-6578");
+        validBuildLabels.add("PRPC-HEAD-6580");
+        validBuildLabels.add("PRPC-HEAD-6583");
+        validBuildLabels.add("PRPC-HEAD-6585");
+        validBuildLabels.add("PRPC-HEAD-6586");
 
         for (String buildLabel :
                 validBuildLabels) {
             ScenarioDataDTO scenarioDataDTO = callAScenario("CCCASE", paramList, PRPC_VERSION, buildLabel);
-            System.out.println("BuildLabel : "+ buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
+            System.out.println("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
         }
     }
 
-    public void analyseAParticularBuild() {
-        String specificBuild = "PRPC-HEAD-6577";
-        List<String> paramList = populateParamsList();
+    public void analyseAParticularBuild(String buildLabel) {
+        List<String> paramList = populateParamsList("totalreqtime");
 
-        ScenarioDataDTO scenarioDataDTO = callAScenario("CCCASE", paramList, PRPC_VERSION, specificBuild);
-        System.out.println("BuildLabel : "+ specificBuild + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
+        ScenarioDataDTO scenarioDataDTO = callAScenario("CCCASE", paramList, PRPC_VERSION, buildLabel);
+        System.out.println("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
 
         System.out.println(FormatUtil.convertToJSON(scenarioDataDTO));
     }
@@ -69,7 +79,7 @@ public class SchedulerService {
         List<String> paramList = populateParamsList(params);
 
         ScenarioDataDTO scenarioDataDTO = callAScenario(scenarioName, paramList, prpcVersion, testBuildLabel);
-        System.out.println("BuildLabel : "+ testBuildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
+        System.out.println("BuildLabel : " + testBuildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
 
         return scenarioDataDTO;
     }
@@ -78,7 +88,7 @@ public class SchedulerService {
         List<String> paramList = populateParamsList(params);
 
         ScenarioDataDTO scenarioDataDTO = callAScenario(scenarioName, paramList, prpcVersion, testBuildLabel);
-        System.out.println("BuildLabel : "+ testBuildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
+        System.out.println("BuildLabel : " + testBuildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
 
         String jsonString = FormatUtil.convertToJSON(scenarioDataDTO);
 
@@ -90,9 +100,9 @@ public class SchedulerService {
      * Then it calculates if the #testBuild metrics are degraded based on how far they are from standard deviation.
      *
      * @param scenarioName Scenario to be tested.
-     * @param paramList Parameters to be tested.
-     * @param prpcVersion Prpcversion of the testing builds.
-     * @param testBuild The build for which degradation analysis to be done.
+     * @param paramList    Parameters to be tested.
+     * @param prpcVersion  Prpcversion of the testing builds.
+     * @param testBuild    The build for which degradation analysis to be done.
      * @return This an object which contains all the degradation details.
      */
     public ScenarioDataDTO callAScenario(String scenarioName, List<String> paramList, String prpcVersion, String testBuild) {
@@ -100,43 +110,19 @@ public class SchedulerService {
         scenarioDataDTO.setTestname(scenarioName);
         scenarioDataDTO.setLatestbuild(testBuild);
 
-        //Bullet points
-            //If the degradation continues for 5(This can be varied based on the scenario and parameter) builds, we dont need manual intervention to consider it as degraded.
-        //Get number of builds after last degradation/improvement
-        //Query table2 and get the last build having degradation for the given metric and get its rank (#the position in the last 100 builds).
-            //If the rank is less than 5, then do X
-            //If the rank is between 5 and n, then do Y
-            //If the rank is beyond n, then just do the existing logic.
+        Map<String, ParamDataDTO> currentBuildParamMap = perfStatService.analyseData(scenarioName, paramList, prpcVersion, testBuild);
 
-            //**X = Update the accuracy of the previous build according to the current result.
-                //Say last degraded at build A with rank 1, then take mean of build A+Current build and then verify if the value is beyond std. If yes, increase accuracy of the earlier degradation.
-                    //If no, mark the deviation at build A as outlier and consider current build as valid build.
-                //Say last degraded at build A with rank 2, then take mean of build A + (A+1) and current build and then verify if the value is beyond std. If yes, increase accuracy of the earlier degradation.
-                    //If no, mark the deviation at build A as outlier and consider current build as valid build.
-
-
-        List<PerfStatDTO> resultDTOs = perfStatService.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, testBuild, 50, true);
-        Map<String, ParamDataDTO> tempMap = DegradationIdentificationUtil.getStandardDeviation(resultDTOs, paramList);
-
-        PerfStatDTO perfStatDTO = perfStatService.getPerfStatForAGivenBuild(scenarioName, testBuild);
-
-        for (String param : paramList) {
-            DegradationIdentificationUtil.isDegraded(tempMap, param, perfStatDTO.getDouble(param));
-        }
-
-        scenarioDataDTO.setMap(tempMap);
+        scenarioDataDTO.setMap(currentBuildParamMap);
 
         //Persist analysis to database
         ScenarioData scenarioData = Mapper.convert(scenarioDataDTO);
+
+
         saveScenarioData(scenarioData);
 
         //Map this scenario data into an entity and then save it to database.
 
         return scenarioDataDTO;
-    }
-
-    public String getLastDegradedBuild() {
-        return "PRPC-HEAD-6814";
     }
 
     public void populateScenariosList(List<String> list) {
@@ -268,7 +254,7 @@ public class SchedulerService {
      * @return
      */
     public List<String> populateParamsList(String params) {
-        if("ALL".equalsIgnoreCase(params))
+        if ("ALL".equalsIgnoreCase(params))
             return populateParamsList();
         else {
             List<String> list = new ArrayList<>();
@@ -286,7 +272,7 @@ public class SchedulerService {
     public List<String> populateParamsList(String... params) {
         List<String> list = new ArrayList<>();
         for (String param : params
-             ) {
+        ) {
             list.add(param);
         }
         return list;

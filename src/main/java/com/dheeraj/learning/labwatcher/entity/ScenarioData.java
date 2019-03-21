@@ -3,7 +3,6 @@ package com.dheeraj.learning.labwatcher.entity;
 
 import javax.persistence.*;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -13,10 +12,9 @@ public class ScenarioData {
     @GeneratedValue
     int id;
     String testname;
-    String latestbuild;
+    String buildLabel;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "SCENARIO_PARAM", joinColumns = { @JoinColumn(name = "ID") }, inverseJoinColumns = { @JoinColumn(name = "PARAMID") })
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "scenarioData")
     private Set<ParamData> set;
 
     public int getId() {
@@ -35,20 +33,20 @@ public class ScenarioData {
         this.testname = testname;
     }
 
-    public String getLatestbuild() {
-        return latestbuild;
+    public String getBuildLabel() {
+        return buildLabel;
     }
 
-    public void setLatestbuild(String latestbuild) {
-        this.latestbuild = latestbuild;
+    public void setBuildLabel(String latestbuild) {
+        this.buildLabel = latestbuild;
     }
 
-    public void addParam(String paramName){
+    public void addParam(String paramName) {
         set.add(new ParamData(paramName));
     }
 
-    public void addParam(ParamData paramData){
-        if(set == null)
+    public void addParam(ParamData paramData) {
+        if (set == null)
             set = new HashSet<>();
         set.add(paramData);
     }
@@ -63,10 +61,11 @@ public class ScenarioData {
 
     @Override
     public String toString() {
-        return "ScenarioDataDTO{" +
-                "\n\ttestname='" + testname + '\'' + "," +
-                "\n\tlatestbuild='" + latestbuild + '\'' + "," +
-                "\n\tset=" + set + "," +
-                "\n" + '}';
+        return "ScenarioData{" +
+                "id=" + id +
+                ", testname='" + testname + '\'' +
+                ", buildLabel='" + buildLabel + '\'' +
+                ", set=" + set +
+                '}';
     }
 }

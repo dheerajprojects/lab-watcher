@@ -1,13 +1,17 @@
 package com.dheeraj.learning.labwatcher.dao;
 
+import com.dheeraj.learning.labwatcher.entity.ParamData;
 import com.dheeraj.learning.labwatcher.entity.PerfStat;
+import com.dheeraj.learning.labwatcher.repository.ParamDataRepository;
 import com.dheeraj.learning.labwatcher.repository.PerfStatsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.tags.Param;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -16,11 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@Transactional(readOnly=true)
+@Transactional
 public class PerfStatDAO {
 
     @PersistenceContext
     EntityManager em;
+
+    @Autowired
+    ParamDataRepository paramDataRepository;
 
     public List<PerfStat> getPerfStatsBetweenBuilds(String scenarioName, String prpcVersion, String startBuildLabel, String endBuildLabel, int maxResults) {
         String sql2 = "select s " +
@@ -28,10 +35,10 @@ public class PerfStatDAO {
                 "where s.studentName = :studentName ";
 
         String sql = "FROM PerfStat " +
-        "where trialtype='Performance' " +
+                "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and testname='" + scenarioName + "' " +
-                "and prpcversion='" + prpcVersion+ "' " +
+                "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true'" +
                 "and buildlabel >= '" + startBuildLabel + "' " +
                 "and buildlabel <= '" + endBuildLabel + "' " +
@@ -71,11 +78,11 @@ public class PerfStatDAO {
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and testname='" + scenarioName + "' " +
-                "and prpcversion='" + prpcVersion+ "' " +
+                "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true'" +
                 "and buildlabel < '" + endBuildLabel + "' ";
 
-        if(isHead)
+        if (isHead)
             sql += "and buildinfo like '%HEAD%' ";
 
         sql += "order by teststart desc";
@@ -91,7 +98,7 @@ public class PerfStatDAO {
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and testname='" + scenarioName + "' " +
-                "and prpcversion='" + prpcVersion+ "' " +
+                "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true'" +
                 "and teststart > '" + startDate + "' " +
                 "and teststart < '" + endDate + "' " +
@@ -106,5 +113,55 @@ public class PerfStatDAO {
         }
 
         return buildLabels;
+    }
+
+    /**
+     * Find an efficent way for this later.
+     * ========================
+     *
+     * @param scenarioName
+     * @param param
+     * @param currentBuildLabel
+     */
+    public ParamData getVariedBuildRankDetails(String scenarioName, String param, String currentBuildLabel) {
+        String sql = "FROM ParamData pd " +
+                "where pd.scenarioData.testname='" + scenarioName + "' " +
+                "and pd.paramName = '" + param + "' " +
+                "and pd.scenarioData.buildLabel < '" + currentBuildLabel + "' " +
+                "order by pd.scenarioData.buildLabel desc";
+        Query query = em.createQuery(sql);
+        List<ParamData> list = query.getResultList();
+        int counter = 1;
+        ParamData temp = null;
+        for (ParamData paramData : list) {
+            if (paramData.isDegraded() || paramData.isImproved()) {
+                paramData.setVariedBuildRank(counter);
+                temp = paramData;
+                break;
+            } else
+                counter++;
+        }
+
+        return temp;
+    }
+
+    public ParamData getParamDataForAGivenBuild(String scenarioName, String paramName, String currentBuildLabel) {
+        String sql = "FROM ParamData pd " +
+                "where pd.scenarioData.testname='" + scenarioName + "' " +
+                "and pd.paramName = '" + paramName + "' " +
+                "and pd.scenarioData.buildLabel = '" + currentBuildLabel + "' " +
+                "order by pd.scenarioData.buildLabel desc";
+        Query query = em.createQuery(sql);
+        List<ParamData> list = query.getResultList();
+        return list.get(0);
+    }
+
+    public void findAndUpdate(ParamData paramData, Double newAccuracy) {
+        ParamData attachedParamData = em.find(ParamData.class, paramData.getParamId());
+        attachedParamData.setAccuracy(newAccuracy);
+    }
+
+    public void flush() {
+        em.flush();
     }
 }

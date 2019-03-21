@@ -2,26 +2,50 @@ package com.dheeraj.learning.labwatcher.dto;
 
 
 public class ParamDataDTO {
-    String name;
+    String scenarioName;
+    String paramName;
     Double mean;
     Double standardDeviation;
-    Double latestBuildValue;
+    String buildLabel;
+    Double paramValue;
     Double noOfValidRecords = 0.0;
     transient Double tempsum = 0.0;
     transient Double tempSD = 0.0;
-    Double degradationPercentage = 0.0;
+    Double variedBy = 0.0;
+    int variedBuildRank;
     boolean isDegraded;
+    boolean isImproved;
+    Double accuracy;
 
-    public ParamDataDTO(String name) {
-        this.name = name;
+    public ParamDataDTO() {
     }
 
-    public String getName() {
-        return name;
+    public ParamDataDTO(String paramName) {
+        this.paramName = paramName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getBuildLabel() {
+        return buildLabel;
+    }
+
+    public void setBuildLabel(String buildLabel) {
+        this.buildLabel = buildLabel;
+    }
+
+    public String getScenarioName() {
+        return scenarioName;
+    }
+
+    public void setScenarioName(String scenarioName) {
+        this.scenarioName = scenarioName;
+    }
+
+    public String getParamName() {
+        return paramName;
+    }
+
+    public void setParamName(String paramName) {
+        this.paramName = paramName;
     }
 
     public Double getMean() {
@@ -40,12 +64,12 @@ public class ParamDataDTO {
         this.standardDeviation = standardDeviation;
     }
 
-    public Double getLatestBuildValue() {
-        return latestBuildValue;
+    public Double getParamValue() {
+        return paramValue;
     }
 
-    public void setLatestBuildValue(Double latestBuildValue) {
-        this.latestBuildValue = latestBuildValue;
+    public void setParamValue(Double paramValue) {
+        this.paramValue = paramValue;
     }
 
     public Double getNoOfValidRecords() {
@@ -72,12 +96,36 @@ public class ParamDataDTO {
         this.tempSD = tempSD;
     }
 
-    public Double getDegradationPercentage() {
-        return degradationPercentage;
+    public Double getVariedBy() {
+        return variedBy;
     }
 
-    public void setDegradationPercentage(Double degradationPercentage) {
-        this.degradationPercentage = degradationPercentage;
+    public void setVariedBy(Double variedBy) {
+        this.variedBy = variedBy;
+    }
+
+    public int getVariedBuildRank() {
+        return variedBuildRank;
+    }
+
+    public void setVariedBuildRank(int variedBuildRank) {
+        this.variedBuildRank = variedBuildRank;
+    }
+
+    public boolean isImproved() {
+        return isImproved;
+    }
+
+    public void setImproved(boolean improved) {
+        isImproved = improved;
+    }
+
+    public Double getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(Double accuracy) {
+        this.accuracy = accuracy;
     }
 
     public boolean isDegraded() {
@@ -88,25 +136,29 @@ public class ParamDataDTO {
         isDegraded = degraded;
     }
 
-    public void calcMean(){
+    public void calcMean() {
         mean = tempsum / noOfValidRecords;
     }
 
-    public void calcStandardDeviation(){
+    public void calcStandardDeviation() {
         standardDeviation = Math.sqrt(tempSD / noOfValidRecords);
     }
 
     @Override
     public String toString() {
         return "ParamDataDTO{" +
-                "\n\t\tname='" + name + '\'' + "," +
-                "\n\t\tmean=" + mean + "," +
-                "\n\t\tstandardDeviation=" + standardDeviation + "," +
-                "\n\t\tlatestBuildValue=" + latestBuildValue + "," +
-                "\n\t\tnoOfValidRecords=" + noOfValidRecords + "," +
-                "\n\t\tdegradationPercentage=" + degradationPercentage + "," +
-                "\n\t" + '}';
+                "paramName='" + paramName + '\'' +
+                ", mean=" + mean +
+                ", standardDeviation=" + standardDeviation +
+                ", paramValue=" + paramValue +
+                ", noOfValidRecords=" + noOfValidRecords +
+                ", tempsum=" + tempsum +
+                ", tempSD=" + tempSD +
+                ", variedBy=" + variedBy +
+                ", variedBuildRank=" + variedBuildRank +
+                ", isDegraded=" + isDegraded +
+                ", isImproved=" + isImproved +
+                ", accuracy=" + accuracy +
+                '}';
     }
-    
-    
 }

@@ -44,8 +44,8 @@ public class DataUtil {
      * @param paramDataDTO
      */
     public static void printVariationMessage(ParamDataDTO paramDataDTO) {
-        logger.info("The scenario : "+paramDataDTO.getScenarioName()+" is degraded/improved in terms of performance metric : "+ paramDataDTO.getParamName());
-        logger.info("The degradation/improvement percentage is : "+paramDataDTO.getVariedBy());
+        logger.info("The scenario : "+paramDataDTO.getScenarioName()+" for build :"+paramDataDTO.getBuildLabel()+
+                " is degraded/improved in terms of performance metric : "+ paramDataDTO.getParamName()+" with "+paramDataDTO.getVariedBy()+" percentage.");
 
         logger.debug(paramDataDTO.toString());
     }

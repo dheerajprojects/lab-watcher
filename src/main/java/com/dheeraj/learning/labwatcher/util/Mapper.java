@@ -49,6 +49,35 @@ public class Mapper {
         return scenarioData;
     }
 
+    public static ScenarioData map(ScenarioDataDTO scenarioDataDTO, ScenarioData scenarioData, List<String> paramList) {
+        scenarioData.setTestname(scenarioDataDTO.getTestname());
+        scenarioData.setBuildLabel(scenarioDataDTO.getLatestbuild());
+
+        //Temporary map to easily access paramdata set.
+        Map<String, ParamData> temporaryMap = new HashMap<>();
+        for (ParamData paramData: scenarioData.getSet()) {
+            temporaryMap.put(paramData.getParamName(), paramData);
+        }
+
+        for (String paramName: paramList) {
+            if(temporaryMap.containsKey(paramName))
+                map(scenarioDataDTO.getMap().get(paramName), temporaryMap.get(paramName));
+            else {
+                ParamData paramData = new ParamData();
+                BeanUtils.copyProperties(scenarioDataDTO.getMap().get(paramName), paramData);
+                scenarioData.getSet().add(paramData);
+            }
+        }
+
+        return scenarioData;
+    }
+
+    public static ParamData map(ParamDataDTO paramDataDTO, ParamData paramData) {
+        BeanUtils.copyProperties(paramDataDTO, paramData);
+
+        return paramData;
+    }
+
     public static ParamDataDTO convert(ParamData paramData) {
         ParamDataDTO paramDataDTO = new ParamDataDTO();
 

@@ -129,21 +129,21 @@ public class DegradationIdentificationUtil {
     public static boolean isVariedOld(Map<String, ParamDataDTO> tempMap, String param, Double latestValue) {
         double mean = tempMap.get(param).getMean();
         double standardDeviation = tempMap.get(param).getStandardDeviation();
-        double degradationPercentage;
+        double variationPercentage;
         boolean isDegraded;
         boolean isImproved;
 
         tempMap.get(param).setParamValue(latestValue);
-        degradationPercentage = (mean == 0 ? 0 : (((latestValue - mean) / mean) * 100));
-        isDegraded = isDegraded(latestValue, mean, standardDeviation, 2);
-        isImproved = isImproved(latestValue, mean, standardDeviation, 2);
+        variationPercentage = (mean == 0 ? 0 : (((latestValue - mean) / mean) * 100));
+        isDegraded = isDegraded(latestValue, mean, standardDeviation, 2, true, variationPercentage);
+        isImproved = isImproved(latestValue, mean, standardDeviation, 2, true, variationPercentage);
 
         if (latestValue > mean + 2 * standardDeviation) {
             isDegraded = true;
         } else if (latestValue < mean - 2 * standardDeviation) {
             isImproved = true;
         }
-        tempMap.get(param).setVariedBy(degradationPercentage);
+        tempMap.get(param).setVariedBy(variationPercentage);
         tempMap.get(param).setDegraded(isDegraded);
         tempMap.get(param).setImproved(isImproved);
         return isDegraded || isImproved;
@@ -154,8 +154,8 @@ public class DegradationIdentificationUtil {
         double standardDeviation = paramDataDTO.getStandardDeviation();
 
         double variationPercentage = (mean == 0 ? 0 : (((latestValue - mean) / mean) * 100));
-        boolean isDegraded = isDegraded(latestValue, mean, standardDeviation, 2);
-        boolean isImproved = isImproved(latestValue, mean, standardDeviation, 2);
+        boolean isDegraded = isDegraded(latestValue, mean, standardDeviation, 2, true, variationPercentage);
+        boolean isImproved = isImproved(latestValue, mean, standardDeviation, 2, true, variationPercentage);
 
         paramDataDTO.setParamValue(latestValue);
         paramDataDTO.setVariedBy(variationPercentage);
@@ -165,15 +165,23 @@ public class DegradationIdentificationUtil {
         return isDegraded || isImproved;
     }
 
-    public static boolean isDegraded(Double currentValue, Double mean, Double standardDeviation, Integer sigmaCount) {
-        if (currentValue > (mean + (sigmaCount * standardDeviation)))
-            return true;
+    public static boolean isDegraded(Double currentValue, Double mean, Double standardDeviation, Integer sigmaCount, boolean isMinVariationCheck, Double variationPercentage) {
+        if (currentValue > (mean + (sigmaCount * standardDeviation))) {
+            //Ensure that the variation is atleast X%
+            if(isMinVariationCheck && variationPercentage >= 3.0) {
+                return true;
+            }
+        }
         return false;
     }
 
-    public static boolean isImproved(Double currentValue, Double mean, Double standardDeviation, Integer sigmaCount) {
-        if (currentValue < (mean - (sigmaCount * standardDeviation)))
-            return true;
+    public static boolean isImproved(Double currentValue, Double mean, Double standardDeviation, Integer sigmaCount, boolean isMinVariationCheck, Double variationPercentage) {
+        if (currentValue < (mean - (sigmaCount * standardDeviation))) {
+            //Ensure that the variation is atleast X%
+            if(isMinVariationCheck && variationPercentage <= -3.0) {
+                return true;
+            }
+        }
         return false;
     }
 

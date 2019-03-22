@@ -2,16 +2,14 @@ package com.dheeraj.learning.labwatcher.dao;
 
 import com.dheeraj.learning.labwatcher.entity.ParamData;
 import com.dheeraj.learning.labwatcher.entity.PerfStat;
+import com.dheeraj.learning.labwatcher.entity.ScenarioData;
 import com.dheeraj.learning.labwatcher.repository.ParamDataRepository;
-import com.dheeraj.learning.labwatcher.repository.PerfStatsRepository;
+import com.dheeraj.learning.labwatcher.repository.ScenarioDataRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.tags.Param;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -23,11 +21,16 @@ import java.util.List;
 @Transactional
 public class PerfStatDAO {
 
+    Logger logger = LoggerFactory.getLogger(PerfStatDAO.class);
+
     @PersistenceContext
     EntityManager em;
 
     @Autowired
     ParamDataRepository paramDataRepository;
+
+    @Autowired
+    ScenarioDataRepository scenarioDataRepository;
 
     public List<PerfStat> getPerfStatsBetweenBuilds(String scenarioName, String prpcVersion, String startBuildLabel, String endBuildLabel, int maxResults) {
         String sql2 = "select s " +
@@ -94,23 +97,25 @@ public class PerfStatDAO {
         return list;
     }
 
-    public List<String> getValidBuildLabels(String scenarioName, String prpcVersion, String startDate, String endDate) {
-        String sql = "FROM PerfStat " +
+    public List<String> getValidBuildLabelsBetweenGivenDates(String scenarioName, String prpcVersion, String startDate, String endDate) {
+        String sql = "select max(teststart) as maxteststart, buildlabel, trialtype, runlevel, testname, isvalidrun, prpcversion from PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and testname='" + scenarioName + "' " +
                 "and prpcversion='" + prpcVersion + "' " +
-                "and isvalidrun='true'" +
+                "and isvalidrun='true' " +
+                "and buildlabel like '%HEAD%' "+
                 "and teststart > '" + startDate + "' " +
                 "and teststart < '" + endDate + "' " +
+                "group by trialtype, runlevel, testname, isvalidrun, prpcversion, buildlabel "+
                 "order by buildlabel asc";
 
         Query query = em.createQuery(sql);
-        List<PerfStat> list = query.getResultList();
+        List<Object[]> rows = query.getResultList();
         List<String> buildLabels = new ArrayList<>();
-        for (PerfStat perfStat :
-                list) {
-            buildLabels.add(perfStat.getBuildlabel());
+        for (Object[] row :
+                rows) {
+            buildLabels.add(row[1]+"");
         }
 
         return buildLabels;
@@ -124,26 +129,48 @@ public class PerfStatDAO {
      * @param param
      * @param currentBuildLabel
      */
-    public ParamData getVariedBuildRankDetails(String scenarioName, String param, String currentBuildLabel) {
+    public ParamData getVariedBuildRankDetails(String scenarioName, String param, String currentBuildLabel, String prpcVersion, boolean isHead) {
         String sql = "FROM ParamData pd " +
                 "where pd.scenarioData.testname='" + scenarioName + "' " +
                 "and pd.paramName = '" + param + "' " +
                 "and pd.scenarioData.buildLabel < '" + currentBuildLabel + "' " +
+                "and pd.accuracy >= 50 "+
+                "and ( pd.isDegraded = true or pd.isImproved = true ) "+
                 "order by pd.scenarioData.buildLabel desc";
         Query query = em.createQuery(sql);
         List<ParamData> list = query.getResultList();
-        int counter = 1;
-        ParamData temp = null;
-        for (ParamData paramData : list) {
-            if (paramData.isDegraded() || paramData.isImproved()) {
-                paramData.setVariedBuildRank(counter);
-                temp = paramData;
-                break;
-            } else
-                counter++;
-        }
+        if (list.size() == 0)
+            return null;
+        else{
+            ParamData paramData = list.get(0);
+            String sql2 ="from PerfStat ps1 "+
+                            "where trialtype='Performance' "+
+                            "and runlevel='optimized' "+
+                            "and testname='"+scenarioName+"' "+
+                            "and isvalidrun='true' "+
+                            "and prpcversion='"+prpcVersion+"' "+
+                            "and teststart = ( select max(ps2.teststart) from PerfStat ps2 "+
+                                            "where ps1.trialtype=ps2.trialtype "+
+                                            "and ps1.runlevel=ps2.runlevel "+
+                                            "and ps1.testname=ps2.testname "+
+                                            "and ps1.isvalidrun=ps2.isvalidrun "+
+                                            "and ps1.prpcversion=ps2.prpcversion "+
+                                            "and ps1.buildinfo=ps2.buildinfo "+
+                                            "and ps1.buildlabel=ps2.buildlabel ) ";
+            if (isHead)
+                sql2 += "and buildinfo like '%HEAD%' ";
 
-        return temp;
+            sql2 += "and buildLabel >= '" +paramData.getScenarioData().getBuildLabel()+"' "+
+                    "and buildLabel < '"+currentBuildLabel+"' "+
+                    "order by buildlabel desc";
+
+
+            Query query2 = em.createQuery(sql2);
+            List<PerfStat> list2 = query2.getResultList();
+            paramData.setVariedBuildRank(list2.size());
+
+            return paramData;
+        }
     }
 
     public ParamData getParamDataForAGivenBuild(String scenarioName, String paramName, String currentBuildLabel) {
@@ -162,7 +189,21 @@ public class PerfStatDAO {
         attachedParamData.setAccuracy(newAccuracy);
     }
 
-    public void flush() {
-        em.flush();
+    public ScenarioData getScenarioData(String scenarioName, String buildLabel) {
+        //TODO : Add prpcversion later if required.
+        String sql = "from ScenarioData sd " +
+                "where sd.testname = '"+scenarioName+"' " +
+                "and sd.buildLabel = '"+buildLabel+"' ";
+
+        Query query = em.createQuery(sql);
+        List<ScenarioData> list = query.getResultList();
+        if(list == null || list.size() == 0)
+            return null;
+
+        if(list.size()>1) {
+            logger.debug("There are duplicates in scenario data. Scenario name : "+scenarioName+", buildLabel : "+buildLabel+", List size : " + list.size());
+        }
+
+        return list.get(0);
     }
 }

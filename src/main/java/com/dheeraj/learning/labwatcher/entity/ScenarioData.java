@@ -14,7 +14,7 @@ public class ScenarioData {
     String testname;
     String buildLabel;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "scenarioData")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "scenarioData")
     private Set<ParamData> set;
 
     public int getId() {

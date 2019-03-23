@@ -24,11 +24,9 @@ public class LabWatcherApplicationTests {
     @Autowired
     PerfStatDAO perfStatDAO;
 
-
-    @Test
     public void contextLoads() {
         //TODO : Remove DTOs and use only Entity objects everywhere.
-        schedulerService.analyseAScenarioLatestBuild();
+        schedulerService.analyseMultipleScenariosMultipleBuilds();
     }
 
 

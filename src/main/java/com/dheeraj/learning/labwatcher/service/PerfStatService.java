@@ -109,9 +109,9 @@ public class PerfStatService {
             } else {
                 int rank = variedBuildParamDataDTO.getVariedBuildRank();
                 if (variedBuildParamDataDTO.isDegraded()) {
-                    analyseWhenRecentBuildsHaveVariation(scenarioName, prpcVersion, currentBuildLabel, variedBuildRankMap.get(param).getBuildLabel(), param, rank, true);
+                    analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, variedBuildRankMap.get(param).getBuildLabel(), param, rank, true);
                 } else if (variedBuildParamDataDTO.isImproved()) {
-                    analyseWhenRecentBuildsHaveVariation(scenarioName, prpcVersion, currentBuildLabel, variedBuildRankMap.get(param).getBuildLabel(), param, rank, false);
+                    analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, variedBuildRankMap.get(param).getBuildLabel(), param, rank, false);
                 } else {
                     logger.debug("Though this param is neither improved nor degraded somehow this data got into database incorrectly.");
                 }
@@ -120,18 +120,28 @@ public class PerfStatService {
         return currentBuildParamMap;
     }
 
-    private void analyseWhenRecentBuildsHaveVariation(String scenarioName, String prpcVersion, String currentBuildLabel, String degradedBuild, String param, Integer rank, boolean isForDegradationCheck) {
-        List<PerfStat> perfStats = perfStatDAO.getPerfStatsBetweenBuilds(scenarioName, prpcVersion, degradedBuild, currentBuildLabel, rank);
+    private void analyseWhenRecentBuildsHaveVariation(boolean isAverageRecentBuilds, String scenarioName, String prpcVersion, String currentBuildLabel, String degradedBuild, String param, Integer rank, boolean isForDegradationCheck) {
+        Double currentParamValue;
+        if(isAverageRecentBuilds) {  //This logic takes the average of the last n (<5) builds and compare with the last degraded value.
+            List<PerfStat> perfStats = perfStatDAO.getPerfStatsBetweenBuilds(scenarioName, prpcVersion, degradedBuild, currentBuildLabel, rank);
 
-        List<PerfStatDTO> perfStatDTOs = Mapper.copyResultsToDTO(perfStats);
-        Double consolidatedMean = DegradationIdentificationUtil.getMean(perfStatDTOs, param);
+            List<PerfStatDTO> perfStatDTOs = Mapper.copyResultsToDTO(perfStats);
+            Double consolidatedMean = DegradationIdentificationUtil.getMean(perfStatDTOs, param);
+            currentParamValue = consolidatedMean;
+        } else { //This logic just compares the current value with last degraded value.
+            PerfStat currentBuildPerfStat = perfStatDAO.getPerfStatForAGivenBuild(scenarioName, currentBuildLabel);
+            PerfStatDTO perfStatDTO = new PerfStatDTO();
+            BeanUtils.copyProperties(currentBuildPerfStat, perfStatDTO);
+
+            currentParamValue = perfStatDTO.getDouble(param);
+        }
 
         ParamData paramData = perfStatDAO.getParamDataForAGivenBuild(scenarioName, param, degradedBuild);
         ParamDataDTO paramDataDTO = Mapper.convert(paramData);
 
-        double variationPercentage = (paramDataDTO.getMean() == 0 ? 0 : (((consolidatedMean - paramDataDTO.getMean()) / paramDataDTO.getMean()) * 100));
-        boolean isDegraded = DegradationIdentificationUtil.isDegraded(consolidatedMean, paramDataDTO.getMean(), paramDataDTO.getStandardDeviation(), 2, true, variationPercentage);
-        boolean isImproved = DegradationIdentificationUtil.isImproved(consolidatedMean, paramDataDTO.getMean(), paramDataDTO.getStandardDeviation(), 2, true, variationPercentage);
+        double variationPercentage = (paramDataDTO.getMean() == 0 ? 0 : (((currentParamValue - paramDataDTO.getMean()) / paramDataDTO.getMean()) * 100));
+        boolean isDegraded = DegradationIdentificationUtil.isDegraded(currentParamValue, paramDataDTO.getMean(), paramDataDTO.getStandardDeviation(), 2, true, variationPercentage);
+        boolean isImproved = DegradationIdentificationUtil.isImproved(currentParamValue, paramDataDTO.getMean(), paramDataDTO.getStandardDeviation(), 2, true, variationPercentage);
         logger.debug("ScenarioName : "+scenarioName+", currentBuildLabel : "+currentBuildLabel+" Variation status : isDegraded : "+isDegraded+", isImproved : "+isImproved);
 
         Double accuracy = 0.0;

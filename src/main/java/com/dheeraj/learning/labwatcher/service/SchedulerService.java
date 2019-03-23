@@ -54,8 +54,7 @@ public class SchedulerService {
      *                 "PRPC-HEAD-6675,PRPC-HEAD-6676,PRPC-HEAD-6677,PRPC-HEAD-6679,PRPC-HEAD-6681,PRPC-HEAD-6683,PRPC-HEAD-6684,PRPC-HEAD-6685,PRPC-HEAD-6688,PRPC-HEAD-6689,PRPC-HEAD-6690," +
      *                 "PRPC-HEAD-6691,PRPC-HEAD-6692,PRPC-HEAD-6693,PRPC-HEAD-6696,PRPC-HEAD-6697,PRPC-HEAD-6701");
      */
-    public void analyseAScenarioMultipleBuilds() {
-        String scenarioName = "CCCASE";
+    public void analyseAScenarioMultipleBuilds(String scenarioName) {
         List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount");
         String prpcVersion = "8.2.0";
         String startDate = "2018-08-25";
@@ -66,6 +65,22 @@ public class SchedulerService {
         for (String buildLabel : validBuildLabels) {
             ScenarioDataDTO scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, buildLabel, true);
             logger.debug("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded()+", isImproved : "+scenarioDataDTO.getMap().get("totalreqtime").isImproved());
+        }
+    }
+
+    public void analyseMultipleScenariosMultipleBuilds() {
+        List<String> scenarioNames = DataUtil.populateScenariosList();
+
+        for (String scenarioName : scenarioNames) {
+            logger.debug("==============================================================================================");
+            logger.debug("Started analysing scenario : "+scenarioName);
+            try {
+                analyseAScenarioMultipleBuilds(scenarioName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            logger.debug("Completed analysing scenario : "+scenarioName);
+            logger.debug("==============================================================================================");
         }
     }
 

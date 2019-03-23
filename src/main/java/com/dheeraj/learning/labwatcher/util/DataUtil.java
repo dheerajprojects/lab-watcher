@@ -50,22 +50,28 @@ public class DataUtil {
         logger.debug(paramDataDTO.toString());
     }
 
-    public static void populateScenariosList(List<String> list) {
-        list.add("CCCASE");
-
-        /*list.add("SimpleSurvey");
-        list.add("CCCASE");
-        list.add("ChaseMidas");
-        list.add("Mortgage");
-        list.add("CallCenterJUnit");
-        list.add("DataEngineJUnit");
-        list.add("DevPerfJUnit");
-        list.add("Integration");
-        list.add("ISBANK");
-        list.add("MultiChannel");
-        list.add("Offline");
+    public static List<String> populateScenariosList() {
+        List<String> list = new ArrayList<>();
         list.add("RBS");
-        /*list.add("PerfClip");*/
+        list.add("Offline");
+        list.add("ChaseMidas");
+        list.add("MultiChannel");
+        list.add("Mortgage");
+        list.add("CRM_731_SA");
+        list.add("PerfClip");
+        list.add("CustomerService");
+        list.add("DevPerfJUnit");
+        list.add("SimpleSurvey");
+        list.add("CRM_731_CS");
+        list.add("DataEngineJUnit");
+        list.add("DSMBatchMarketing");
+        list.add("ISBANK");
+        list.add("CallCenterJUnit");
+        list.add("Integration");
+        list.add("CCCASE");
+        list.add("CRM_81_CS");
+
+        return list;
     }
 
     public static List<String> populateAllParamsList() {

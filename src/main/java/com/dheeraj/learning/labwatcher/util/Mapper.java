@@ -10,6 +10,9 @@ import org.springframework.beans.BeanUtils;
 
 import java.util.*;
 
+/**
+ * TODO : Try spring provided modelmapper : http://modelmapper.org/getting-started/
+ */
 public class Mapper {
     public static List<PerfStatDTO> copyResultsToDTO(List<PerfStat> results) {
         List resultDTOs = new ArrayList();

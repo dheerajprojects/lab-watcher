@@ -234,6 +234,8 @@ public class DegradationIdentificationUtil {
     }
 
     public static Double calcStandardDeviation(List<PerfStatDTO> perfStatDTOs, String param, ParamDataDTO paramDataDTO) {
+        //Map list of previous build values to check/confirm manually in a chart
+
         Double mean = calcMean(perfStatDTOs, param, paramDataDTO);
         Double sdTemp = 0.0;
         Double standardDeviation;

@@ -35,7 +35,7 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -47,6 +47,8 @@
             <version>2.8.4</version>
         </dependency>
 
+        <!--These are needed to deploy the application
+        TODO : Check removing the below two and find if the UI webpage still works-->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
@@ -56,6 +58,12 @@
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <!--This is for hot deploying code in web application-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
         </dependency>
     </dependencies>
 

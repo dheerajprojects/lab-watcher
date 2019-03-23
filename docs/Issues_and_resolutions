@@ -1,6 +1,5 @@
 Error 1 :
 Spring Boot – Cannot determine embedded database driver class for database type NONE
-PANKAJ 10 COMMENTS
 
 Sol 1 : Exclude auto configuration of DataSource in the Spring Boot application class. We can do this using EnableAutoConfiguration annotation as shown in below code.
 
@@ -9,4 +8,12 @@ spring.datasource.url=jdbc:mysql://localhost/Test_DB
 Link : https://www.journaldev.com/13830/spring-boot-cannot-determine-embedded-database-driver-class-for-database-type-none
 
 ===========================
+Issue 2 :
+Hotswap of data not working
+Follow this and it started working perfectly
+https://stackoverflow.com/questions/21399586/hot-swapping-in-spring-boot/43114954#43114954
 
+===========================
+Issue 3 :
+UI not resolving properly
+executin via maven command prompt worked. Other way is having certain maven dep worked

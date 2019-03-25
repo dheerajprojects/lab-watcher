@@ -5,8 +5,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class WebController {
-    @RequestMapping(value = "/welcome2")
+    @RequestMapping(value = "/welcomejsp")
     public String loginMessage() {
         return "welcome";
     }
+
+    @RequestMapping(value = "/chartjsp")
+    public String chartjs() {
+        return "chart";
+    }
+
 }

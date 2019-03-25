@@ -24,6 +24,12 @@ public class ParamDataDTO {
         this.paramName = paramName;
     }
 
+    public ParamDataDTO(String paramName, String scenarioName, String buildLabel) {
+        this.paramName = paramName;
+        this.scenarioName = scenarioName;
+        this.buildLabel = buildLabel;
+    }
+
     public String getBuildLabel() {
         return buildLabel;
     }
@@ -147,9 +153,11 @@ public class ParamDataDTO {
     @Override
     public String toString() {
         return "ParamDataDTO{" +
-                "paramName='" + paramName + '\'' +
+                "scenarioName='" + scenarioName + '\'' +
+                ", paramName='" + paramName + '\'' +
                 ", mean=" + mean +
                 ", standardDeviation=" + standardDeviation +
+                ", buildLabel='" + buildLabel + '\'' +
                 ", paramValue=" + paramValue +
                 ", noOfValidRecords=" + noOfValidRecords +
                 ", tempsum=" + tempsum +

@@ -70,6 +70,8 @@ public class PerfStatService {
         //Ensure that this works even if we rerun the analysis for the same build.
         boolean isVaried = DegradationIdentificationUtil.isAnyParamVaried(currentBuildParamMap);
         if(isVaried) {
+            //Send Email
+            EmailService.sendEmail(scenarioDataDTO);
             ScenarioData scenarioData = perfStatDAO.getScenarioData(scenarioName, testBuild);
             if(scenarioData!= null)
                 Mapper.map(scenarioDataDTO, scenarioData, paramList);
@@ -94,7 +96,7 @@ public class PerfStatService {
     public Map<String, ParamDataDTO> analyseData(String scenarioName, List<String> paramList, String prpcVersion, String currentBuildLabel, boolean isHead) {
 
         Map<String, ParamDataDTO> variedBuildRankMap = getLastVariedBuildDetails(scenarioName, paramList, currentBuildLabel, prpcVersion, isHead);
-        Map<String, ParamDataDTO> currentBuildParamMap = createMapOfGivenParams(paramList);
+        Map<String, ParamDataDTO> currentBuildParamMap = createMapOfGivenParams(paramList, scenarioName, currentBuildLabel);
 
         //For loop over params
         for (String param : currentBuildParamMap.keySet()) {
@@ -192,10 +194,10 @@ public class PerfStatService {
         }
     }
 
-    private static Map<String, ParamDataDTO> createMapOfGivenParams(List<String> paramList) {
+    private static Map<String, ParamDataDTO> createMapOfGivenParams(List<String> paramList, String scenarioName, String buildLabel) {
         Map<String, ParamDataDTO> currentBuildParamMap = new HashMap<>();
         for (String param : paramList) {
-            currentBuildParamMap.put(param, new ParamDataDTO(param));
+            currentBuildParamMap.put(param, new ParamDataDTO(param, scenarioName, buildLabel));
         }
         return currentBuildParamMap;
     }

@@ -2,6 +2,8 @@ package com.dheeraj.learning.labwatcher;
 
 import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
 import com.dheeraj.learning.labwatcher.entity.ParamData;
+import com.dheeraj.learning.labwatcher.entity.PerfStat;
+import com.dheeraj.learning.labwatcher.service.EmailService;
 import com.dheeraj.learning.labwatcher.service.SchedulerService;
 import com.dheeraj.learning.labwatcher.util.DataUtil;
 import org.junit.Test;
@@ -24,9 +26,12 @@ public class LabWatcherApplicationTests {
     @Autowired
     PerfStatDAO perfStatDAO;
 
+
+    //@Test
     public void contextLoads() {
         //TODO : Remove DTOs and use only Entity objects everywhere.
-        schedulerService.analyseMultipleScenariosMultipleBuilds();
+        //schedulerService.analyseMultipleScenariosMultipleBuilds();
+        EmailService.sendApacheCommonsEmail();
     }
 
 
@@ -44,5 +49,15 @@ public class LabWatcherApplicationTests {
 
     public void testGetScenarioData() {
         System.out.println(perfStatDAO.getScenarioData("CCCASE", "PRPC-HEAD-6577"));
+    }
+
+
+    @Test
+    public void testGetLatestBuilds() {
+        List<PerfStat> perfStats = perfStatDAO.getBuilds("2018-11-11");
+        System.out.println(perfStats.size());
+        for (PerfStat perfStat : perfStats) {
+            System.out.println("BuildLabel : "+perfStat.getBuildlabel()+", ScenarioName : "+perfStat.getTestname());
+        }
     }
 }

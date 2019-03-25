@@ -1,0 +1,24 @@
+{
+  "testname": "CCCASE",
+  "latestbuild": "PRPC-HEAD-6577",
+  "map": {
+    "totalreqtime": {
+      "scenarioName": null,
+      "paramName": "totalreqtime",
+      "mean": 14863.445000000002,
+      "standardDeviation": 203.90608961927427,
+      "buildLabel": null,
+      "paramValue": 18757.22,
+      "noOfValidRecords": 68,
+      "tempsum": 0,
+      "tempSD": 0,
+      "variedBy": 26.19698865236154,
+      "variedBuildRank": 0,
+      "accuracy": 60,
+      "improved": false,
+      "degraded": true,
+      "buildLabels": ["HEAD-1", "HEAD-2", "HEAD-3"],
+      "buildValues": [10,11,10]
+    }
+  }
+}

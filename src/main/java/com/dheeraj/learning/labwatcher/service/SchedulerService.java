@@ -43,6 +43,16 @@ public class SchedulerService {
     }
 
     /**
+     * This method is analyses the latest build of a scenario with the last n builds
+     * and identifies if the latest build is degraded or not.
+     */
+    public void analyseMultipleScenariosLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel) {
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime");
+
+        perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
+    }
+
+    /**
      * This method analyses degradations occurred in a scenario between the given dates.
      *
      * Sample builds
@@ -132,8 +142,6 @@ public class SchedulerService {
 
         return jsonString;
     }
-
-
 
 
 }

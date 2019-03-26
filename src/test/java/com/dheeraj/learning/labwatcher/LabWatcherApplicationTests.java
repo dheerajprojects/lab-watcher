@@ -6,6 +6,7 @@ import com.dheeraj.learning.labwatcher.entity.PerfStat;
 import com.dheeraj.learning.labwatcher.service.EmailService;
 import com.dheeraj.learning.labwatcher.service.SchedulerService;
 import com.dheeraj.learning.labwatcher.util.DataUtil;
+import com.dheeraj.learning.labwatcher.util.DateUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +55,15 @@ public class LabWatcherApplicationTests {
 
     @Test
     public void testGetLatestBuilds() {
-        List<PerfStat> perfStats = perfStatDAO.getBuilds("2018-11-11");
+        List<PerfStat> perfStats = perfStatDAO.getBuilds("2019-03-26");
         System.out.println(perfStats.size());
         for (PerfStat perfStat : perfStats) {
             System.out.println("BuildLabel : "+perfStat.getBuildlabel()+", ScenarioName : "+perfStat.getTestname());
         }
+    }
+
+    //@Test
+    public void testDateUtil() {
+        System.out.println(DateUtil.getDates("2019-03-26", 1));
     }
 }

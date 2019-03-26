@@ -221,8 +221,10 @@ public class DegradationIdentificationUtil {
         Double mean;
         Double sum = 0.0;
         Double noOfRecords = 0.0;
+        System.out.println("List of params considered are : ");
         for (PerfStatDTO perfstatDTO : perfStatDTOs) {
             if (perfstatDTO.getDouble(param) != null) {
+                System.out.print(paramDataDTO.getBuildLabel()+" : "+perfstatDTO.getDouble(param)+", ");
                 sum += perfstatDTO.getDouble(param);
                 noOfRecords++;
             }

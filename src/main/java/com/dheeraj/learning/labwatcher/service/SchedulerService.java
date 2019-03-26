@@ -1,13 +1,20 @@
 package com.dheeraj.learning.labwatcher.service;
 
+import com.dheeraj.learning.labwatcher.constants.JUnitScenarios;
+import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
 import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
+import com.dheeraj.learning.labwatcher.entity.PerfStat;
 import com.dheeraj.learning.labwatcher.util.DataUtil;
+import com.dheeraj.learning.labwatcher.util.DateUtil;
 import com.dheeraj.learning.labwatcher.util.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,9 +32,14 @@ import java.util.List;
 public class SchedulerService {
 
     Logger logger = LoggerFactory.getLogger(SchedulerService.class);
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Autowired
     private PerfStatService perfStatService;
+
+
+    @Autowired
+    PerfStatDAO perfStatDAO;
 
     /**
      * This method is analyses the latest build of a scenario with the last n builds
@@ -47,7 +59,9 @@ public class SchedulerService {
      * and identifies if the latest build is degraded or not.
      */
     public void analyseMultipleScenariosLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel) {
-        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime");
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount");
+
+        fixTimeAttributeForJUnits(scenarioName, paramList);
 
         perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
     }
@@ -143,5 +157,48 @@ public class SchedulerService {
         return jsonString;
     }
 
+    public void scheduleDailyRuns() {
+        logger.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
 
+        List<String> dates = DateUtil.getDates("2019-03-26", 5);
+        for (String date : dates) {
+            runAnalysisOnDailyBuilds(date);
+        }
+    }
+
+    public void runAnalysisOnDailyBuilds(String date) {
+        logger.info("Running analysis on performance metrics on "+date+"...");
+        logger.info("_______________________________________________________");
+        List<PerfStat> perfStats = perfStatDAO.getBuilds(date);
+        logger.info("Number of scenarios for analysis : "+perfStats.size());
+        for (PerfStat perfstat : perfStats) {
+            try {
+                logger.info("Started processing scenario : "+perfstat.getTestname()+", buildlabel : "+perfstat.getBuildlabel());
+
+                analyseMultipleScenariosLatestBuild(perfstat.getTestname(), perfstat.getPrpcversion(), perfstat.getBuildlabel());
+
+                logger.info("Completed processing scenario : "+perfstat.getTestname()+", buildlabel : "+perfstat.getBuildlabel());
+            } catch (Exception e) {
+                logger.info(e.toString());
+            }
+        }
+    }
+
+    /**
+     * Time attribute for junits is wallseconds. So this method replaces totalreqtime with wallseconds for all junit scenarios.
+     * TODO : Make use of enum #JUnitScenarios.
+     * @param paramList
+     */
+    public void fixTimeAttributeForJUnits(String scenarioName, List<String> paramList) {
+        List<String> jUnitScenarios = new ArrayList<>();
+        jUnitScenarios.add("PerfClip");
+        jUnitScenarios.add("DevPerfJUnit");
+        jUnitScenarios.add("DataEngineJUnit");
+        jUnitScenarios.add("CallCenterJUnit");
+
+        if(jUnitScenarios.contains(scenarioName)) {
+            if(paramList.remove("totalreqtime"))
+                paramList.add("wallseconds");
+        }
+    }
 }

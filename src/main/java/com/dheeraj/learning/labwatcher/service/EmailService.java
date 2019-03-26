@@ -15,6 +15,9 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 @Service
@@ -58,8 +61,18 @@ public class EmailService {
 
     public static void sendEmail(ScenarioDataDTO scenarioDataDTO) {
         subject = scenarioDataDTO.getTestname() + " is varied on build : " + scenarioDataDTO.getLatestbuild();
+        //removeStableParams(scenarioDataDTO);
         constructBody(scenarioDataDTO);
         sendApacheCommonsEmail();
+    }
+
+    public static void removeStableParams(ScenarioDataDTO scenarioDataDTO) {
+        Map<String, ParamDataDTO> paramMap = scenarioDataDTO.getMap();
+        for (String param: paramMap.keySet()) {
+            if(!paramMap.get(param).isImproved() && !paramMap.get(param).isDegraded()) {
+                paramMap.remove(param);
+            }
+        }
     }
 
     public static void sendApacheCommonsEmail() {
@@ -154,15 +167,15 @@ public class EmailService {
                 "            <span lang=EN-US style='mso-fareast-language:EN-IN'>\n";
 
 
-        ParamDataDTO totalreqtimeData = scenarioDataDTO.getMap().get("totalreqtime");
+        ParamDataDTO timeData = getTimeData(scenarioDataDTO);
         String body2 = "";
-        if (totalreqtimeData != null) {
-            body2 = "Lab watcher has noticed a <b>" + totalreqtimeData.getVariedBy() + "</b>% ";
-            if (totalreqtimeData.isDegraded())
+        if (timeData != null) {
+            body2 = "Lab watcher has noticed a <b>" + timeData.getVariedBy() + "</b>% ";
+            if (timeData.isDegraded())
                 body2 += "<b>degradation</b> ";
-            if (totalreqtimeData.isImproved())
+            if (timeData.isImproved())
                 body2 += "<b>improvement</b> ";
-            body2 += " in <b>" + totalreqtimeData.getBuildLabel() + "</b> build w.r.t <b>totalreqtime </b>in <b>" + totalreqtimeData.getScenarioName() + " </b>scenario.\n";
+            body2 += " in <b>" + timeData.getBuildLabel() + "</b> build w.r.t <b>"+timeData.getParamName()+" </b>in <b>" + timeData.getScenarioName() + " </b>scenario.\n";
         }
 
         String body3 = " <o:p></o:p>\n" +
@@ -265,8 +278,10 @@ public class EmailService {
             String status;
             if (paramDataDTO.isDegraded())
                 status = "<o:p style=\"color:red;\">Degraded</o:p>\n";
-            else
+            else if (paramDataDTO.isImproved())
                 status = "<o:p style=\"color:blue;\">Improved</o:p>\n";
+            else
+                status = "<o:p style=\"color:blue;\">Stable</o:p>\n";
 
             body4 += "        <tr>\n";
 
@@ -405,5 +420,25 @@ public class EmailService {
                 "</html>";
 
         body = body1 + body2 + body3 + body4 + body5;
+    }
+
+    /**
+     * Since totaltime is diff from junits to other scenarios, this method is needed.
+     * @param scenarioDataDTO
+     * @return
+     */
+    public static ParamDataDTO getTimeData(ScenarioDataDTO scenarioDataDTO) {
+        //TODO make use of enum JUnitScenarios.
+        List<String> jUnitScenarios = new ArrayList<>();
+        jUnitScenarios.add("PerfClip");
+        jUnitScenarios.add("DevPerfJUnit");
+        jUnitScenarios.add("DataEngineJUnit");
+        jUnitScenarios.add("CallCenterJUnit");
+
+
+        if(jUnitScenarios.contains(scenarioDataDTO.getTestname())) {
+            return scenarioDataDTO.getMap().get("wallseconds");
+        }
+        return scenarioDataDTO.getMap().get("totalreqtime");
     }
 }

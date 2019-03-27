@@ -6,7 +6,9 @@ import java.util.List;
 
 public class DateUtil {
     public static void main(String[] args) {
-        getDates("2019-11-11", 10);
+        //getDates("2019-11-11", 10);
+
+        System.out.println(LocalDate.now().toString());
     }
 
     /**

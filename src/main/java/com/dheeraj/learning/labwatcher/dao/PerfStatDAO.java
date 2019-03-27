@@ -189,6 +189,12 @@ public class PerfStatDAO {
         attachedParamData.setAccuracy(newAccuracy);
     }
 
+    public void findAndRemoveVariation(ParamData paramData) {
+        ParamData attachedParamData = em.find(ParamData.class, paramData.getParamId());
+        attachedParamData.setDegraded(false);
+        attachedParamData.setImproved(false);
+    }
+
     public ScenarioData getScenarioData(String scenarioName, String buildLabel) {
         //TODO : Add prpcversion later if required.
         String sql = "from ScenarioData sd " +
@@ -253,6 +259,27 @@ public class PerfStatDAO {
                 "and isvalidrun='true' " +
                 "and buildinfo like '%HEAD%' " +
                 "and cast(teststart as date) = '"+date+"' "+
+                "order by buildlabel asc";
+
+        Query query = em.createQuery(sql);
+        List<PerfStat> list = query.getResultList();
+        return list;
+    }
+
+    /**
+     * Retrieves builds on the given date.
+     * @param date
+     * @return
+     */
+    public List<PerfStat> getBuilds(String date, String scenarioName) {
+        String sql = "FROM PerfStat " +
+                "where trialtype='Performance' " +
+                "and runlevel='optimized' " +
+                "and isvalidrun='true' " +
+                "and buildinfo like '%HEAD%' " +
+                "and cast(teststart as date) = '"+date+"' "+
+                "and testname = '"+scenarioName+"' "+
+                "and prpcversion <> null "+
                 "order by buildlabel asc";
 
         Query query = em.createQuery(sql);

@@ -4,6 +4,8 @@ import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.PerfStatDTO;
 import com.dheeraj.learning.labwatcher.entity.ParamData;
 import com.dheeraj.learning.labwatcher.entity.PerfStat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 public class DegradationIdentificationUtil {
+
+    static Logger logger = LoggerFactory.getLogger(DegradationIdentificationUtil.class);
 
     /**
      * Here mapping is done for all parameters simultaneously
@@ -221,14 +225,16 @@ public class DegradationIdentificationUtil {
         Double mean;
         Double sum = 0.0;
         Double noOfRecords = 0.0;
-        System.out.println("List of params considered are : ");
+        String listOfBuilds="";
+        logger.debug("List of params considered are : ");
         for (PerfStatDTO perfstatDTO : perfStatDTOs) {
             if (perfstatDTO.getDouble(param) != null) {
-                System.out.print(paramDataDTO.getBuildLabel()+" : "+perfstatDTO.getDouble(param)+", ");
+                listOfBuilds += perfstatDTO.getBuildlabel()+" : "+perfstatDTO.getDouble(param)+", ";
                 sum += perfstatDTO.getDouble(param);
                 noOfRecords++;
             }
         }
+        logger.debug(listOfBuilds);
         mean = sum / noOfRecords;
         paramDataDTO.setMean(mean);
         paramDataDTO.setNoOfValidRecords(noOfRecords);

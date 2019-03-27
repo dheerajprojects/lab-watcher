@@ -1,7 +1,6 @@
 package com.dheeraj.learning.labwatcher;
 
 import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
-import com.dheeraj.learning.labwatcher.entity.ParamData;
 import com.dheeraj.learning.labwatcher.entity.PerfStat;
 import com.dheeraj.learning.labwatcher.service.EmailService;
 import com.dheeraj.learning.labwatcher.service.SchedulerService;
@@ -10,8 +9,6 @@ import com.dheeraj.learning.labwatcher.util.DateUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -31,10 +28,15 @@ public class LabWatcherApplicationTests {
     //@Test
     public void contextLoads() {
         //TODO : Remove DTOs and use only Entity objects everywhere.
-        //schedulerService.analyseMultipleScenariosMultipleBuilds();
-        EmailService.sendApacheCommonsEmail();
+        schedulerService.analyseAScenarioLatestBuild();
+
+
     }
 
+    @Test
+    public void testEmail() {
+        EmailService.sendEmail(DataUtil.getScenarioDataDTO());
+    }
 
     public void testGetValidBuildLabelsBetweenGivenDates() {
         String scenarioName = "CCCASE";
@@ -53,7 +55,7 @@ public class LabWatcherApplicationTests {
     }
 
 
-    @Test
+    //@Test
     public void testGetLatestBuilds() {
         List<PerfStat> perfStats = perfStatDAO.getBuilds("2019-03-26");
         System.out.println(perfStats.size());

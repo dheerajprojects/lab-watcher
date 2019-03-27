@@ -1,11 +1,14 @@
 package com.dheeraj.learning.labwatcher.util;
 
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
+import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
 import com.dheeraj.learning.labwatcher.entity.ParamData;
 import com.dheeraj.learning.labwatcher.entity.ScenarioData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,13 +24,20 @@ public class DataUtil {
     public static ScenarioData getScenarioData() {
         ParamData paramData1 = new ParamData("totalreqtime");
         paramData1.setDegraded(true);
-        paramData1.setVariedBy(10.0);
-        paramData1.setStandardDeviation(4.0);
+        paramData1.setMean(94.59659999999998);
+        paramData1.setStandardDeviation(3.531566570234802);
+        paramData1.setParamValue(91.76);
+        paramData1.setVariedBy(2.998627857660821);
+        paramData1.setNoOfValidRecords(10.0);
+
 
         ParamData paramData2 = new ParamData("rdbiocount");
-        paramData2.setDegraded(true);
-        paramData2.setVariedBy(9.0);
-        paramData2.setStandardDeviation(7.0);
+        paramData2.setDegraded(false);
+        paramData2.setMean(93.59612499999998);
+        paramData2.setStandardDeviation(43.531566570234802);
+        paramData2.setParamValue(91.73246);
+        paramData2.setVariedBy(29.998627857660821);
+        paramData1.setNoOfValidRecords(20.0);
 
         ScenarioData scenarioData = new ScenarioData();
         scenarioData.setBuildLabel("PRPC-HEAD-5577");
@@ -35,7 +45,15 @@ public class DataUtil {
         scenarioData.addParam(paramData1);
         scenarioData.addParam(paramData2);
 
+        paramData1.setScenarioData(scenarioData);
+        paramData2.setScenarioData(scenarioData);
+
         return scenarioData;
+    }
+
+    public static ScenarioDataDTO getScenarioDataDTO() {
+        ScenarioData scenarioData = getScenarioData();
+        return Mapper.convert(scenarioData);
     }
 
     /**
@@ -204,5 +222,16 @@ public class DataUtil {
             list.add(strList[i]);
         }
         return list;
+    }
+
+    /**
+     * Returns formatted string value.
+     *
+     * @param value
+     * @return
+     */
+    public static String getValue(Double value) {
+        DecimalFormat decimalFormat = new DecimalFormat("##.##");
+        return decimalFormat.format(value);
     }
 }

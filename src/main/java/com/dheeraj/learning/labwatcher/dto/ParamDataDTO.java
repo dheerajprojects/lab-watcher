@@ -8,6 +8,7 @@ public class ParamDataDTO {
     Double standardDeviation;
     String buildLabel;
     Double paramValue;
+    //TODO : Change this to Integer
     Double noOfValidRecords = 0.0;
     transient Double tempsum = 0.0;
     transient Double tempSD = 0.0;
@@ -15,7 +16,7 @@ public class ParamDataDTO {
     int variedBuildRank;
     boolean isDegraded;
     boolean isImproved;
-    Double accuracy;
+    Double accuracy = 0.0;
 
     public ParamDataDTO() {
     }

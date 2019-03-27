@@ -52,6 +52,22 @@ public class Mapper {
         return scenarioData;
     }
 
+    public static ScenarioDataDTO convert(ScenarioData scenarioData) {
+        ScenarioDataDTO scenarioDataDTO = new ScenarioDataDTO();
+        scenarioDataDTO.setTestname(scenarioData.getTestname());
+        scenarioDataDTO.setLatestbuild(scenarioData.getBuildLabel());
+
+        Map<String, ParamDataDTO> paramDataDTOMap = new HashMap<>();
+        Set<ParamData> paramDataSet = scenarioData.getSet();
+        for (ParamData paramData : paramDataSet) {
+            ParamDataDTO paramDataDTO = convert(paramData);
+            paramDataDTOMap.put(paramDataDTO.getParamName(), paramDataDTO);
+        }
+        scenarioDataDTO.setMap(paramDataDTOMap);
+
+        return scenarioDataDTO;
+    }
+
     public static ScenarioData map(ScenarioDataDTO scenarioDataDTO, ScenarioData scenarioData, List<String> paramList) {
         scenarioData.setTestname(scenarioDataDTO.getTestname());
         scenarioData.setBuildLabel(scenarioDataDTO.getLatestbuild());

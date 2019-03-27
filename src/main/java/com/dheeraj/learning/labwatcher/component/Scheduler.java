@@ -23,12 +23,13 @@ public class Scheduler {
 
     @Scheduled(initialDelay=0, fixedRate=24*60*60*1000)
     public void scheduleTaskWithFixedRate() {
-        schedulerService.scheduleDailyRuns();
+        schedulerService.scheduleDailyRuns("MultiChannel", 35);
+        //schedulerService.analyseAScenarioMultipleBuildsHardCoded();
     }
 
     //@Scheduled(fixedDelay = 2000)
     public void scheduleTaskWithFixedDelay() {
-        schedulerService.scheduleDailyRuns();
+        //schedulerService.scheduleDailyRuns(null);
     }
 
     public void scheduleTaskWithInitialDelay() {}
@@ -38,6 +39,6 @@ public class Scheduler {
      */
     //@Scheduled(cron = "45 17 * * * *")
     public void scheduleTaskWithCronExpression() {
-        schedulerService.scheduleDailyRuns();
+        //schedulerService.scheduleDailyRuns(null);
     }
 }

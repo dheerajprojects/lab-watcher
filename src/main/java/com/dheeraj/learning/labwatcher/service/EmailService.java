@@ -3,6 +3,7 @@ package com.dheeraj.learning.labwatcher.service;
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
 import com.dheeraj.learning.labwatcher.entity.ParamData;
+import com.dheeraj.learning.labwatcher.util.DataUtil;
 import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +171,7 @@ public class EmailService {
         ParamDataDTO timeData = getTimeData(scenarioDataDTO);
         String body2 = "";
         if (timeData != null) {
-            body2 = "Lab watcher has noticed a <b>" + timeData.getVariedBy() + "</b>% ";
+            body2 = "Lab watcher has noticed a <b>" + DataUtil.getValue(timeData.getVariedBy()) + "</b>% ";
             if (timeData.isDegraded())
                 body2 += "<b>degradation</b> ";
             if (timeData.isImproved())
@@ -199,7 +200,7 @@ public class EmailService {
                 "    </p>\n" +
                 "    <table class=MsoTable15Grid4Accent1 border=1 cellspacing=0 cellpadding=0 style='border-collapse:collapse;border:none'>\n" +
                 "        <tr>\n" +
-                "            <td width=89 valign=top style='width:66.75pt;border:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                "            <td width=89 valign=top style='width:100pt;border:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                 "                <p class=MsoNormal>\n" +
                 "                    <b>\n" +
                 "                        <span lang=EN-US style='color:white;mso-fareast-language:EN-IN'>\n" +
@@ -209,7 +210,7 @@ public class EmailService {
                 "                    </b>\n" +
                 "                </p>\n" +
                 "            </td>\n" +
-                "            <td width=89 valign=top style='width:66.75pt;border-top:solid #4472C4 1.0pt;border-left:none;border-bottom:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                "            <td width=89 valign=top style='width:100pt;border-top:solid #4472C4 1.0pt;border-left:none;border-bottom:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                 "                <p class=MsoNormal>\n" +
                 "                    <b>\n" +
                 "                        <span lang=EN-US style='color:white;mso-fareast-language:EN-IN'>\n" +
@@ -219,7 +220,7 @@ public class EmailService {
                 "                    </b>\n" +
                 "                </p>\n" +
                 "            </td>\n" +
-                "            <td width=89 valign=top style='width:66.8pt;border-top:solid #4472C4 1.0pt;border-left:none;border-bottom:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                "            <td width=89 valign=top style='width:100pt;border-top:solid #4472C4 1.0pt;border-left:none;border-bottom:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                 "                <p class=MsoNormal>\n" +
                 "                    <b>\n" +
                 "                        <span lang=EN-US style='color:white;mso-fareast-language:EN-IN'>\n" +
@@ -229,7 +230,7 @@ public class EmailService {
                 "                    </b>\n" +
                 "                </p>\n" +
                 "            </td>\n" +
-                "            <td width=89 valign=top style='width:66.8pt;border-top:solid #4472C4 1.0pt;border-left:none;border-bottom:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                "            <td width=89 valign=top style='width:100pt;border-top:solid #4472C4 1.0pt;border-left:none;border-bottom:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                 "                <p class=MsoNormal>\n" +
                 "                    <b>\n" +
                 "                        <span lang=EN-US style='color:white;mso-fareast-language:EN-IN'>\n" +
@@ -239,7 +240,7 @@ public class EmailService {
                 "                    </b>\n" +
                 "                </p>\n" +
                 "            </td>\n" +
-                "            <td width=89 valign=top style='width:66.8pt;border-top:solid #4472C4 1.0pt;border-left:none;border-bottom:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                "            <td width=89 valign=top style='width:100pt;border-top:solid #4472C4 1.0pt;border-left:none;border-bottom:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                 "                <p class=MsoNormal>\n" +
                 "                    <b>\n" +
                 "                        <span lang=EN-US style='color:white;mso-fareast-language:EN-IN'>\n" +
@@ -249,7 +250,7 @@ public class EmailService {
                 "                    </b>\n" +
                 "                </p>\n" +
                 "            </td>\n" +
-                "            <td width=89 valign=top style='width:66.8pt;border-top:solid #4472C4 1.0pt;border-left:none;border-bottom:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                "            <td width=89 valign=top style='width:100pt;border-top:solid #4472C4 1.0pt;border-left:none;border-bottom:solid #4472C4 1.0pt;border-right:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                 "                <p class=MsoNormal>\n" +
                 "                    <b>\n" +
                 "                        <span lang=EN-US style='color:white;mso-fareast-language:EN-IN'>\n" +
@@ -259,7 +260,17 @@ public class EmailService {
                 "                    </b>\n" +
                 "                </p>\n" +
                 "            </td>\n" +
-                "            <td width=89 valign=top style='width:66.8pt;border:solid #4472C4 1.0pt;border-left:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                "            <td width=89 valign=top style='width:100pt;border:solid #4472C4 1.0pt;border-left:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                "                <p class=MsoNormal>\n" +
+                "                    <b>\n" +
+                "                        <span lang=EN-US style='color:white;mso-fareast-language:EN-IN'>\n" +
+                "                           Accuracy\n" +
+                "                           <o:p></o:p>\n" +
+                "                        </span>\n" +
+                "                    </b>\n" +
+                "                </p>\n" +
+                "            </td>\n" +
+                "            <td width=89 valign=top style='width:100pt;border:solid #4472C4 1.0pt;border-left:none;background:#4472C4;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                 "                <p class=MsoNormal>\n" +
                 "                    <b>\n" +
                 "                        <span lang=EN-US style='color:white;mso-fareast-language:EN-IN'>\n" +
@@ -286,7 +297,7 @@ public class EmailService {
             body4 += "        <tr>\n";
 
             if (row % 2 == 0) {
-                body4 += "            <td width=89 valign=top style='width:66.75pt;border:solid #8EAADB 1.0pt;border-top:none;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                body4 += "            <td width=89 valign=top style='width:100pt;border:solid #8EAADB 1.0pt;border-top:none;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                    <b>\n" +
                         "                        <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
@@ -295,42 +306,49 @@ public class EmailService {
                         "                    </b>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.75pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
                         "                        <o:p>" + paramDataDTO.getNoOfValidRecords() + "</o:p>\n" +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.8pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
-                        "                        <o:p>" + paramDataDTO.getMean() + "</o:p>\n" +
+                        "                        <o:p>" + DataUtil.getValue(paramDataDTO.getMean()) + "</o:p>\n" +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.8pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
-                        "                        <o:p>" + paramDataDTO.getStandardDeviation() + "</o:p>\n" +
+                        "                        <o:p>" + DataUtil.getValue(paramDataDTO.getStandardDeviation()) + "</o:p>\n" +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.8pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
-                        "                        <o:p>" + paramDataDTO.getParamValue() + "</o:p>\n" +
+                        "                        <o:p>" + DataUtil.getValue(paramDataDTO.getParamValue()) + "</o:p>\n" +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.8pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
-                        "                        <o:p>" + paramDataDTO.getVariedBy() + "</o:p>\n" +
+                        "                        <o:p>" + DataUtil.getValue(paramDataDTO.getVariedBy()) + "</o:p>\n" +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.8pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "                <p class=MsoNormal>\n" +
+                        "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
+                        "                        <o:p>" + DataUtil.getValue(paramDataDTO.getAccuracy()) + "</o:p>\n" +
+                        "                     </span>\n" +
+                        "                </p>\n" +
+                        "            </td>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
                         status+
@@ -338,7 +356,7 @@ public class EmailService {
                         "                </p>\n" +
                         "            </td>\n";
             } else {
-                body4 += "            <td width=89 valign=top style='width:66.75pt;border:solid #8EAADB 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                body4 += "            <td width=89 valign=top style='width:100pt;border:solid #8EAADB 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                    <b>\n" +
                         "                        <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
@@ -347,42 +365,49 @@ public class EmailService {
                         "                    </b>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.75pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
                         "                        <o:p>" + paramDataDTO.getNoOfValidRecords() + "</o:p>\n" +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.8pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
-                        "                        <o:p>" + paramDataDTO.getMean() + "</o:p>\n" +
+                        "                        <o:p>" + DataUtil.getValue(paramDataDTO.getMean()) + "</o:p>\n" +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.8pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
-                        "                        <o:p>" + paramDataDTO.getStandardDeviation() + "</o:p>\n" +
+                        "                        <o:p>" + DataUtil.getValue(paramDataDTO.getStandardDeviation()) + "</o:p>\n" +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.8pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
-                        "                        <o:p>" + paramDataDTO.getParamValue() + "</o:p>\n" +
+                        "                        <o:p>" + DataUtil.getValue(paramDataDTO.getParamValue()) + "</o:p>\n" +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.8pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
-                        "                        <o:p>" + paramDataDTO.getVariedBy() + "</o:p>\n" +
+                        "                        <o:p>" + DataUtil.getValue(paramDataDTO.getVariedBy()) + "</o:p>\n" +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n" +
-                        "            <td width=89 valign=top style='width:66.8pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
+                        "                <p class=MsoNormal>\n" +
+                        "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
+                        "                        <o:p>" + DataUtil.getValue(paramDataDTO.getAccuracy()) + "</o:p>\n" +
+                        "                     </span>\n" +
+                        "                </p>\n" +
+                        "            </td>\n" +
+                        "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
                         status+

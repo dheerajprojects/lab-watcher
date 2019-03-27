@@ -16,7 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.tags.Param;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +40,8 @@ public class PerfStatService {
     public static Integer MIN_DATA_SIZE=5;
     public static Double MAX_DATA_ACCURACY=70.0;
     public static Double DECENT_DATA_ACCURACY=60.0;
-    public static Double MIN_DATA_ACCURACY=50.0;
+    public static Double MIN_DATA_ACCURACY=60.0;
+    public static Double MIN_ACCURACY_FOR_EMAIL=80.0;
 
     @Autowired
     private PerfStatDAO perfStatDAO;
@@ -63,6 +66,7 @@ public class PerfStatService {
         scenarioDataDTO.setTestname(scenarioName);
         scenarioDataDTO.setLatestbuild(testBuild);
 
+
         Map<String, ParamDataDTO> currentBuildParamMap = analyseData(scenarioName, paramList, prpcVersion, testBuild, isHead);
         scenarioDataDTO.setMap(currentBuildParamMap);
 
@@ -70,8 +74,6 @@ public class PerfStatService {
         //Ensure that this works even if we rerun the analysis for the same build.
         boolean isVaried = DegradationIdentificationUtil.isAnyParamVaried(currentBuildParamMap);
         if(isVaried) {
-            //Send Email
-            EmailService.sendEmail(scenarioDataDTO);
             ScenarioData scenarioData = perfStatDAO.getScenarioData(scenarioName, testBuild);
             if(scenarioData!= null)
                 Mapper.map(scenarioDataDTO, scenarioData, paramList);
@@ -82,6 +84,14 @@ public class PerfStatService {
         }
 
         return scenarioDataDTO;
+    }
+
+    public boolean hasMinimumAccuracy(Map<String, ParamDataDTO> paramDataDTOMap, Double minAccuracy) {
+        for (String param : paramDataDTOMap.keySet()) {
+            if(paramDataDTOMap.get(param).getAccuracy() >= minAccuracy)
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -106,23 +116,43 @@ public class PerfStatService {
                 analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, MAX_DATA_SIZE, MAX_DATA_ACCURACY);
             } else if (variedBuildParamDataDTO.getVariedBuildRank() > DECENT_DATA_SIZE) {
                 analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, variedBuildParamDataDTO.getVariedBuildRank(), DECENT_DATA_ACCURACY);
-            } else if (variedBuildParamDataDTO.getVariedBuildRank() > MIN_DATA_SIZE && variedBuildParamDataDTO.getVariedBuildRank() <= DECENT_DATA_SIZE){
+            } else if (variedBuildParamDataDTO.getVariedBuildRank() >= MIN_DATA_SIZE && variedBuildParamDataDTO.getVariedBuildRank() <= DECENT_DATA_SIZE){
                 analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, variedBuildParamDataDTO.getVariedBuildRank(), MIN_DATA_ACCURACY);
             } else {
                 int rank = variedBuildParamDataDTO.getVariedBuildRank();
+                Double accuracy = 0.0;
                 if (variedBuildParamDataDTO.isDegraded()) {
-                    analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, variedBuildRankMap.get(param).getBuildLabel(), param, rank, true);
+                    accuracy = analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, variedBuildRankMap.get(param).getBuildLabel(), param, rank, true);
                 } else if (variedBuildParamDataDTO.isImproved()) {
-                    analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, variedBuildRankMap.get(param).getBuildLabel(), param, rank, false);
+                    accuracy = analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, variedBuildRankMap.get(param).getBuildLabel(), param, rank, false);
                 } else {
                     logger.debug("Though this param is neither improved nor degraded somehow this data got into database incorrectly.");
                 }
+
+                decideAndSendEmail(variedBuildParamDataDTO, accuracy);
             }
         }
         return currentBuildParamMap;
     }
 
-    private void analyseWhenRecentBuildsHaveVariation(boolean isAverageRecentBuilds, String scenarioName, String prpcVersion, String currentBuildLabel, String degradedBuild, String param, Integer rank, boolean isForDegradationCheck) {
+    public void decideAndSendEmail(ParamDataDTO variedBuildParamDTO, Double accuracy) {
+        boolean sendEmail = false;
+        Integer rank = variedBuildParamDTO.getVariedBuildRank();
+        if(rank >= 3) {
+            if(rank == 3 && accuracy >= 90) {
+                sendEmail = true;
+            } else if (rank == 4 && accuracy >= 80) {
+                sendEmail = true;
+            }
+        }
+        if(sendEmail) {
+            ScenarioData scenarioData = perfStatDAO.getScenarioData(variedBuildParamDTO.getScenarioName(), variedBuildParamDTO.getBuildLabel());
+            ScenarioDataDTO scenarioDataDTO = Mapper.convert(scenarioData);
+            EmailService.sendEmail(scenarioDataDTO);
+        }
+    }
+
+    private Double analyseWhenRecentBuildsHaveVariation(boolean isAverageRecentBuilds, String scenarioName, String prpcVersion, String currentBuildLabel, String degradedBuild, String param, Integer rank, boolean isForDegradationCheck) {
         Double currentParamValue;
         if(isAverageRecentBuilds) {  //This logic takes the average of the last n (<5) builds and compare with the last degraded value.
             List<PerfStat> perfStats = perfStatDAO.getPerfStatsBetweenBuilds(scenarioName, prpcVersion, degradedBuild, currentBuildLabel, rank);
@@ -156,8 +186,65 @@ public class PerfStatService {
             accuracy = paramData.getAccuracy() - 10.0;
             logger.debug("Accuracy decreased for scenario : "+paramDataDTO.getScenarioName()+", build : "+paramDataDTO.getBuildLabel()+", param : "+paramDataDTO.getParamName());
         }
-        //Can change this save logic later
-        perfStatDAO.findAndUpdate(paramData, accuracy);
+
+        //Send Email
+        //Send the last degraded content as email //Also put accuracy in the email.
+
+        //Check if the last degradation/baseline is an outlier. If it is then remove/update it from database that it is not degraded.
+        boolean isLastVariationInvalid = isLastVariationInvalid(rank, accuracy);
+        if(!isLastVariationInvalid) {
+            perfStatDAO.findAndRemoveVariation(paramData);
+            //Rerun later builds after this degradation.
+            rerunLaterBuildsAfterDegradation(scenarioName, prpcVersion, rank, currentBuildLabel, paramData);
+        } else {
+            //Can change this save logic later
+            perfStatDAO.findAndUpdate(paramData, accuracy);
+        }
+
+        return accuracy;
+    }
+
+    /**
+     * TODO Make use of rank attribute from the caller to cross check the data.
+     * @param scenarioName
+     * @param prpcVersion
+     * @param rank
+     * @param endBuildLabel
+     */
+    public void rerunLaterBuildsAfterDegradation(String scenarioName, String prpcVersion, Integer rank, String endBuildLabel, ParamData paramData) {
+        List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, endBuildLabel, rank-1, true);
+        List<String> paramList = new ArrayList<>();
+        paramList.add(paramData.getParamName());
+        for (PerfStat perfstat : perfStats) {
+            callAScenario(scenarioName, paramList, prpcVersion, perfstat.getBuildlabel(), true);
+        }
+    }
+
+    /**
+     * When there is a degradation/baseline in the last 5 builds and 2 in the last 4 builds doesnt follow the same trend, then
+     * it is considered that the last degradation is invalid and it is removed from the database.
+     *
+     * The below logic is simplified in the method.
+     * if(rank == 1 && accuracy >= 50)
+     *             return true;
+     *         else if(rank == 2 && accuracy >= 60)
+     *             return true;
+     *         else if (rank == 3 && accuracy >= 70)
+     *             return true;
+     *         else if (rank == 4 && accuracy >= 80)
+     *             return true;
+     *         else
+     *             return false;
+     *
+     * @param rank
+     * @param accuracy
+     * @return
+     */
+    public boolean isLastVariationInvalid(Integer rank, Double accuracy) {
+        if(accuracy >= (40+rank*10))
+            return true;
+        else
+            return false;
     }
 
     /**

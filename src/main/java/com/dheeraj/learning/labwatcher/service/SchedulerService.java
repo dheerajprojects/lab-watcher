@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -48,8 +49,8 @@ public class SchedulerService {
     public void analyseAScenarioLatestBuild() {
         String scenarioName = "CCCASE";
         List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime");
-        String prpcVersion = "8.2.0";
-        String currentBuildLabel = "PRPC-HEAD-6577";
+        String prpcVersion = "8.3.0";
+        String currentBuildLabel = "PRPC-HEAD-6813";
 
         perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
     }
@@ -88,7 +89,7 @@ public class SchedulerService {
 
         for (String buildLabel : validBuildLabels) {
             ScenarioDataDTO scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, buildLabel, true);
-            logger.debug("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded()+", isImproved : "+scenarioDataDTO.getMap().get("totalreqtime").isImproved());
+            logger.info("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded()+", isImproved : "+scenarioDataDTO.getMap().get("totalreqtime").isImproved());
         }
     }
 
@@ -96,15 +97,15 @@ public class SchedulerService {
         List<String> scenarioNames = DataUtil.populateScenariosList();
 
         for (String scenarioName : scenarioNames) {
-            logger.debug("==============================================================================================");
-            logger.debug("Started analysing scenario : "+scenarioName);
+            logger.info("==============================================================================================");
+            logger.info("Started analysing scenario : "+scenarioName);
             try {
                 analyseAScenarioMultipleBuilds(scenarioName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            logger.debug("Completed analysing scenario : "+scenarioName);
-            logger.debug("==============================================================================================");
+            logger.info("Completed analysing scenario : "+scenarioName);
+            logger.info("==============================================================================================");
         }
     }
 
@@ -157,20 +158,26 @@ public class SchedulerService {
         return jsonString;
     }
 
-    public void scheduleDailyRuns() {
+    public void scheduleDailyRuns(String scenarioName, Integer numberOfDays) {
         logger.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
 
-        List<String> dates = DateUtil.getDates("2019-03-26", 5);
+        List<String> dates = DateUtil.getDates(LocalDate.now().toString(), numberOfDays);
         for (String date : dates) {
-            runAnalysisOnDailyBuilds(date);
+            runAnalysisOnDailyBuilds(date, scenarioName);
         }
     }
 
-    public void runAnalysisOnDailyBuilds(String date) {
+    public void runAnalysisOnDailyBuilds(String date, String scenarioName) {
         logger.info("Running analysis on performance metrics on "+date+"...");
-        logger.info("_______________________________________________________");
-        List<PerfStat> perfStats = perfStatDAO.getBuilds(date);
-        logger.info("Number of scenarios for analysis : "+perfStats.size());
+        List<PerfStat> perfStats;
+        if(scenarioName == null) {
+            perfStats = perfStatDAO.getBuilds(date);
+        } else {
+            perfStats = perfStatDAO.getBuilds(date, scenarioName);
+        }
+
+
+        logger.info("Number of builds for analysis : "+perfStats.size());
         for (PerfStat perfstat : perfStats) {
             try {
                 logger.info("Started processing scenario : "+perfstat.getTestname()+", buildlabel : "+perfstat.getBuildlabel());
@@ -179,7 +186,7 @@ public class SchedulerService {
 
                 logger.info("Completed processing scenario : "+perfstat.getTestname()+", buildlabel : "+perfstat.getBuildlabel());
             } catch (Exception e) {
-                logger.info(e.toString());
+                e.printStackTrace();
             }
         }
     }

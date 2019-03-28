@@ -1,5 +1,6 @@
 package com.dheeraj.learning.labwatcher.util;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ public class DateUtil {
     public static void main(String[] args) {
         //getDates("2019-11-11", 10);
 
+        System.out.println(Duration.between(LocalDate.now().atStartOfDay(), LocalDate.parse("2018-10-24").atStartOfDay()).toDays());
         System.out.println(LocalDate.now().toString());
     }
 

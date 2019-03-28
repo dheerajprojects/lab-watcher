@@ -84,11 +84,23 @@ public class PerfStatDAO {
                 "and testname='" + scenarioName + "' " +
                 "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true'" +
-                "and buildlabel < '" + endBuildLabel + "' ";
+                "and builddate < ( "+
+                                    "select max(builddate) from PerfStat "+
+                                    "where buildlabel='"+endBuildLabel+"' "+
+                                    "and trialtype='Performance' "+
+                                    "and runlevel='optimized' "+
+                                    "and isvalidrun='true' ";
+        if(isHead)
+            sql+="and buildinfo like '%HEAD%' ";
+
+        //This is remaining of the subquery
+        sql+="and testname = '"+scenarioName+"' "+
+                                ")";
 
         if (isHead)
             sql += "and buildinfo like '%HEAD%' ";
 
+        //This is remaining of main query
         sql += "order by teststart desc";
 
         Query query = em.createQuery(sql);

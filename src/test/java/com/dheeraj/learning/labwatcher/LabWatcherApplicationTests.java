@@ -33,16 +33,17 @@ public class LabWatcherApplicationTests {
 
     }
 
-    @Test
+    //@Test
     public void testEmail() {
         EmailService.sendEmail(DataUtil.getScenarioDataDTO());
     }
 
+    @Test
     public void testGetValidBuildLabelsBetweenGivenDates() {
-        String scenarioName = "CCCASE";
+        String scenarioName = "MultiChannel";
         String prpcVersion = "8.2.0";
-        String startDate = "2018-08-25";
-        String endDate = "2018-12-11";
+        String startDate = "2018-10-24";
+        String endDate = "2019-03-31";
 
         List<String> validBuildLabels = perfStatDAO.getValidBuildLabelsBetweenGivenDates(scenarioName, prpcVersion, startDate, endDate);
 

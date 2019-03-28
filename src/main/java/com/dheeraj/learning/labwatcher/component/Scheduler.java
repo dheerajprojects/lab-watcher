@@ -23,7 +23,7 @@ public class Scheduler {
 
     @Scheduled(initialDelay=0, fixedRate=24*60*60*1000)
     public void scheduleTaskWithFixedRate() {
-        schedulerService.scheduleDailyRuns("MultiChannel", 35);
+        schedulerService.scheduleDailyRuns("CCCASE", 2);
         //schedulerService.analyseAScenarioMultipleBuildsHardCoded();
     }
 

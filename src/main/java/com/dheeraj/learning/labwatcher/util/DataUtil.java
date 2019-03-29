@@ -231,6 +231,7 @@ public class DataUtil {
      * @return
      */
     public static String getValue(Double value) {
+        logger.trace("Value : "+value);
         DecimalFormat decimalFormat = new DecimalFormat("##.##");
         return decimalFormat.format(value);
     }

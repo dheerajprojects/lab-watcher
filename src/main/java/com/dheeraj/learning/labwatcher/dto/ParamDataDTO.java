@@ -4,16 +4,16 @@ package com.dheeraj.learning.labwatcher.dto;
 public class ParamDataDTO {
     String scenarioName;
     String paramName;
-    Double mean;
-    Double standardDeviation;
+    Double mean=0.0;
+    Double standardDeviation=0.0;
     String buildLabel;
-    Double paramValue;
+    Double paramValue=0.0;
     //TODO : Change this to Integer
     Double noOfValidRecords = 0.0;
     transient Double tempsum = 0.0;
     transient Double tempSD = 0.0;
     Double variedBy = 0.0;
-    int variedBuildRank;
+    int variedBuildRank=0;
     boolean isDegraded;
     boolean isImproved;
     Double accuracy = 0.0;

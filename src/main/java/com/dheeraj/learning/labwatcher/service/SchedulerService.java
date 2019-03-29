@@ -59,8 +59,8 @@ public class SchedulerService {
      * This method is analyses the latest build of a scenario with the last n builds
      * and identifies if the latest build is degraded or not.
      */
-    public void analyseMultipleScenariosLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel) {
-        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount");
+    public void analyseAScenarioLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel) {
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount","totalreqcpu","otheriocount","otheriocpu","errorcount","othercount");
 
         fixTimeAttributeForJUnits(scenarioName, paramList);
 
@@ -72,10 +72,10 @@ public class SchedulerService {
      *
      */
     public void analyseAScenarioMultipleBuilds(String scenarioName) {
-        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount");
-        String prpcVersion = "8.2.0";
-        String startDate = "2018-08-25";
-        String endDate = "2018-12-11";
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount","totalreqcpu","otheriocount","otheriocpu","errorcount","othercount");
+        String prpcVersion = "8.3.0";
+        String startDate = "2019-01-04";
+        String endDate = "2019-01-19";
         List<String> validBuildLabels = perfStatService.getValidBuildLabelsBetweenGivenDates(scenarioName, prpcVersion, startDate, endDate);
 
 
@@ -150,10 +150,13 @@ public class SchedulerService {
         return jsonString;
     }
 
-    public void scheduleDailyRuns(String scenarioName, Integer numberOfDays) {
+    public void scheduleDailyRuns(String scenarioName, String startDate, Integer numberOfDays) {
         logger.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
 
-        List<String> dates = DateUtil.getDates(LocalDate.now().toString(), numberOfDays);
+        if(startDate == null)
+            startDate = LocalDate.now().toString();
+
+        List<String> dates = DateUtil.getDates(LocalDate.parse(startDate).toString(), numberOfDays);
         for (String date : dates) {
             runAnalysisOnDailyBuilds(date, scenarioName);
         }
@@ -174,7 +177,7 @@ public class SchedulerService {
             try {
                 logger.info("Started processing scenario : "+perfstat.getTestname()+", buildlabel : "+perfstat.getBuildlabel());
 
-                analyseMultipleScenariosLatestBuild(perfstat.getTestname(), perfstat.getPrpcversion(), perfstat.getBuildlabel());
+                analyseAScenarioLatestBuild(perfstat.getTestname(), perfstat.getPrpcversion(), perfstat.getBuildlabel());
 
                 logger.info("Completed processing scenario : "+perfstat.getTestname()+", buildlabel : "+perfstat.getBuildlabel());
             } catch (Exception e) {

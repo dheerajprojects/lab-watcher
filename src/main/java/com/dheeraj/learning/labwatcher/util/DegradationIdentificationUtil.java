@@ -226,7 +226,7 @@ public class DegradationIdentificationUtil {
         Double sum = 0.0;
         Double noOfRecords = 0.0;
         String listOfBuilds="";
-        logger.debug("List of params considered are : ");
+        logger.debug("List of builds considered are : ");
         for (PerfStatDTO perfstatDTO : perfStatDTOs) {
             if (perfstatDTO.getDouble(param) != null) {
                 listOfBuilds += perfstatDTO.getBuildlabel()+" : "+perfstatDTO.getDouble(param)+", ";

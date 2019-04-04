@@ -2,8 +2,6 @@ package com.dheeraj.learning.labwatcher.util;
 
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.PerfStatDTO;
-import com.dheeraj.learning.labwatcher.entity.ParamData;
-import com.dheeraj.learning.labwatcher.entity.PerfStat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

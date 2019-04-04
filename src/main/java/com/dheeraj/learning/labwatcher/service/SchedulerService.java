@@ -60,7 +60,7 @@ public class SchedulerService {
      * and identifies if the latest build is degraded or not.
      */
     public void analyseAScenarioLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel) {
-        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount","totalreqcpu","otheriocount","otheriocpu","errorcount","othercount");
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount");
 
         fixTimeAttributeForJUnits(scenarioName, paramList);
 
@@ -72,7 +72,7 @@ public class SchedulerService {
      *
      */
     public void analyseAScenarioMultipleBuilds(String scenarioName) {
-        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount","totalreqcpu","otheriocount","otheriocpu","errorcount","othercount");
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount");
         String prpcVersion = "8.3.0";
         String startDate = "2019-01-04";
         String endDate = "2019-01-19";

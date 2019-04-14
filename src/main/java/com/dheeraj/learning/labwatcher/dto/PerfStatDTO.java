@@ -134,17 +134,6 @@ public class PerfStatDTO {
     private String mprid;
     private String testrunstatus;
 
-    public String getString(String paramName) {
-        switch (paramName) {
-            case "testname":
-                return testname;
-            default:
-                System.out.println("Parameter not found");
-                break;
-        }
-        return null;
-    }
-
     public Double getDouble(String paramName) {
         switch (paramName) {
             case "activitycount":
@@ -335,17 +324,6 @@ public class PerfStatDTO {
                 return totalstartedthreadcount == null ? 0 : totalstartedthreadcount.doubleValue();
             case "infergeneratedjavacpu":
                 return infergeneratedjavacpu == null ? 0 : infergeneratedjavacpu.doubleValue();
-            default:
-                System.out.println("Parameter not found");
-                break;
-        }
-        return null;
-    }
-
-    public Timestamp getTimeStamp(String paramName) {
-        switch (paramName) {
-            case "builddate":
-                return builddate;
             default:
                 System.out.println("Parameter not found");
                 break;

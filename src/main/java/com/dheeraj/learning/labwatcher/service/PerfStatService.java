@@ -1,5 +1,6 @@
 package com.dheeraj.learning.labwatcher.service;
 
+import com.dheeraj.learning.labwatcher.InvalidInputCustomException;
 import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.PerfStatDTO;
@@ -16,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +43,6 @@ public class PerfStatService {
     public static Double MAX_DATA_ACCURACY=70.0;
     public static Double DECENT_DATA_ACCURACY=60.0;
     public static Double MIN_DATA_ACCURACY=60.0;
-    public static Double MIN_ACCURACY_FOR_EMAIL=80.0;
 
     @Autowired
     private PerfStatDAO perfStatDAO;
@@ -60,6 +62,11 @@ public class PerfStatService {
      * @return This an object which contains all the degradation details.
      */
     public ScenarioDataDTO callAScenario(String scenarioName, List<String> paramList, String prpcVersion, String testBuild, boolean isHead) {
+        //validateInputData(scenarioName, paramList, prpcVersion, testBuild);
+
+        //TODO : Validate relevant database data. Whether user requested data exist in the database. Fire perfstat db with scenarioname, prpcversion, testbuild
+        // and see if we get atleast one row. If not then throw error that the requested build doesn't exist.
+        //TODO : Later we might give more information to the user whether scenario is invalid, prpcversion is invalid or build label is invalid.
         //TODO : map/create exact parameters from entity to dto.
         ScenarioDataDTO scenarioDataDTO = new ScenarioDataDTO();
         scenarioDataDTO.setTestname(scenarioName);
@@ -83,14 +90,6 @@ public class PerfStatService {
         }
 
         return scenarioDataDTO;
-    }
-
-    public boolean hasMinimumAccuracy(Map<String, ParamDataDTO> paramDataDTOMap, Double minAccuracy) {
-        for (String param : paramDataDTOMap.keySet()) {
-            if(paramDataDTOMap.get(param).getAccuracy() >= minAccuracy)
-                return true;
-        }
-        return false;
     }
 
     /**
@@ -308,29 +307,25 @@ public class PerfStatService {
         return variedBuildRankMap;
     }
 
-    public List<PerfStatDTO> getPerfStatsBetweenBuilds(String scenarioName, String prpcVersion, String startBuildLabel, String endBuildLabel, int maxResults) {
-        List<PerfStat> list = perfStatDAO.getPerfStatsBetweenBuilds(scenarioName, prpcVersion, startBuildLabel, endBuildLabel, maxResults);
-        List<PerfStatDTO> dtoList = Mapper.copyResultsToDTO(list);
-        return dtoList;
-    }
-
-    public PerfStatDTO getPerfStatForAGivenBuild(String scenarioName, String buildLabel) {
-        PerfStat perfStat = perfStatDAO.getPerfStatForAGivenBuild(scenarioName, buildLabel);
-        PerfStatDTO perfStatDTO = new PerfStatDTO();
-        BeanUtils.copyProperties(perfStat, perfStatDTO);
-        return  perfStatDTO;
-    }
-
-
-    public List<PerfStatDTO> getPerfStatsForLastNBuilds(String scenarioName, String prpcVersion,  String endBuildLabel, int maxResults, boolean isHead) {
-        List<PerfStat> list = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, endBuildLabel, maxResults, isHead);
-
-        List<PerfStatDTO> dtoList = Mapper.copyResultsToDTO(list);
-        return dtoList;
-    }
-
     public List<String> getValidBuildLabelsBetweenGivenDates(String scenarioName, String prpcVersion, String startDate, String endDate) {
         List<String> list = perfStatDAO.getValidBuildLabelsBetweenGivenDates(scenarioName, prpcVersion, startDate, endDate);
         return list;
     }
+
+    public void validateInputData(String scenarioName, List<String> paramList, String prpcVersion, String testBuild) {
+        if(StringUtils.isEmpty(scenarioName)) {
+            logger.info("Scenario name can't be empty : " + scenarioName);
+            throw new InvalidInputCustomException("Scenario name can't be empty : " + scenarioName);
+        } else if (CollectionUtils.isEmpty(paramList)) {
+            logger.info("Parameter list can't be empty : " + paramList);
+            throw new InvalidInputCustomException("Parameter list can't be empty : " + paramList);
+        } else if (StringUtils.isEmpty(prpcVersion)) {
+            logger.info("Prpc Version can't be empty : " + prpcVersion);
+            throw new InvalidInputCustomException("Prpc Version can't be empty : " + prpcVersion);
+        } else if (StringUtils.isEmpty(testBuild)) {
+            logger.info("Testbuild can't be empty : " + testBuild);
+            throw new InvalidInputCustomException("Testbuild can't be empty : " + testBuild);
+        }
+    }
 }
+

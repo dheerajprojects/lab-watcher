@@ -33,10 +33,6 @@ public class PerfStatDAO {
     ScenarioDataRepository scenarioDataRepository;
 
     public List<PerfStat> getPerfStatsBetweenBuilds(String scenarioName, String prpcVersion, String startBuildLabel, String endBuildLabel, int maxResults) {
-        String sql2 = "select s " +
-                "from Student s " +
-                "where s.studentName = :studentName ";
-
         String sql = "FROM PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
@@ -55,10 +51,6 @@ public class PerfStatDAO {
     }
 
     public PerfStat getPerfStatForAGivenBuild(String scenarioName, String buildLabel) {
-        String sql2 = "select s " +
-                "from Student s " +
-                "where s.studentName = :studentName ";
-
         String sql = "FROM PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
@@ -74,10 +66,6 @@ public class PerfStatDAO {
     }
 
     public List<PerfStat> getPerfStatsForLastNBuilds(String scenarioName, String prpcVersion, String endBuildLabel, int maxResults, boolean isHead) {
-        String sql2 = "select s " +
-                "from Student s " +
-                "where s.studentName = :studentName ";
-
         String sql = "FROM PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
@@ -225,40 +213,6 @@ public class PerfStatDAO {
         }
 
         return list.get(0);
-    }
-
-    public Integer getNumberOfRecords(String scenarioName, String prpcVersion, boolean isHead) {
-        String sql = "select count(*) FROM PerfStat " +
-                "where trialtype='Performance' " +
-                "and runlevel='optimized' " +
-                "and testname='" + scenarioName + "' " +
-                "and prpcversion='" + prpcVersion + "' " +
-                "and isvalidrun='true' " +
-                "and buildinfo like '%HEAD%' ";
-
-        Query query = em.createQuery(sql);
-        List<Object> rows = query.getResultList();
-        if(rows.size() > 1)
-            logger.info("Something is wrong with the query result. Current row size : "+rows.size());
-
-        return Integer.parseInt(rows.get(0)+"");
-    }
-
-    /**
-     * Currently this gives today's builds.
-     * @return
-     */
-    public List<PerfStat> getLatestBuilds() {
-        String sql = "from PerfStat " +
-                "where trialtype='Performance' " +
-                "and runlevel='optimized' " +
-                "and isvalidrun='true' " +
-                "and buildinfo like '%HEAD%' " +
-                "and teststart > current_date";
-
-        Query query = em.createQuery(sql);
-        List<PerfStat> list = query.getResultList();
-        return list;
     }
 
     /**

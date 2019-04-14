@@ -35,45 +35,11 @@ public class EmailService {
     public static String subject = "testsubject";
     public static String body = "<h1> Hello </h1>";
 
-    public static void sendEmail() {
-        // Get system properties
-        Properties properties = new Properties();
-        // Setup mail server
-        properties.setProperty("mail.smtp.host", SMTP_SERVER);
-
-        // Get the default Session object.
-        Session session = Session.getDefaultInstance(properties);
-
-        try {
-            MimeMessage message = new MimeMessage(session); // Create a default MimeMessage object.
-            message.setContent(message, "text/html");
-            message.setFrom(new InternetAddress(FROM_ADDRESS));// Set From: header field of the header.
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(TO_ADDRESS));// Set To: header field of the header.
-            message.setSubject(subject);// Set Subject: header field
-            message.setText(body);
-
-            Transport.send(message);// Send message
-
-            logger.info("Sent message successfully....");
-        } catch (MessagingException mex) {
-            mex.printStackTrace();
-        }
-    }
-
     public static void sendEmail(ScenarioDataDTO scenarioDataDTO) {
         subject = scenarioDataDTO.getTestname() + " is varied on build : " + scenarioDataDTO.getLatestbuild();
         //removeStableParams(scenarioDataDTO);
         constructBody(scenarioDataDTO);
         sendApacheCommonsEmail();
-    }
-
-    public static void removeStableParams(ScenarioDataDTO scenarioDataDTO) {
-        Map<String, ParamDataDTO> paramMap = scenarioDataDTO.getMap();
-        for (String param: paramMap.keySet()) {
-            if(!paramMap.get(param).isImproved() && !paramMap.get(param).isDegraded()) {
-                paramMap.remove(param);
-            }
-        }
     }
 
     public static void sendApacheCommonsEmail() {

@@ -1,6 +1,5 @@
 package com.dheeraj.learning.labwatcher.service;
 
-import com.dheeraj.learning.labwatcher.constants.JUnitScenarios;
 import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
 import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
 import com.dheeraj.learning.labwatcher.entity.PerfStat;
@@ -51,18 +50,6 @@ public class SchedulerService {
         List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime");
         String prpcVersion = "8.3.0";
         String currentBuildLabel = "PRPC-HEAD-6813";
-
-        perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
-    }
-
-    /**
-     * This method is analyses the latest build of a scenario with the last n builds
-     * and identifies if the latest build is degraded or not.
-     */
-    public void analyseAScenarioLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel) {
-        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount");
-
-        fixTimeAttributeForJUnits(scenarioName, paramList);
 
         perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
     }
@@ -129,6 +116,22 @@ public class SchedulerService {
 
         ScenarioDataDTO scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
         logger.debug(scenarioDataDTO.toString());
+
+        return scenarioDataDTO;
+    }
+
+    /**
+     * This method is analyses the latest build of a scenario with the last n builds
+     * and identifies if the latest build is degraded or not.
+     */
+    public ScenarioDataDTO analyseAScenarioLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel) {
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount");
+
+        fixTimeAttributeForJUnits(scenarioName, paramList);
+
+        ScenarioDataDTO scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
+
+        logger.debug(scenarioDataDTO!=null?scenarioDataDTO.toString():"ScenarioDataDTO is null");
 
         return scenarioDataDTO;
     }

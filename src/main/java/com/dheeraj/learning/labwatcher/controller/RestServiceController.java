@@ -14,7 +14,7 @@ public class RestServiceController {
     private SchedulerService schedulerService;
 
     @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{testBuild}/{param}")
-    public ScenarioDataDTO analyseAParticularBuild(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
+    public ScenarioDataDTO analyseAParticularBuildParticularParam(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
                                                    @PathVariable("testBuild") String testBuild, @PathVariable("param") String param){
         ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, testBuild, prpcversion, param);
         return scenarioDataDTO;
@@ -25,5 +25,12 @@ public class RestServiceController {
                                                 @PathVariable("testBuild") String testBuild, @PathVariable("param") String param){
         String jsonString = schedulerService.analyseAParticularBuildReturnString(scenarioName, testBuild, prpcversion, param);
         return jsonString;
+    }
+
+    @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{testBuild}")
+    public ScenarioDataDTO analyseAParticularBuild(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
+                                                   @PathVariable("testBuild") String testBuild){
+        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, prpcversion, testBuild);
+        return scenarioDataDTO;
     }
 }

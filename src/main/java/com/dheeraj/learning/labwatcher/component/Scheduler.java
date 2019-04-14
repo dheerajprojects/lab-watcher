@@ -21,9 +21,9 @@ public class Scheduler {
     @Autowired
     SchedulerService schedulerService;
 
-    @Scheduled(initialDelay=0, fixedRate=24*60*60*1000)
+    //@Scheduled(initialDelay=0, fixedRate=24*60*60*1000)
     public void scheduleTaskWithFixedRate() {
-        schedulerService.scheduleDailyRuns("CCCASE",null ,35);
+        schedulerService.scheduleDailyRuns("DataEngineJUnit","2019-03-27" ,3);
         //schedulerService.analyseAScenarioMultipleBuildsHardCoded();
     }
 

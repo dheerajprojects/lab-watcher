@@ -32,24 +32,6 @@ public class PerfStatDAO {
     @Autowired
     ScenarioDataRepository scenarioDataRepository;
 
-    public List<PerfStat> getPerfStatsBetweenBuilds(String scenarioName, String prpcVersion, String startBuildLabel, String endBuildLabel, int maxResults) {
-        String sql = "FROM PerfStat " +
-                "where trialtype='Performance' " +
-                "and runlevel='optimized' " +
-                "and testname='" + scenarioName + "' " +
-                "and prpcversion='" + prpcVersion + "' " +
-                "and isvalidrun='true'" +
-                "and buildlabel >= '" + startBuildLabel + "' " +
-                "and buildlabel <= '" + endBuildLabel + "' " +
-                "order by teststart desc";
-
-        Query query = em.createQuery(sql);
-        // TODO : Verify here if the results size is  <= rank.
-        // query.setMaxResults(maxResults);
-        List<PerfStat> list = query.getResultList();
-        return list;
-    }
-
     public PerfStat getPerfStatForAGivenBuild(String scenarioName, String buildLabel) {
         String sql = "FROM PerfStat " +
                 "where trialtype='Performance' " +
@@ -251,6 +233,45 @@ public class PerfStatDAO {
                 "order by buildlabel asc";
 
         Query query = em.createQuery(sql);
+        List<PerfStat> list = query.getResultList();
+        return list;
+    }
+
+    /**
+     * Retrieves builds on the given date.
+     * @param startDate This excludes the start date
+     * @return
+     */
+    public List<PerfStat> getBuildsBetweenBuilds(String startDate, String endDate) {
+        String sql = "FROM PerfStat " +
+                "where trialtype='Performance' " +
+                "and runlevel='optimized' " +
+                "and isvalidrun='true' " +
+                "and buildinfo like '%HEAD%' " +
+                "and cast(teststart as date) > '"+startDate+"' "+
+                "and cast(teststart as date) <= '"+endDate+"' "+
+                "and prpcversion <> null "+
+                "order by buildlabel asc";
+
+        Query query = em.createQuery(sql);
+        List<PerfStat> list = query.getResultList();
+        return list;
+    }
+
+    public List<PerfStat> getPerfStatsBetweenBuilds(String scenarioName, String prpcVersion, String startBuildLabel, String endBuildLabel, int maxResults) {
+        String sql = "FROM PerfStat " +
+                "where trialtype='Performance' " +
+                "and runlevel='optimized' " +
+                "and testname='" + scenarioName + "' " +
+                "and prpcversion='" + prpcVersion + "' " +
+                "and isvalidrun='true'" +
+                "and buildlabel >= '" + startBuildLabel + "' " +
+                "and buildlabel <= '" + endBuildLabel + "' " +
+                "order by teststart desc";
+
+        Query query = em.createQuery(sql);
+        // TODO : Verify here if the results size is  <= rank.
+        // query.setMaxResults(maxResults);
         List<PerfStat> list = query.getResultList();
         return list;
     }

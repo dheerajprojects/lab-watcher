@@ -11,8 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -165,6 +164,17 @@ public class SchedulerService {
         }
     }
 
+    public void scheduleDailyRuns() {
+        logger.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+
+        LocalDateTime endDate = LocalDate.now().atStartOfDay();
+        LocalDateTime startDate = endDate.minusDays(1);
+        //Gets all available builds from Yesterday 0 hour to today 0 hour.
+        List<PerfStat> perfStats = perfStatDAO.getBuildsBetweenBuilds(startDate.toString(), endDate.toString());
+
+        runAnalysisOnGivenPerfStats(perfStats);
+    }
+
     public void runAnalysisOnDailyBuilds(String date, String scenarioName) {
         logger.info("Running analysis on performance metrics on "+date+"...");
         List<PerfStat> perfStats;
@@ -175,6 +185,10 @@ public class SchedulerService {
         }
 
 
+        runAnalysisOnGivenPerfStats(perfStats);
+    }
+
+    public void runAnalysisOnGivenPerfStats(List<PerfStat> perfStats) {
         logger.info("Number of builds for analysis : "+perfStats.size());
         for (PerfStat perfstat : perfStats) {
             try {

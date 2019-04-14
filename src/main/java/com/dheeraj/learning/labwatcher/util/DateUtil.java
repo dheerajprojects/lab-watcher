@@ -1,7 +1,6 @@
 package com.dheeraj.learning.labwatcher.util;
 
-import java.time.Duration;
-import java.time.LocalDate;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +10,17 @@ public class DateUtil {
 
         System.out.println(Duration.between(LocalDate.now().atStartOfDay(), LocalDate.parse("2018-10-24").atStartOfDay()).toDays());
         System.out.println(LocalDate.now().toString());
+
+        /*LocalDate startDate = LocalDate.now();
+        LocalTime nineAM = LocalTime.of(9, 0);
+        LocalDateTime todaySpecificTime = LocalDateTime.of(startDate, nineAM);
+        System.out.println(todaySpecificTime);
+        System.out.println(todaySpecificTime.minusDays(1));*/
+
+        LocalDateTime endDate = LocalDate.now().atStartOfDay();
+        LocalDateTime startDate = endDate.minusDays(1);
+        System.out.println(endDate);
+        System.out.println(startDate);
     }
 
     /**

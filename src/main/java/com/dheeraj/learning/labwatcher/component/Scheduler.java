@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * The below class is created based on : https://www.callicoder.com/spring-boot-task-scheduling-with-scheduled-annotation/
  *
@@ -16,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Scheduler {
     private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
-
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Autowired
     SchedulerService schedulerService;
@@ -35,10 +38,12 @@ public class Scheduler {
     public void scheduleTaskWithInitialDelay() {}
 
     /**
-     * Can refer this link for cron tasks : http://www.nncron.ru/help/EN/working/cron-format.htm
+     * https://www.baeldung.com/cron-expressions
+     * <second> <minute> <hour> <day-of-month> <month> <day-of-week> <year>
+     *
      */
-    //@Scheduled(cron = "45 17 * * * *")
+    @Scheduled(cron = "0 0 9 ? * *")
     public void scheduleTaskWithCronExpression() {
-        //schedulerService.scheduleDailyRuns(null);
+        schedulerService.scheduleDailyRuns();
     }
 }

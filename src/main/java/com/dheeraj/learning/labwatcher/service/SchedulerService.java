@@ -15,6 +15,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * This just mimics invocation of PerfStatService from a cron job.
@@ -39,6 +40,9 @@ public class SchedulerService {
 
     @Autowired
     PerfStatDAO perfStatDAO;
+
+    @Autowired
+    ConfigurationService configurationService;
 
     /**
      * This method is analyses the latest build of a scenario with the last n builds
@@ -124,7 +128,7 @@ public class SchedulerService {
      * and identifies if the latest build is degraded or not.
      */
     public ScenarioDataDTO analyseAScenarioLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel) {
-        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount");
+        List<String> paramList = configurationService.getPerformanceMetrics();
 
         fixTimeAttributeForJUnits(scenarioName, paramList);
 
@@ -152,6 +156,14 @@ public class SchedulerService {
         return jsonString;
     }
 
+    /**
+     * This methods triggers analysis for the past n days #numberOfDays builds from current date.
+     * When scenarioName is null, it runs on all performance scenarios.
+     *
+     * @param scenarioName
+     * @param startDate
+     * @param numberOfDays
+     */
     public void scheduleDailyRuns(String scenarioName, String startDate, Integer numberOfDays) {
         logger.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
 

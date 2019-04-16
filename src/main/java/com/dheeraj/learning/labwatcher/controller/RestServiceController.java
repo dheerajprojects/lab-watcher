@@ -2,6 +2,8 @@ package com.dheeraj.learning.labwatcher.controller;
 
 import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
 import com.dheeraj.learning.labwatcher.service.SchedulerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class RestServiceController {
+
+    Logger logger = LoggerFactory.getLogger(RestServiceController.class);
 
     @Autowired
     private SchedulerService schedulerService;
@@ -33,4 +37,14 @@ public class RestServiceController {
         ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, prpcversion, testBuild);
         return scenarioDataDTO;
     }
+
+    @GetMapping("allscenarios/{currentDate}/{noOfPreviousDays}")
+    public void analyseAParticularBuild(@PathVariable("currentDate") String currentDate, @PathVariable("noOfPreviousDays") String noOfPreviousDays){
+        logger.info("Running performance metric analysis for all scenarios from last "+noOfPreviousDays+" days till "+currentDate);
+        logger.info("Current Date : "+currentDate);
+        logger.info("Number of previous days : "+noOfPreviousDays);
+
+        schedulerService.scheduleDailyRuns(null,currentDate ,Integer.parseInt(noOfPreviousDays));
+    }
+
 }

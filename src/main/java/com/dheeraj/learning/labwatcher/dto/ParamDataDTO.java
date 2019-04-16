@@ -13,9 +13,17 @@ public class ParamDataDTO {
     transient Double tempsum = 0.0;
     transient Double tempSD = 0.0;
     Double variedBy = 0.0;
-    int variedBuildRank=0;
+
+    /**
+     * Last baseline build position from current build.
+     */
+    int baselineBuildPosition =0;
     boolean isDegraded;
     boolean isImproved;
+
+    /**
+     * This defines the confidence level of the identified degradation or improvement.
+     */
     Double accuracy = 0.0;
 
     public ParamDataDTO() {
@@ -111,12 +119,12 @@ public class ParamDataDTO {
         this.variedBy = variedBy;
     }
 
-    public int getVariedBuildRank() {
-        return variedBuildRank;
+    public int getBaselineBuildPosition() {
+        return baselineBuildPosition;
     }
 
-    public void setVariedBuildRank(int variedBuildRank) {
-        this.variedBuildRank = variedBuildRank;
+    public void setBaselineBuildPosition(int baselineBuildPosition) {
+        this.baselineBuildPosition = baselineBuildPosition;
     }
 
     public boolean isImproved() {
@@ -164,7 +172,7 @@ public class ParamDataDTO {
                 ", tempsum=" + tempsum +
                 ", tempSD=" + tempSD +
                 ", variedBy=" + variedBy +
-                ", variedBuildRank=" + variedBuildRank +
+                ", baselineBuildPosition=" + baselineBuildPosition +
                 ", isDegraded=" + isDegraded +
                 ", isImproved=" + isImproved +
                 ", accuracy=" + accuracy +

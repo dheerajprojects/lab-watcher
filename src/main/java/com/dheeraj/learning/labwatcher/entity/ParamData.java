@@ -14,6 +14,10 @@ public class ParamData {
     Double paramValue;
     Double noOfValidRecords = 0.0;
     Double variedBy = 0.0;
+    /**
+     * This indicates the number of builds between last baseline and current build.
+     * TODO : Rename this field to baselineBuildPosition later.
+     */
     int variedBuildRank;
     boolean isDegraded;
     boolean isImproved;

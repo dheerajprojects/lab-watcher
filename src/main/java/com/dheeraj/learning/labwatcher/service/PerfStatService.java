@@ -93,41 +93,42 @@ public class PerfStatService {
     }
 
     /**
-     * This method contains the important logic to identify degradation.
-     * This method can be improved to add more configuraiton stuff.
-     * @param scenarioName
-     * @param paramList
-     * @param prpcVersion
-     * @param currentBuildLabel
-     * @return
+     * This method retrieves different baselines for each parameter and based on the position of the baseline build, it performs different tasks to identify the given build degradation.
+     *
+     * @param scenarioName Performance scenario to be tested.
+     * @param paramList List of performance metrics to be analyzed for degradation or improvement.
+     * @param prpcVersion PrpcVersion for the #currentBuildLabel.
+     * @param currentBuildLabel Build to be tested.
+     *
+     * @return A map of given performance metrics with analysis results.
      */
     public Map<String, ParamDataDTO> analyseData(String scenarioName, List<String> paramList, String prpcVersion, String currentBuildLabel, boolean isHead) {
 
-        Map<String, ParamDataDTO> variedBuildRankMap = getLastVariedBuildDetails(scenarioName, paramList, currentBuildLabel, prpcVersion, isHead);
+        Map<String, ParamDataDTO> baselineBuildMap = getLatestBaselineBuildDetails(scenarioName, paramList, currentBuildLabel, prpcVersion, isHead);
         Map<String, ParamDataDTO> currentBuildParamMap = createMapOfGivenParams(paramList, scenarioName, currentBuildLabel);
 
         //For loop over params
         for (String param : currentBuildParamMap.keySet()) {
-            ParamDataDTO variedBuildParamDataDTO = variedBuildRankMap.get(param);
+            ParamDataDTO baselineBuildParamDataDTO = baselineBuildMap.get(param);
             //The second condition occurs below only when the first condition is false
-            if( variedBuildParamDataDTO  == null) {
+            if( baselineBuildParamDataDTO  == null) {
                 analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, MAX_DATA_SIZE, MAX_DATA_ACCURACY);
-            } else if (variedBuildParamDataDTO.getVariedBuildRank() > DECENT_DATA_SIZE) {
-                analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, variedBuildParamDataDTO.getVariedBuildRank(), DECENT_DATA_ACCURACY);
-            } else if (variedBuildParamDataDTO.getVariedBuildRank() >= MIN_DATA_SIZE && variedBuildParamDataDTO.getVariedBuildRank() <= DECENT_DATA_SIZE){
-                analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, variedBuildParamDataDTO.getVariedBuildRank(), MIN_DATA_ACCURACY);
+            } else if (baselineBuildParamDataDTO.getBaselineBuildPosition() > DECENT_DATA_SIZE) {
+                analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, baselineBuildParamDataDTO.getBaselineBuildPosition(), DECENT_DATA_ACCURACY);
+            } else if (baselineBuildParamDataDTO.getBaselineBuildPosition() >= MIN_DATA_SIZE && baselineBuildParamDataDTO.getBaselineBuildPosition() <= DECENT_DATA_SIZE){
+                analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, baselineBuildParamDataDTO.getBaselineBuildPosition(), MIN_DATA_ACCURACY);
             } else {
-                int rank = variedBuildParamDataDTO.getVariedBuildRank();
+                int rank = baselineBuildParamDataDTO.getBaselineBuildPosition();
                 Double accuracy = 0.0;
-                if (variedBuildParamDataDTO.isDegraded()) {
-                    accuracy = analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, variedBuildRankMap.get(param).getBuildLabel(), param, rank, true);
-                } else if (variedBuildParamDataDTO.isImproved()) {
-                    accuracy = analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, variedBuildRankMap.get(param).getBuildLabel(), param, rank, false);
+                if (baselineBuildParamDataDTO.isDegraded()) {
+                    accuracy = analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, baselineBuildMap.get(param).getBuildLabel(), param, rank, true);
+                } else if (baselineBuildParamDataDTO.isImproved()) {
+                    accuracy = analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, baselineBuildMap.get(param).getBuildLabel(), param, rank, false);
                 } else {
                     logger.debug("Though this param is neither improved nor degraded somehow this data got into database incorrectly.");
                 }
 
-                decideAndSendEmail(variedBuildParamDataDTO, accuracy);
+                decideAndSendEmail(baselineBuildParamDataDTO, accuracy);
             }
         }
         return currentBuildParamMap;
@@ -135,7 +136,7 @@ public class PerfStatService {
 
     public void decideAndSendEmail(ParamDataDTO variedBuildParamDTO, Double accuracy) {
         boolean sendEmail = false;
-        Integer rank = variedBuildParamDTO.getVariedBuildRank();
+        Integer rank = variedBuildParamDTO.getBaselineBuildPosition();
         if(rank >= 3) {
             if(rank == 3 && accuracy >= 90) {
                 sendEmail = true;
@@ -289,22 +290,23 @@ public class PerfStatService {
 
     /**
      * This method retrieves the builds(#with ocmplete parameter data) which were degraded/improved earlier for the given scenario.
+     * In other words this method returns latest baseline build for each parameter. How far is the
      * @param scenarioName
      * @param paramList
      * @param currentBuildLabel
      * @return
      */
-    private Map<String, ParamDataDTO> getLastVariedBuildDetails(String scenarioName, List<String> paramList, String currentBuildLabel, String prpcVersion, boolean isHead) {
-        Map<String, ParamDataDTO> variedBuildRankMap = new HashMap<>();
+    private Map<String, ParamDataDTO> getLatestBaselineBuildDetails(String scenarioName, List<String> paramList, String currentBuildLabel, String prpcVersion, boolean isHead) {
+        Map<String, ParamDataDTO> baselineBuildMap = new HashMap<>();
         for (String param : paramList) {
             ParamData paramData = perfStatDAO.getVariedBuildRankDetails(scenarioName, param, currentBuildLabel, prpcVersion, isHead);
             ParamDataDTO paramDataDTO = null;
             if(paramData != null)
                 paramDataDTO = Mapper.convert(paramData);
 
-            variedBuildRankMap.put(param, paramDataDTO);
+            baselineBuildMap.put(param, paramDataDTO);
         }
-        return variedBuildRankMap;
+        return baselineBuildMap;
     }
 
     public List<String> getValidBuildLabelsBetweenGivenDates(String scenarioName, String prpcVersion, String startDate, String endDate) {

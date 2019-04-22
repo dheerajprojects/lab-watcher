@@ -35,7 +35,7 @@ public class LabWatcherApplicationTests {
         schedulerService.scheduleDailyRuns(null,"2019-04-17" ,0);
     }
 
-    @Test
+    //@Test
     public void testEmail() {
         EmailService.sendEmail(DataUtil.getScenarioDataDTO());
     }

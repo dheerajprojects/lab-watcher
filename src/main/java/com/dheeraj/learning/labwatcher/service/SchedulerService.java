@@ -15,7 +15,6 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * This just mimics invocation of PerfStatService from a cron job.

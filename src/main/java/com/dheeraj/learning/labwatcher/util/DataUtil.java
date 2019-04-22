@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class DataUtil {
 
@@ -29,6 +30,7 @@ public class DataUtil {
         paramData1.setParamValue(91.76);
         paramData1.setVariedBy(2.998627857660821);
         paramData1.setNoOfValidRecords(10.0);
+        paramData1.setAccuracy(60.0);
 
 
         ParamData paramData2 = new ParamData("rdbiocount");
@@ -37,7 +39,8 @@ public class DataUtil {
         paramData2.setStandardDeviation(43.531566570234802);
         paramData2.setParamValue(91.73246);
         paramData2.setVariedBy(29.998627857660821);
-        paramData1.setNoOfValidRecords(20.0);
+        paramData2.setNoOfValidRecords(20.0);
+        paramData2.setAccuracy(60.0);
 
         ScenarioData scenarioData = new ScenarioData();
         scenarioData.setBuildLabel("PRPC-HEAD-5577");
@@ -234,5 +237,11 @@ public class DataUtil {
         logger.trace("Value : "+value);
         DecimalFormat decimalFormat = new DecimalFormat("##.##");
         return decimalFormat.format(value);
+    }
+
+    public static void main(String[] args) {
+        Random rand = new Random();
+        for (int i=0;i<20;i++)
+            System.out.println(rand.nextInt(10));
     }
 }

@@ -102,6 +102,7 @@ public class Mapper {
 
         BeanUtils.copyProperties(paramData, paramDataDTO);
 
+        paramDataDTO.setBaselineBuildPosition(paramData.getVariedBuildRank());
         paramDataDTO.setScenarioName(paramData.getScenarioData().getTestname());
         paramDataDTO.setBuildLabel(paramData.getScenarioData().getBuildLabel());
 

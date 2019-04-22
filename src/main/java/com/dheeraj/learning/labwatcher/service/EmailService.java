@@ -36,6 +36,8 @@ public class EmailService {
     public static String body = "<h1> Hello </h1>";
 
     public static void sendEmail(ScenarioDataDTO scenarioDataDTO) {
+        logger.info("Sending email to "+TO_ADDRESS+" for degradation/improvement in :"+scenarioDataDTO.getTestname()+
+                " for build  :"+scenarioDataDTO.getLatestbuild());
         subject = scenarioDataDTO.getTestname() + " is varied on build : " + scenarioDataDTO.getLatestbuild();
         //removeStableParams(scenarioDataDTO);
         constructBody(scenarioDataDTO);

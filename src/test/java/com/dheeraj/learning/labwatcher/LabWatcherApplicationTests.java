@@ -29,13 +29,13 @@ public class LabWatcherApplicationTests {
     ConfigurationService configurationService;
 
 
-    @Test
+
     public void contextLoads() {
         //TODO : Remove DTOs and use only Entity objects everywhere.
-        schedulerService.scheduleDailyRuns(null,"2019-04-16" ,0);
+        schedulerService.scheduleDailyRuns(null,"2019-04-17" ,0);
     }
 
-    //@Test
+    @Test
     public void testEmail() {
         EmailService.sendEmail(DataUtil.getScenarioDataDTO());
     }

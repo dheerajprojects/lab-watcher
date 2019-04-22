@@ -1,0 +1,5 @@
+How to run this application by command prompt.
+To compile
+mvn clean install -DskipTests=true
+To run
+mvn spring-boot:run

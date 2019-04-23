@@ -109,6 +109,7 @@ public class PerfStatService {
 
         //For loop over params
         for (String param : currentBuildParamMap.keySet()) {
+            logger.debug("Processing parameter : "+param);
             ParamDataDTO baselineBuildParamDataDTO = baselineBuildMap.get(param);
             //The second condition occurs below only when the first condition is false
             if( baselineBuildParamDataDTO  == null) {

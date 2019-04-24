@@ -131,7 +131,9 @@ public class ParamData {
     @Override
     public String toString() {
         return "ParamData{" +
-                "paramId=" + paramId +
+                "buildLabel=" + (scenarioData==null?"":scenarioData.getBuildLabel()) +
+                ", testname="+ (scenarioData==null?"":scenarioData.getTestname()) +
+                ", paramId=" + paramId +
                 ", paramName='" + paramName + '\'' +
                 ", mean=" + mean +
                 ", standardDeviation=" + standardDeviation +
@@ -142,8 +144,6 @@ public class ParamData {
                 ", isDegraded=" + isDegraded +
                 ", isImproved=" + isImproved +
                 ", accuracy=" + accuracy +
-                ", buildLabel=" + scenarioData.getBuildLabel() +
-                ", testname="+ scenarioData.getTestname() +
                 '}';
     }
 }

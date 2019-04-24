@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" th:href="@{webjars/bootstrap/4.2.1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+<style>
+    #results {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    #results td, #results th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    #results tr:nth-child(even){background-color: #f2f2f2;}
+
+    #results tr:hover {background-color: #ddd;}
+
+    #results th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #4CAF50;
+        color: white;
+    }
+</style>
+</head>
+<body>
+<div>
+    <h2>Degradations or Improvements identified by LabWatcher</h2>
+    <table id="results">
+        <tr>
+            <th>BuildLabel</th>
+            <th>ScenarioName</th>
+            <th>Performance Metric</th>
+            <th>Performance Metric Value</th>
+            <th>Degradation %</th>
+        </tr>
+        <tr th:each="result : ${analyzedresults}">
+            <td th:text="${result.buildLabel}"></td>
+            <td th:text="${result.scenarioName}"></td>
+            <td th:text="${result.paramName}"></td>
+            <td th:text="${#numbers.formatDecimal(result.paramValue,2,2)}"></td>
+            <td th:text="${#numbers.formatDecimal(result.variedBy,2,2)}"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

@@ -1,7 +1,12 @@
 package com.dheeraj.learning.labwatcher;
 
+import com.dheeraj.learning.labwatcher.dao.ParamDataDAO;
 import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
+import com.dheeraj.learning.labwatcher.entity.ParamData;
 import com.dheeraj.learning.labwatcher.entity.PerfStat;
+import com.dheeraj.learning.labwatcher.entity.ScenarioData;
+import com.dheeraj.learning.labwatcher.repository.ParamDataRepository;
+import com.dheeraj.learning.labwatcher.repository.ScenarioDataRepository;
 import com.dheeraj.learning.labwatcher.service.ConfigurationService;
 import com.dheeraj.learning.labwatcher.service.EmailService;
 import com.dheeraj.learning.labwatcher.service.SchedulerService;
@@ -28,7 +33,14 @@ public class LabWatcherApplicationTests {
     @Autowired
     ConfigurationService configurationService;
 
+    @Autowired
+    ScenarioDataRepository scenarioDataRepository;
 
+    @Autowired
+    ParamDataRepository paramDataRepository;
+
+    @Autowired
+    ParamDataDAO paramDataDAO;
 
     public void contextLoads() {
         //TODO : Remove DTOs and use only Entity objects everywhere.
@@ -81,5 +93,16 @@ public class LabWatcherApplicationTests {
             e.printStackTrace();
         }
         System.out.println(configurationService.getPerformanceMetrics());
+    }
+
+    @Test
+    public void testScenarioDataRepository() {
+        //List<ScenarioData> scenarioDatas = scenarioDataRepository.findAll();
+        //List<ParamData> paramDatas = paramDataRepository.findByAccuracyGreaterThan(50.0);
+        List<ParamData> paramDatas = paramDataDAO.getAll();
+        for (ParamData paramData :
+                paramDatas) {
+            System.out.println(paramData);
+        }
     }
 }

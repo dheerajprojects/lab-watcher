@@ -109,4 +109,14 @@ public class Mapper {
         return paramDataDTO;
     }
 
+    public static List<ParamDataDTO> convertResultsToDTO(List<ParamData> paramDatas){
+        List<ParamDataDTO> paramDataDTOs = new ArrayList<>();
+        for (ParamData paramData : paramDatas) {
+            if(paramData.getScenarioData() != null)
+                paramDataDTOs.add(convert(paramData));
+        }
+
+        return paramDataDTOs;
+    }
+
 }

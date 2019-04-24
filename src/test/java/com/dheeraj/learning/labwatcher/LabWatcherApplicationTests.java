@@ -95,7 +95,7 @@ public class LabWatcherApplicationTests {
         System.out.println(configurationService.getPerformanceMetrics());
     }
 
-    @Test
+    //@Test
     public void testScenarioDataRepository() {
         //List<ScenarioData> scenarioDatas = scenarioDataRepository.findAll();
         //List<ParamData> paramDatas = paramDataRepository.findByAccuracyGreaterThan(50.0);
@@ -104,5 +104,10 @@ public class LabWatcherApplicationTests {
                 paramDatas) {
             System.out.println(paramData);
         }
+    }
+
+    @Test
+    public void criteriaTest() {
+        paramDataDAO.researchOnCriteria();
     }
 }

@@ -9,8 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.concurrent.RecursiveTask;
 
 /**
  *  * /analyzedresults/scenarios/              --all scenario
@@ -70,5 +73,17 @@ public class ParamDataDAO {
 
     public List<ParamData> getDataOnGivenPerfMetric(String perfMetric, Boolean isDegraded){
         return getAll(100.0, null, null, perfMetric, isDegraded);
+    }
+
+    public void researchOnCriteria() {
+        CriteriaBuilder cb=em.getCriteriaBuilder();
+        CriteriaQuery<ParamData> cq=cb.createQuery(ParamData.class);
+        Root<ParamData> paramDatas=cq.from(ParamData.class);
+        CriteriaQuery<ParamData> select = cq.multiselect(paramDatas.get("paramName"),paramDatas.get("paramValue"));
+        TypedQuery<ParamData> q = em.createQuery(select);
+        List<ParamData> list = q.getResultList();
+        for (ParamData paramData : list) {
+            System.out.println(paramData);
+        }
     }
 }

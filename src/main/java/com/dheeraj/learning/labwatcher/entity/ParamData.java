@@ -28,6 +28,11 @@ public class ParamData {
     public ParamData() {
     }
 
+    public ParamData(String paramName, Double paramValue) {
+        this.paramName=paramName;
+        this.paramValue=paramValue;
+    }
+
     public ParamData(String paramName) {
         this.paramName = paramName;
     }

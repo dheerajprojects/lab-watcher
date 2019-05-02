@@ -42,7 +42,7 @@ public class Scheduler {
      * <second> <minute> <hour> <day-of-month> <month> <day-of-week> <year>
      *
      */
-    //@Scheduled(cron = "0 0 9 ? * *")
+    @Scheduled(cron = "0 0 9 ? * *")
     public void scheduleTaskWithCronExpression() {
         schedulerService.scheduleDailyRuns();
     }

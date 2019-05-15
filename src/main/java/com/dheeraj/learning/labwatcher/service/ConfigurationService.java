@@ -21,9 +21,12 @@ import java.util.Properties;
 public class ConfigurationService {
 
     private Properties properties;
-    private String PROPERTIES_FILE_NAME="src/main/resources/scenarioConfiguration.properties";
+    private Properties emailProperties;
 
-    private void loadProperties() {
+    private String PROPERTIES_FILE_NAME="src/main/resources/scenarioConfiguration.properties";
+    private String EMAIL_PROPERTIES_FILE_NAME="src/main/resources/emailConfig.properties";
+
+    private void loadScenarioConfigProperties() {
         properties = new Properties();
         try {
             properties.load(new FileReader(PROPERTIES_FILE_NAME));
@@ -33,10 +36,24 @@ public class ConfigurationService {
     }
 
     public List<String> getPerformanceMetrics() {
-        loadProperties();
+        loadScenarioConfigProperties();
         String perfMetrics = properties.getProperty("perf.metrics");
         List<String> list = DataUtil.buildArrayList(perfMetrics);
         return list;
+    }
+
+    private void loadEmailProperties() {
+        emailProperties = new Properties();
+        try {
+            emailProperties.load(new FileReader(EMAIL_PROPERTIES_FILE_NAME));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Properties getEmailProperties() {
+        loadEmailProperties();
+        return emailProperties;
     }
 }
 

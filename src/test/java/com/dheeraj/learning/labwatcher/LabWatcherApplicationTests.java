@@ -4,7 +4,6 @@ import com.dheeraj.learning.labwatcher.dao.ParamDataDAO;
 import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
 import com.dheeraj.learning.labwatcher.entity.ParamData;
 import com.dheeraj.learning.labwatcher.entity.PerfStat;
-import com.dheeraj.learning.labwatcher.entity.ScenarioData;
 import com.dheeraj.learning.labwatcher.repository.ParamDataRepository;
 import com.dheeraj.learning.labwatcher.repository.ScenarioDataRepository;
 import com.dheeraj.learning.labwatcher.service.ConfigurationService;
@@ -47,7 +46,7 @@ public class LabWatcherApplicationTests {
         schedulerService.scheduleDailyRuns(null,"2019-04-17" ,0);
     }
 
-    //@Test
+    @Test
     public void testEmail() {
         EmailService.sendEmail(DataUtil.getScenarioDataDTO());
     }
@@ -106,7 +105,7 @@ public class LabWatcherApplicationTests {
         }
     }
 
-    @Test
+    //@Test
     public void criteriaTest() {
         paramDataDAO.researchOnCriteria();
     }

@@ -3,6 +3,7 @@ package com.dheeraj.learning.labwatcher.service;
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
 import com.dheeraj.learning.labwatcher.entity.ParamData;
+import com.dheeraj.learning.labwatcher.entity.ScenarioData;
 import com.dheeraj.learning.labwatcher.util.DataUtil;
 import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
@@ -36,21 +37,26 @@ public class EmailService {
     public static String body = "<h1> Hello </h1>";
 
     public static void sendEmail(ScenarioDataDTO scenarioDataDTO) {
-        logger.info("Sending email to "+TO_ADDRESS+" for degradation/improvement in :"+scenarioDataDTO.getTestname()+
-                " for build  :"+scenarioDataDTO.getLatestbuild());
-        subject = scenarioDataDTO.getTestname() + " is varied on build : " + scenarioDataDTO.getLatestbuild();
-        //removeStableParams(scenarioDataDTO);
+        //TODO : Think about removing stable parameters, removeStableParams(scenarioDataDTO);
         constructBody(scenarioDataDTO);
-        sendApacheCommonsEmail();
+        sendApacheCommonsEmail(scenarioDataDTO);
     }
 
-    public static void sendApacheCommonsEmail() {
+    public static void sendApacheCommonsEmail(ScenarioDataDTO scenarioDataDTO) {
+        ConfigurationService configurationService = new ConfigurationService();
+        Properties emailProps = configurationService.getEmailProperties();
+
+        logger.info("Sending email to "+emailProps.getProperty("to_address")+" for degradation/improvement in :"+scenarioDataDTO.getTestname()+
+                " for build  :"+scenarioDataDTO.getLatestbuild());
+
+        subject = scenarioDataDTO.getTestname() + " is varied on build : " + scenarioDataDTO.getLatestbuild();
+
         // Create the email message
         HtmlEmail email = new HtmlEmail();
         try {
-            email.setHostName(SMTP_SERVER);
-            email.addTo(TO_ADDRESS);
-            email.setFrom(FROM_ADDRESS);
+            email.setHostName(emailProps.getProperty("smtp_server"));
+            email.addTo(emailProps.getProperty("to_address").split(","));
+            email.setFrom(emailProps.getProperty("from_address"));
             email.setSubject(subject);
             // set the html message
             email.setHtmlMsg(body);

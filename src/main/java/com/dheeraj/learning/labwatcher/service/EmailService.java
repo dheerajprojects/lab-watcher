@@ -25,16 +25,9 @@ import java.util.Properties;
 @Service
 public class EmailService {
 
-    static Logger logger = LoggerFactory.getLogger(EmailService.class);
-
-    // Recipient's email ID needs to be mentioned.
-    public static String TO_ADDRESS = "DheerajKumar.Gopali@in.pega.com";
-    // Sender's email ID needs to be mentioned
-    public static String FROM_ADDRESS = "DheerajKumar.Gopali@in.pega.com";
-    // Setup mail server
-    public static String SMTP_SERVER = "EXINTOPEN.rpega.com";
-    public static String subject = "testsubject";
-    public static String body = "<h1> Hello </h1>";
+    private static Logger logger = LoggerFactory.getLogger(EmailService.class);
+    private static String subject = "testsubject";
+    private static String body = "<h1> Hello </h1>";
 
     public static void sendEmail(ScenarioDataDTO scenarioDataDTO) {
         //TODO : Think about removing stable parameters, removeStableParams(scenarioDataDTO);
@@ -46,8 +39,8 @@ public class EmailService {
         ConfigurationService configurationService = new ConfigurationService();
         Properties emailProps = configurationService.getEmailProperties();
 
-        logger.info("Sending email to "+emailProps.getProperty("to_address")+" for degradation/improvement in :"+scenarioDataDTO.getTestname()+
-                " for build  :"+scenarioDataDTO.getLatestbuild());
+        logger.info("Sending email to "+emailProps.getProperty("to_address")+" for degradation/improvement in "+scenarioDataDTO.getTestname()+
+                " for build  "+scenarioDataDTO.getLatestbuild());
 
         subject = scenarioDataDTO.getTestname() + " is varied on build : " + scenarioDataDTO.getLatestbuild();
 

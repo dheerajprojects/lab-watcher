@@ -47,4 +47,10 @@ public class RestServiceController {
         schedulerService.scheduleDailyRuns(null,currentDate ,Integer.parseInt(noOfPreviousDays));
     }
 
+    @GetMapping("completedBuild/analyzeResult/{prpcversion}/{buildlabel}")
+    public void analyzeCompletedBuildResults(@PathVariable("prpcversion") String prpcversion, @PathVariable("buildlabel") String buildlabel){
+        logger.info("This rest service got triggered from jenkins job");
+        logger.info("Running performance metric analysis on build : "+buildlabel+", prpcversion : "+prpcversion);
+        logger.info("Yet to implement the current service...");
+    }
 }

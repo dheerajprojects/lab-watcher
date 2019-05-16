@@ -233,9 +233,16 @@ public class DataUtil {
      * @return
      */
     public static String getValue(Double value) {
-        logger.trace("Value : "+value);
         DecimalFormat decimalFormat = new DecimalFormat("##.##");
-        return decimalFormat.format(value);
+        String val = null;
+        try{
+             val = decimalFormat.format(value);
+        } catch (Exception e) {
+            logger.info("Converting the value :"+value+" into decimal format has thrown exception.");
+            e.printStackTrace();
+            //Not throwing exception as this is just throw e;
+        }
+        return val;
     }
 
     public static void main(String[] args) {

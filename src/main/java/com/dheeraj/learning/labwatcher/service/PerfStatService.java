@@ -194,7 +194,7 @@ public class PerfStatService {
         boolean isLastVariationInvalid = isLastVariationInvalid(rank, accuracy);
         if(!isLastVariationInvalid) {
             perfStatDAO.findAndRemoveVariation(paramData);
-            //Rerun later builds after this degradation.
+            //Rerun later builds after this degradation. //TODO : Check if this is messing up the accuracy.
             rerunLaterBuildsAfterDegradation(scenarioName, prpcVersion, rank, currentBuildLabel, paramData);
         } else {
             //Can change this save logic later

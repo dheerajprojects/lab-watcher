@@ -12,6 +12,7 @@ import com.dheeraj.learning.labwatcher.repository.ScenarioDataRepository;
 import com.dheeraj.learning.labwatcher.util.DataUtil;
 import com.dheeraj.learning.labwatcher.util.DegradationIdentificationUtil;
 import com.dheeraj.learning.labwatcher.util.Mapper;
+import com.sun.xml.internal.ws.util.CompletedFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * This is the main service method to do business logic on performance stats.
@@ -49,6 +51,9 @@ public class PerfStatService {
 
     @Autowired
     private ScenarioDataRepository scenarioDataRepository;
+
+    @Autowired
+    private ThreadService threadService;
 
     /**
      * This method analyzes last n (maxResults #50 for now) perfstats(previous to the #testBuild} and calculates mean and
@@ -107,31 +112,26 @@ public class PerfStatService {
         Map<String, ParamDataDTO> baselineBuildMap = getLatestBaselineBuildDetails(scenarioName, paramList, currentBuildLabel, prpcVersion, isHead);
         Map<String, ParamDataDTO> currentBuildParamMap = createMapOfGivenParams(paramList, scenarioName, currentBuildLabel);
 
+        List<CompletableFuture<ParamDataDTO>> list = new ArrayList<>();
         //For loop over params
         for (String param : currentBuildParamMap.keySet()) {
             logger.debug("Processing parameter : "+param);
-            ParamDataDTO baselineBuildParamDataDTO = baselineBuildMap.get(param);
-            //The second condition occurs below only when the first condition is false
-            if( baselineBuildParamDataDTO  == null) {
-                analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, MAX_DATA_SIZE, MAX_DATA_ACCURACY);
-            } else if (baselineBuildParamDataDTO.getBaselineBuildPosition() > DECENT_DATA_SIZE) {
-                analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, baselineBuildParamDataDTO.getBaselineBuildPosition(), DECENT_DATA_ACCURACY);
-            } else if (baselineBuildParamDataDTO.getBaselineBuildPosition() >= MIN_DATA_SIZE && baselineBuildParamDataDTO.getBaselineBuildPosition() <= DECENT_DATA_SIZE){
-                analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamMap, param, baselineBuildParamDataDTO.getBaselineBuildPosition(), MIN_DATA_ACCURACY);
-            } else {
-                int rank = baselineBuildParamDataDTO.getBaselineBuildPosition();
-                Double accuracy = 0.0;
-                if (baselineBuildParamDataDTO.isDegraded()) {
-                    accuracy = analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, baselineBuildMap.get(param).getBuildLabel(), param, rank, true);
-                } else if (baselineBuildParamDataDTO.isImproved()) {
-                    accuracy = analyseWhenRecentBuildsHaveVariation(false, scenarioName, prpcVersion, currentBuildLabel, baselineBuildMap.get(param).getBuildLabel(), param, rank, false);
-                } else {
-                    logger.debug("Though this param is neither improved nor degraded somehow this data got into database incorrectly.");
-                }
+            CompletableFuture<ParamDataDTO> futures = threadService.analysePerfMetric(scenarioName, prpcVersion, currentBuildLabel, isHead, baselineBuildMap,currentBuildParamMap, param);
+            list.add(futures);
+        }
 
-                decideAndSendEmail(baselineBuildParamDataDTO, accuracy);
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
+        CompletableFuture.allOf(allFutures);
+
+        for (CompletableFuture<ParamDataDTO> dto :
+                list) {
+            try {
+                currentBuildParamMap.put(dto.get().getParamName(), dto.get());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
+
         return currentBuildParamMap;
     }
 

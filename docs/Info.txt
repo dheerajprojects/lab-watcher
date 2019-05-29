@@ -1,0 +1,27 @@
+How to run this application by command prompt.
+To compile
+mvn clean install -DskipTests=true
+To run
+mvn spring-boot:run
+
+
+Create an entity using hibernate database.
+1.Add hibernate module
+File -> Project Structure -> Modules -> Add new module -> Select Hibernate facet
+Select Hibernate facet and then add decriptor right side. Just go forward with default options.
+
+2.Open Persistence view in the left bottom. Right click hibernate facet which is named as applicaiton name (lab-watcher)
+-> Generate persistence maping -> By database schema
+Add a datasoure if its not there
+Select package for the generated entity class
+Click Refresh in Database Schema Mapping
+Select the required view/table
+Under General settings
+Check 'Add to session factoty and select hibernate.cfg.xml which was generated in step 1.
+Check 'Generate JPA Annotations (Java5).
+Click OK
+
+https://stackoverflow.com/questions/36995670/how-can-i-generate-entities-classes-from-database-using-spring-boot-and-intellij/36996497
+
+JSON object maping
+https://vladmihalcea.com/map-string-jpa-property-json-column-hibernate/

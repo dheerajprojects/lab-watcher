@@ -113,7 +113,7 @@ public class SchedulerService {
      * @param param
      * @return
      */
-    public ScenarioDataDTO analyseAScenarioLatestBuild(String scenarioName, String currentBuildLabel, String prpcVersion, String param) {
+    public ScenarioDataDTO analyseAScenarioLatestBuildGivenParam(String scenarioName, String currentBuildLabel, String prpcVersion, String param) {
         List<String> paramList = DataUtil.populateGivenParamsList(param);
 
         ScenarioDataDTO scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
@@ -126,12 +126,22 @@ public class SchedulerService {
      * This method is analyses the latest build of a scenario with the last n builds
      * and identifies if the latest build is degraded or not.
      */
-    public ScenarioDataDTO analyseAScenarioLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel) {
+    public ScenarioDataDTO analyseAScenarioLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel, String isvalidrun) {
         List<String> paramList = configurationService.getPerformanceMetrics();
 
         fixTimeAttributeForJUnits(scenarioName, paramList);
 
-        ScenarioDataDTO scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
+        ScenarioDataDTO scenarioDataDTO = null;
+
+        if(isvalidrun.equalsIgnoreCase("true")) {
+            System.out.println("Test ran successfully.");
+            scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
+            //perstatservice.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
+        } else {
+            System.out.println("Test failed.");
+            System.out.println("Running test failure analysis.");
+            //scenarioDataDTO = perfStatService.doFailureAnalysisOnAScenario(scenarioName, prpcVersion, currentBuildLabel);
+        }
 
         logger.debug(scenarioDataDTO!=null?scenarioDataDTO.toString():"ScenarioDataDTO is null");
 
@@ -147,7 +157,7 @@ public class SchedulerService {
      * @return
      */
     public String analyseAParticularBuildReturnString(String scenarioName, String testBuildLabel, String prpcVersion, String param) {
-        ScenarioDataDTO scenarioDataDTO = analyseAScenarioLatestBuild(scenarioName, testBuildLabel, prpcVersion, param);
+        ScenarioDataDTO scenarioDataDTO = analyseAScenarioLatestBuildGivenParam(scenarioName, testBuildLabel, prpcVersion, param);
 
         String jsonString = FormatUtil.convertToJSON(scenarioDataDTO);
         logger.debug(jsonString);
@@ -205,7 +215,7 @@ public class SchedulerService {
             try {
                 logger.info("Started processing scenario : "+perfstat.getTestname()+", buildlabel : "+perfstat.getBuildlabel());
 
-                analyseAScenarioLatestBuild(perfstat.getTestname(), perfstat.getPrpcversion(), perfstat.getBuildlabel());
+                analyseAScenarioLatestBuild(perfstat.getTestname(), perfstat.getPrpcversion(), perfstat.getBuildlabel(), perfstat.getIsvalidrun());
 
                 logger.info("Completed processing scenario : "+perfstat.getTestname()+", buildlabel : "+perfstat.getBuildlabel());
             } catch (Exception e) {

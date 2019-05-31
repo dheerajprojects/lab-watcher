@@ -20,3 +20,8 @@ Under General settings
 Check 'Add to session factoty and select hibernate.cfg.xml which was generated in step 1.
 Check 'Generate JPA Annotations (Java5).
 Click OK
+
+https://stackoverflow.com/questions/36995670/how-can-i-generate-entities-classes-from-database-using-spring-boot-and-intellij/36996497
+
+JSON object maping
+https://vladmihalcea.com/map-string-jpa-property-json-column-hibernate/

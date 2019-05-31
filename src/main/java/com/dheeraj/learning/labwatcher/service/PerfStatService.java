@@ -185,7 +185,7 @@ public class PerfStatService {
             perfStatDAO.findAndRemoveVariation(paramData);
             //Rerun later builds after this degradation. //TODO : Check if this is messing up the accuracy.
             //TODO: Dont have to rerun for all the performance metrics. We can just rerun the specific performance metric.
-            rerunLaterBuildsAfterDegradation(scenarioName, prpcVersion, rank, currentBuildLabel, paramData);
+            rerunLaterBuildsAfterDegradation(scenarioName, prpcVersion, performanceMetricName, rank, currentBuildLabel);
         } else {
             //Can change this save logic later
             //Better to update the accuracy based on the number of degraded builds in between than directly increasing the accuracy by 10 every time.
@@ -204,12 +204,10 @@ public class PerfStatService {
      * @param rank
      * @param endBuildLabel
      */
-    public void rerunLaterBuildsAfterDegradation(String scenarioName, String prpcVersion, Integer rank, String endBuildLabel, ParamData paramData) {
+    public void rerunLaterBuildsAfterDegradation(String scenarioName, String prpcVersion, String performanceMetricName, Integer rank, String endBuildLabel) {
         List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, endBuildLabel, rank - 1, true);
-        List<String> paramList = new ArrayList<>();
-        paramList.add(paramData.getParamName());
         for (PerfStat perfstat : perfStats) {
-            callAScenario(scenarioName, paramList, prpcVersion, perfstat.getBuildlabel(), true);
+            analysePerfMetric(scenarioName, performanceMetricName, prpcVersion, perfstat.getBuildlabel(), true);
         }
     }
 

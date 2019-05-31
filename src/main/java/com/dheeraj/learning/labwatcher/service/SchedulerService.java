@@ -134,7 +134,6 @@ public class SchedulerService {
             logger.trace("Test ran successfully.");
             //TODO : Rename below method in a single commit.
             scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
-            //perstatservice.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
         } else {
             logger.trace("Test failed.");
             logger.trace("Yet to implement test failure analysis... ");

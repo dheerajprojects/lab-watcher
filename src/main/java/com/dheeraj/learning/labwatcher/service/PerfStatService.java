@@ -99,7 +99,7 @@ public class PerfStatService {
      * @return A map of given performance metrics with analysis results.
      */
     public ParamDataDTO analysePerfMetric(String scenarioName, String performanceMetricName, String prpcVersion, String currentBuildLabel, boolean isHead) {
-        logger.trace("Processing parameter : " + performanceMetricName);
+        logger.trace("Analyzing " + performanceMetricName+"...");
 
         ParamDataDTO baselineBuildParamDataDTO = getBaselineBuild(scenarioName, performanceMetricName, currentBuildLabel, prpcVersion, isHead);
         ParamDataDTO currentBuildParamDataDTO = new ParamDataDTO(performanceMetricName, scenarioName, currentBuildLabel);
@@ -119,7 +119,7 @@ public class PerfStatService {
             } else if (baselineBuildParamDataDTO.isImproved()) {
                 accuracy = analyseWhenRecentBuildsHaveVariation(scenarioName, prpcVersion, currentBuildLabel, baselineBuildParamDataDTO.getBuildLabel(), performanceMetricName, rank, false);
             } else {
-                logger.debug("Though this param is neither improved nor degraded somehow this data got into database incorrectly.");
+                logger.trace("Though this param is neither improved nor degraded somehow this data got into database incorrectly.");
             }
 
             decideAndSendEmail(baselineBuildParamDataDTO, accuracy);
@@ -281,9 +281,19 @@ public class PerfStatService {
      */
     private ParamDataDTO getBaselineBuild(String scenarioName, String performanceMetricName, String currentBuildLabel, String prpcVersion, boolean isHead) {
         ParamData paramData = perfStatDAO.getBaselineBuild(scenarioName, performanceMetricName, currentBuildLabel, prpcVersion, isHead);
+
         ParamDataDTO paramDataDTO = null;
-        if (paramData != null)
+        if (paramData != null) {
             paramDataDTO = Mapper.convert(paramData);
+
+            try {
+                logger.trace("Baseline build : " + paramData.getScenarioData().getBuildLabel());
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else {
+            logger.trace("No baseline build");
+        }
 
         return paramDataDTO;
     }

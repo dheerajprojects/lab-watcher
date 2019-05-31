@@ -108,14 +108,14 @@ public class PerfStatDAO {
      * ========================
      *
      * @param scenarioName
-     * @param param
+     * @param performanceMetricName
      * @param currentBuildLabel
      */
-    public ParamData getVariedBuildRankDetails(String scenarioName, String param, String currentBuildLabel, String prpcVersion, boolean isHead) {
+    public ParamData getBaselineBuild(String scenarioName, String performanceMetricName, String currentBuildLabel, String prpcVersion, boolean isHead) {
         //TODO : Add prpcVersion to ParamData too.
         String sql = "FROM ParamData pd " +
                 "where pd.scenarioData.testname='" + scenarioName + "' " +
-                "and pd.paramName = '" + param + "' " +
+                "and pd.paramName = '" + performanceMetricName + "' " +
                 "and pd.scenarioData.buildLabel < '" + currentBuildLabel + "' " +
                 "and pd.accuracy >= 50 "+
                 "and ( pd.isDegraded = true or pd.isImproved = true ) "+

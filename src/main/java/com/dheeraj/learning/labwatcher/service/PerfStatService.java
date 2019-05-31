@@ -27,7 +27,7 @@ import java.util.Map;
  * <p>
  * Methods plan
  * 1.getValidBuildLabelsBetweenGivenDates
- * 2.callAScenario
+ * 2.doDegradationAnalysis
  */
 @Service
 public class PerfStatService {
@@ -56,7 +56,7 @@ public class PerfStatService {
      * @param testBuild    The build for which degradation analysis to be done.
      * @return This an object which contains all the degradation details.
      */
-    public ScenarioDataDTO callAScenario(String scenarioName, List<String> paramList, String prpcVersion, String testBuild, boolean isHead) {
+    public ScenarioDataDTO doDegradationAnalysis(String scenarioName, List<String> paramList, String prpcVersion, String testBuild, boolean isHead) {
         //validateInputData(scenarioName, paramList, prpcVersion, testBuild);
         //TODO : Validate relevant database data. Whether user requested data exist in the database. Fire perfstat db with scenarioname, prpcversion, testbuild
         // and see if we get atleast one row. If not then throw error that the requested build doesn't exist.

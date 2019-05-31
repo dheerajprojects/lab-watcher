@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -40,6 +41,7 @@ public class Scheduler {
      */
     @Scheduled(cron = "0 0 9 ? * *")
     public void scheduleTaskWithCronExpression() {
+        logger.trace("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
         schedulerService.scheduleDailyRuns();
     }
 }

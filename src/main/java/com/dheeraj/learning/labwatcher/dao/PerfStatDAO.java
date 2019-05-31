@@ -245,7 +245,7 @@ public class PerfStatDAO {
      * @param startDate This excludes the start date
      * @return
      */
-    public List<PerfStat> getBuildsBetweenBuilds(String startDate, String endDate) {
+    public List<PerfStat> getBuildsBetweenDates(String startDate, String endDate) {
         String sql = "FROM PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +

@@ -131,12 +131,13 @@ public class SchedulerService {
         ScenarioDataDTO scenarioDataDTO = null;
 
         if (isvalidrun.equalsIgnoreCase("true")) {
-            System.out.println("Test ran successfully.");
+            logger.trace("Test ran successfully.");
+            //TODO : Rename below method in a single commit.
             scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
             //perstatservice.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
         } else {
-            System.out.println("Test failed.");
-            System.out.println("Running test failure analysis.");
+            logger.trace("Test failed.");
+            logger.trace("Yet to implement test failure analysis... ");
             //scenarioDataDTO = perfStatService.doFailureAnalysisOnAScenario(scenarioName, prpcVersion, currentBuildLabel);
         }
 
@@ -184,18 +185,16 @@ public class SchedulerService {
     }
 
     public void scheduleDailyRuns() {
-        logger.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
-
         LocalDateTime endDate = LocalDate.now().atStartOfDay();
         LocalDateTime startDate = endDate.minusDays(1);
         //Gets all available builds from Yesterday 0 hour to today 0 hour.
-        List<PerfStat> perfStats = perfStatDAO.getBuildsBetweenBuilds(startDate.toString(), endDate.toString());
+        List<PerfStat> perfStats = perfStatDAO.getBuildsBetweenDates(startDate.toString(), endDate.toString());
 
         runAnalysisOnGivenPerfStats(perfStats);
     }
 
     public void runAnalysisOnDailyBuilds(String date, String scenarioName) {
-        logger.info("Running analysis on performance metrics on " + date + "...");
+        logger.trace("Running analysis on performance metrics on " + date + "...");
         List<PerfStat> perfStats;
         if (scenarioName == null) {
             perfStats = perfStatDAO.getBuilds(date);
@@ -203,19 +202,18 @@ public class SchedulerService {
             perfStats = perfStatDAO.getBuilds(date, scenarioName);
         }
 
-
         runAnalysisOnGivenPerfStats(perfStats);
     }
 
     public void runAnalysisOnGivenPerfStats(List<PerfStat> perfStats) {
-        logger.info("Number of builds for analysis : " + perfStats.size());
+        logger.trace("Number of builds for analysis : " + perfStats.size());
         for (PerfStat perfstat : perfStats) {
             try {
-                logger.info("Started processing scenario : " + perfstat.getTestname() + ", buildlabel : " + perfstat.getBuildlabel());
+                logger.trace("Started processing scenario : " + perfstat.getTestname() + ", buildlabel : " + perfstat.getBuildlabel());
 
                 analyseAScenarioLatestBuild(perfstat.getTestname(), perfstat.getPrpcversion(), perfstat.getBuildlabel(), perfstat.getIsvalidrun());
 
-                logger.info("Completed processing scenario : " + perfstat.getTestname() + ", buildlabel : " + perfstat.getBuildlabel());
+                logger.trace("Completed processing scenario : " + perfstat.getTestname() + ", buildlabel : " + perfstat.getBuildlabel());
             } catch (Exception e) {
                 e.printStackTrace();
             }

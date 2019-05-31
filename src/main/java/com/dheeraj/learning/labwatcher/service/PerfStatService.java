@@ -58,7 +58,6 @@ public class PerfStatService {
      */
     public ScenarioDataDTO callAScenario(String scenarioName, List<String> paramList, String prpcVersion, String testBuild, boolean isHead) {
         //validateInputData(scenarioName, paramList, prpcVersion, testBuild);
-
         //TODO : Validate relevant database data. Whether user requested data exist in the database. Fire perfstat db with scenarioname, prpcversion, testbuild
         // and see if we get atleast one row. If not then throw error that the requested build doesn't exist.
         //TODO : Later we might give more information to the user whether scenario is invalid, prpcversion is invalid or build label is invalid.
@@ -72,7 +71,6 @@ public class PerfStatService {
             ParamDataDTO paramDataDTO = analysePerfMetric(scenarioName, perfMetric, prpcVersion, testBuild, isHead);
             currentBuildParamMap.put(paramDataDTO.getParamName(), paramDataDTO);
         }
-
         scenarioDataDTO.setMap(currentBuildParamMap);
 
         //Saving only if atleast one parameter is degraded/improved;
@@ -101,7 +99,7 @@ public class PerfStatService {
      * @return A map of given performance metrics with analysis results.
      */
     public ParamDataDTO analysePerfMetric(String scenarioName, String performanceMetricName, String prpcVersion, String currentBuildLabel, boolean isHead) {
-        logger.debug("Processing parameter : " + performanceMetricName);
+        logger.trace("Processing parameter : " + performanceMetricName);
 
         ParamDataDTO baselineBuildParamDataDTO = getBaselineBuild(scenarioName, performanceMetricName, currentBuildLabel, prpcVersion, isHead);
         ParamDataDTO currentBuildParamDataDTO = new ParamDataDTO(performanceMetricName, scenarioName, currentBuildLabel);

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class FormatUtil {
-    public static String convertToJSON(Object obj){
+    public static String convertToJSON(Object obj) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.serializeSpecialFloatingPointValues();
         Gson gson = gsonBuilder.create();

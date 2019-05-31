@@ -48,7 +48,7 @@ public class LabWatcherApplicationTests {
 
     public void contextLoads() {
         //TODO : Remove DTOs and use only Entity objects everywhere.
-        schedulerService.scheduleDailyRuns(null,"2019-04-17" ,0);
+        schedulerService.scheduleDailyRuns(null, "2019-04-17", 0);
     }
 
     //@Test
@@ -79,7 +79,7 @@ public class LabWatcherApplicationTests {
         List<PerfStat> perfStats = perfStatDAO.getBuilds("2019-03-26");
         System.out.println(perfStats.size());
         for (PerfStat perfStat : perfStats) {
-            System.out.println("BuildLabel : "+perfStat.getBuildlabel()+", ScenarioName : "+perfStat.getTestname());
+            System.out.println("BuildLabel : " + perfStat.getBuildlabel() + ", ScenarioName : " + perfStat.getTestname());
         }
     }
 

@@ -64,8 +64,8 @@ public class DataUtil {
      * @param paramDataDTO
      */
     public static void printVariationMessage(ParamDataDTO paramDataDTO) {
-        logger.info("The scenario : "+paramDataDTO.getScenarioName()+" for build :"+paramDataDTO.getBuildLabel()+
-                " is degraded/improved in terms of performance metric : "+ paramDataDTO.getParamName()+" with "+paramDataDTO.getVariedBy()+" percentage.");
+        logger.info("The scenario : " + paramDataDTO.getScenarioName() + " for build :" + paramDataDTO.getBuildLabel() +
+                " is degraded/improved in terms of performance metric : " + paramDataDTO.getParamName() + " with " + paramDataDTO.getVariedBy() + " percentage.");
 
         logger.debug(paramDataDTO.toString());
     }
@@ -216,11 +216,11 @@ public class DataUtil {
      * @param str
      * @return
      */
-    public static ArrayList<String> buildArrayList(String str){
+    public static ArrayList<String> buildArrayList(String str) {
         String[] strList = str.split(",");
         ArrayList<String> list = new ArrayList<>();
-        int length=strList.length;
-        for(int i=0;i<length;i++){
+        int length = strList.length;
+        for (int i = 0; i < length; i++) {
             list.add(strList[i]);
         }
         return list;
@@ -235,10 +235,10 @@ public class DataUtil {
     public static String getValue(Double value) {
         DecimalFormat decimalFormat = new DecimalFormat("##.##");
         String val = null;
-        try{
-             val = decimalFormat.format(value);
+        try {
+            val = decimalFormat.format(value);
         } catch (Exception e) {
-            logger.info("Converting the value :"+value+" into decimal format has thrown exception.");
+            logger.info("Converting the value :" + value + " into decimal format has thrown exception.");
             e.printStackTrace();
             //Not throwing exception as this is just throw e;
         }
@@ -247,7 +247,7 @@ public class DataUtil {
 
     public static void main(String[] args) {
         Random rand = new Random();
-        for (int i=0;i<20;i++)
+        for (int i = 0; i < 20; i++)
             System.out.println(rand.nextInt(10));
     }
 }

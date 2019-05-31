@@ -29,7 +29,7 @@ public class DegradationIdentificationUtil {
     }
 
     public static boolean isAnyParamVaried(Map<String, ParamDataDTO> paramDataDTOMap) {
-        boolean varied=false;
+        boolean varied = false;
         for (ParamDataDTO paramDataDTO : paramDataDTOMap.values()) {
             if (paramDataDTO.isImproved() || paramDataDTO.isDegraded()) {
                 varied = true;
@@ -42,7 +42,7 @@ public class DegradationIdentificationUtil {
     public static boolean isDegraded(Double currentValue, Double mean, Double standardDeviation, Integer sigmaCount, boolean isMinVariationCheck, Double variationPercentage) {
         if (currentValue > (mean + (sigmaCount * standardDeviation))) {
             //Ensure that the variation is atleast X%
-            if(isMinVariationCheck && variationPercentage >= 3.0) {
+            if (isMinVariationCheck && variationPercentage >= 3.0) {
                 return true;
             }
         }
@@ -52,7 +52,7 @@ public class DegradationIdentificationUtil {
     public static boolean isImproved(Double currentValue, Double mean, Double standardDeviation, Integer sigmaCount, boolean isMinVariationCheck, Double variationPercentage) {
         if (currentValue < (mean - (sigmaCount * standardDeviation))) {
             //Ensure that the variation is atleast X%
-            if(isMinVariationCheck && variationPercentage <= -3.0) {
+            if (isMinVariationCheck && variationPercentage <= -3.0) {
                 return true;
             }
         }
@@ -78,11 +78,11 @@ public class DegradationIdentificationUtil {
         Double mean;
         Double sum = 0.0;
         Double noOfRecords = 0.0;
-        String listOfBuilds="";
+        String listOfBuilds = "";
         logger.debug("List of builds considered are : ");
         for (PerfStatDTO perfstatDTO : perfStatDTOs) {
             if (perfstatDTO.getDouble(param) != null) {
-                listOfBuilds += perfstatDTO.getBuildlabel()+" : "+perfstatDTO.getDouble(param)+", ";
+                listOfBuilds += perfstatDTO.getBuildlabel() + " : " + perfstatDTO.getDouble(param) + ", ";
                 sum += perfstatDTO.getDouble(param);
                 noOfRecords++;
             }

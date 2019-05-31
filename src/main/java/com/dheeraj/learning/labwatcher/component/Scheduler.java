@@ -11,9 +11,6 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * The below class is created based on : https://www.callicoder.com/spring-boot-task-scheduling-with-scheduled-annotation/
- *
- *
- *
  */
 @Component
 public class Scheduler {
@@ -25,7 +22,7 @@ public class Scheduler {
 
     //@Scheduled(initialDelay=0, fixedRate=24*60*60*1000)
     public void scheduleTaskWithFixedRate() {
-        schedulerService.scheduleDailyRuns("CCCASE","2019-01-17" ,10);
+        schedulerService.scheduleDailyRuns("CCCASE", "2019-01-17", 10);
         //schedulerService.analyseAScenarioMultipleBuildsHardCoded();
     }
 
@@ -34,12 +31,12 @@ public class Scheduler {
         //schedulerService.scheduleDailyRuns(null);
     }
 
-    public void scheduleTaskWithInitialDelay() {}
+    public void scheduleTaskWithInitialDelay() {
+    }
 
     /**
      * https://www.baeldung.com/cron-expressions
      * <second> <minute> <hour> <day-of-month> <month> <day-of-week> <year>
-     *
      */
     @Scheduled(cron = "0 0 9 ? * *")
     public void scheduleTaskWithCronExpression() {

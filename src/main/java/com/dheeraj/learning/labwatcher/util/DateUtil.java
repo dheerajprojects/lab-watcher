@@ -36,7 +36,7 @@ public class DateUtil {
         List<String> list = new ArrayList<>();
         LocalDate date = LocalDate.parse(startDate);
 
-        for(int i=numberOfPastDays;i>0;i--) {
+        for (int i = numberOfPastDays; i > 0; i--) {
             list.add(date.minusDays(i).toString());
         }
         list.add(date.toString());

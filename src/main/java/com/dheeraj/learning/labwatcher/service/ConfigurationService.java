@@ -14,8 +14,8 @@ public class ConfigurationService {
     private Properties properties;
     private Properties emailProperties;
 
-    private String PROPERTIES_FILE_NAME="src/main/resources/scenarioConfiguration.properties";
-    private String EMAIL_PROPERTIES_FILE_NAME="src/main/resources/emailConfig.properties";
+    private String PROPERTIES_FILE_NAME = "src/main/resources/scenarioConfiguration.properties";
+    private String EMAIL_PROPERTIES_FILE_NAME = "src/main/resources/emailConfig.properties";
 
     private void loadScenarioConfigProperties() {
         properties = new Properties();

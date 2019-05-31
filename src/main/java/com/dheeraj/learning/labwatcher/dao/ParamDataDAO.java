@@ -16,9 +16,9 @@ import javax.persistence.criteria.Root;
 import java.util.List;
 
 /**
- *  * /analyzedresults/scenarios/              --all scenario
- *  * /analyzedresults/scenarios/scenarioname  --given scenario
- *  * /analyzedresults/builds/buildlabel       --all scenarios for the given build
+ * * /analyzedresults/scenarios/              --all scenario
+ * * /analyzedresults/scenarios/scenarioname  --given scenario
+ * * /analyzedresults/builds/buildlabel       --all scenarios for the given build
  */
 @Repository
 @Transactional
@@ -32,23 +32,23 @@ public class ParamDataDAO {
     public List<ParamData> getAll(Double accuracy, String scenarioName, String buildLabel, String perfMetric, Boolean isDegraded) {
         String sql = "FROM ParamData pd " +
                 "where pd.scenarioData.testname is not NULL ";
-        if(accuracy != null)
-            sql+="and pd.accuracy >= "+accuracy+" ";
-        if(scenarioName != null)
-            sql+="and pd.scenarioData.testname='" + scenarioName + "' ";
-        if(buildLabel != null)
-            sql+="and pd.scenarioData.buildLabel = '" + buildLabel + "' ";
-        if(perfMetric != null)
-            sql+="and pd.paramName = '" + perfMetric + "' ";
-        if(isDegraded != null) {
-            if(isDegraded)
-                sql+="and pd.isDegraded = true ";
+        if (accuracy != null)
+            sql += "and pd.accuracy >= " + accuracy + " ";
+        if (scenarioName != null)
+            sql += "and pd.scenarioData.testname='" + scenarioName + "' ";
+        if (buildLabel != null)
+            sql += "and pd.scenarioData.buildLabel = '" + buildLabel + "' ";
+        if (perfMetric != null)
+            sql += "and pd.paramName = '" + perfMetric + "' ";
+        if (isDegraded != null) {
+            if (isDegraded)
+                sql += "and pd.isDegraded = true ";
             else
-                sql+="and pd.isImproved = true ";
+                sql += "and pd.isImproved = true ";
         }
 
 
-        sql+="order by pd.scenarioData.buildLabel desc";
+        sql += "order by pd.scenarioData.buildLabel desc";
 
         Query query = em.createQuery(sql);
         List<ParamData> list = query.getResultList();
@@ -56,30 +56,30 @@ public class ParamDataDAO {
     }
 
     public List<ParamData> getAll() {
-        return getAll(100.0, null, null, null,null);
+        return getAll(100.0, null, null, null, null);
     }
 
-    public List<ParamData> getDataOnGivenScenario(String scenarioName){
+    public List<ParamData> getDataOnGivenScenario(String scenarioName) {
         return getAll(100.0, scenarioName, null, null, null);
     }
 
-    public List<ParamData> getDataOnGivenBuild(String buildLabel){
+    public List<ParamData> getDataOnGivenBuild(String buildLabel) {
         return getAll(100.0, null, buildLabel, null, null);
     }
 
-    public List<ParamData> getDataOnGivenPerfMetric(String perfMetric){
+    public List<ParamData> getDataOnGivenPerfMetric(String perfMetric) {
         return getAll(100.0, null, null, perfMetric, null);
     }
 
-    public List<ParamData> getDataOnGivenPerfMetric(String perfMetric, Boolean isDegraded){
+    public List<ParamData> getDataOnGivenPerfMetric(String perfMetric, Boolean isDegraded) {
         return getAll(100.0, null, null, perfMetric, isDegraded);
     }
 
     public void researchOnCriteria() {
-        CriteriaBuilder cb=em.getCriteriaBuilder();
-        CriteriaQuery<ParamData> cq=cb.createQuery(ParamData.class);
-        Root<ParamData> paramDatas=cq.from(ParamData.class);
-        CriteriaQuery<ParamData> select = cq.multiselect(paramDatas.get("paramName"),paramDatas.get("paramValue"));
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<ParamData> cq = cb.createQuery(ParamData.class);
+        Root<ParamData> paramDatas = cq.from(ParamData.class);
+        CriteriaQuery<ParamData> select = cq.multiselect(paramDatas.get("paramName"), paramDatas.get("paramValue"));
         TypedQuery<ParamData> q = em.createQuery(select);
         List<ParamData> list = q.getResultList();
         for (ParamData paramData : list) {

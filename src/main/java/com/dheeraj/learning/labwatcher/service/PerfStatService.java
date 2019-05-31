@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * This is the main service method to do business logic on performance stats.
- *
+ * <p>
  * Methods plan
  * 1.getValidBuildLabelsBetweenGivenDates
  * 2.callAScenario
@@ -32,15 +32,13 @@ import java.util.Map;
 @Service
 public class PerfStatService {
 
+    public static Integer MAX_DATA_SIZE = 50;
+    public static Integer DECENT_DATA_SIZE = 20;
+    public static Integer MIN_DATA_SIZE = 5;
+    public static Double MAX_DATA_ACCURACY = 70.0;
+    public static Double DECENT_DATA_ACCURACY = 60.0;
+    public static Double MIN_DATA_ACCURACY = 60.0;
     Logger logger = LoggerFactory.getLogger(PerfStatService.class);
-
-    public static Integer MAX_DATA_SIZE=50;
-    public static Integer DECENT_DATA_SIZE=20;
-    public static Integer MIN_DATA_SIZE=5;
-    public static Double MAX_DATA_ACCURACY=70.0;
-    public static Double DECENT_DATA_ACCURACY=60.0;
-    public static Double MIN_DATA_ACCURACY=60.0;
-
     @Autowired
     private PerfStatDAO perfStatDAO;
 
@@ -80,9 +78,9 @@ public class PerfStatService {
         //Saving only if atleast one parameter is degraded/improved;
         //Ensure that this works even if we rerun the analysis for the same build.
         boolean isVaried = DegradationIdentificationUtil.isAnyParamVaried(currentBuildParamMap);
-        if(isVaried) {
+        if (isVaried) {
             ScenarioData scenarioData = perfStatDAO.getScenarioData(scenarioName, testBuild);
-            if(scenarioData!= null)
+            if (scenarioData != null)
                 Mapper.map(scenarioDataDTO, scenarioData, paramList);
             else
                 scenarioData = Mapper.convert(scenarioDataDTO);
@@ -96,10 +94,10 @@ public class PerfStatService {
     /**
      * This method retrieves different baselines for each parameter and based on the position of the baseline build, it performs different tasks to identify the given build degradation.
      *
-     * @param scenarioName      Performance scenario to be tested.
-     * @param performanceMetricName         List of performance metrics to be analyzed for degradation or improvement.
-     * @param prpcVersion       PrpcVersion for the #currentBuildLabel.
-     * @param currentBuildLabel Build to be tested.
+     * @param scenarioName          Performance scenario to be tested.
+     * @param performanceMetricName List of performance metrics to be analyzed for degradation or improvement.
+     * @param prpcVersion           PrpcVersion for the #currentBuildLabel.
+     * @param currentBuildLabel     Build to be tested.
      * @return A map of given performance metrics with analysis results.
      */
     public ParamDataDTO analysePerfMetric(String scenarioName, String performanceMetricName, String prpcVersion, String currentBuildLabel, boolean isHead) {
@@ -135,14 +133,14 @@ public class PerfStatService {
     public void decideAndSendEmail(ParamDataDTO variedBuildParamDTO, Double accuracy) {
         boolean sendEmail = false;
         Integer rank = variedBuildParamDTO.getBaselineBuildPosition();
-        if(rank >= 3) {
-            if(rank == 3 && accuracy >= 90) {
+        if (rank >= 3) {
+            if (rank == 3 && accuracy >= 90) {
                 sendEmail = true;
             } else if (rank == 4 && accuracy >= 80) {
                 sendEmail = true;
             }
         }
-        if(sendEmail) {
+        if (sendEmail) {
             ScenarioData scenarioData = perfStatDAO.getScenarioData(variedBuildParamDTO.getScenarioName(), variedBuildParamDTO.getBuildLabel());
             ScenarioDataDTO scenarioDataDTO = Mapper.convert(scenarioData);
             EmailService.sendEmail(scenarioDataDTO);
@@ -200,6 +198,7 @@ public class PerfStatService {
 
     /**
      * TODO Make use of rank attribute from the caller to cross check the data.
+     *
      * @param scenarioName
      * @param prpcVersion
      * @param rank
@@ -217,25 +216,25 @@ public class PerfStatService {
     /**
      * When there is a degradation/baseline in the last 5 builds and 2 in the last 4 builds doesnt follow the same trend, then
      * it is considered that the last degradation is invalid and it is removed from the database.
-     *
+     * <p>
      * The below logic is simplified in the method.
      * if(rank == 1 && accuracy >= 50)
-     *             return true;
-     *         else if(rank == 2 && accuracy >= 60)
-     *             return true;
-     *         else if (rank == 3 && accuracy >= 70)
-     *             return true;
-     *         else if (rank == 4 && accuracy >= 80)
-     *             return true;
-     *         else
-     *             return false;
+     * return true;
+     * else if(rank == 2 && accuracy >= 60)
+     * return true;
+     * else if (rank == 3 && accuracy >= 70)
+     * return true;
+     * else if (rank == 4 && accuracy >= 80)
+     * return true;
+     * else
+     * return false;
      *
      * @param rank
      * @param accuracy
      * @return
      */
     public boolean isLastVariationInvalid(Integer rank, Double accuracy) {
-        if(accuracy >= (40+rank*10))
+        if (accuracy >= (40 + rank * 10))
             return true;
         else
             return false;

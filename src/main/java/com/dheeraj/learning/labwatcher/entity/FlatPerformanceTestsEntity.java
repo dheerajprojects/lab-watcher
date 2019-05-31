@@ -557,7 +557,7 @@ public class FlatPerformanceTestsEntity {
     }
 
     @Type(type = "jsonb")
-    @Column(name = "performance_data",  columnDefinition = "jsonb")
+    @Column(name = "performance_data", columnDefinition = "jsonb")
     public String getPerformanceData() {
         return performanceData;
     }

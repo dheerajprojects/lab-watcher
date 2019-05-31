@@ -2,7 +2,7 @@
 <html>
 <head>
     <script>
-        window.onload = function() {
+        window.onload = function () {
 
             var dataPoints = [];
 
@@ -25,11 +25,11 @@
 
             function addData(data) {
 
-                $.each( data, function( key, val ) {
-                    console.log("Key : "+key+", Value : "+val);
+                $.each(data, function (key, val) {
+                    console.log("Key : " + key + ", Value : " + val);
                 });
-                var j=0;
-                for (var i = 0; i < 10 ; i++) {
+                var j = 0;
+                for (var i = 0; i < 10; i++) {
                     j++;
                     dataPoints.push({
                         x: j,

@@ -23,7 +23,7 @@ public class ScenarioDataDTO {
         this.latestbuild = latestbuild;
     }
 
-    public void addParam(String paramName){
+    public void addParam(String paramName) {
         map.put(paramName, new ParamDataDTO(paramName));
     }
 

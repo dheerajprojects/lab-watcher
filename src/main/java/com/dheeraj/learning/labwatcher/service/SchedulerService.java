@@ -19,30 +19,26 @@ import java.util.List;
 
 /**
  * This just mimics invocation of PerfStatService from a cron job.
- *
+ * <p>
  * Methods plan
  * 1.analyseAScenarioLatestBuild
  * 2.analyseAScenarioMultipleBuilds
- *
- *
+ * <p>
+ * <p>
  * Later
  * 1.analyseMultipleScenarios
  */
 @Service
 public class SchedulerService {
 
-    Logger logger = LoggerFactory.getLogger(SchedulerService.class);
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-    @Autowired
-    private PerfStatService perfStatService;
-
-
+    Logger logger = LoggerFactory.getLogger(SchedulerService.class);
     @Autowired
     PerfStatDAO perfStatDAO;
-
     @Autowired
     ConfigurationService configurationService;
+    @Autowired
+    private PerfStatService perfStatService;
 
     /**
      * This method is analyses the latest build of a scenario with the last n builds
@@ -59,10 +55,9 @@ public class SchedulerService {
 
     /**
      * This method analyses degradations occurred in a scenario between the given dates.
-     *
      */
     public void analyseAScenarioMultipleBuilds(String scenarioName) {
-        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime","rdbiocount");
+        List<String> paramList = DataUtil.populateGivenParamsList("totalreqtime", "rdbiocount");
         String prpcVersion = "8.3.0";
         String startDate = "2019-01-04";
         String endDate = "2019-01-19";
@@ -71,7 +66,7 @@ public class SchedulerService {
 
         for (String buildLabel : validBuildLabels) {
             ScenarioDataDTO scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, buildLabel, true);
-            logger.info("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded()+", isImproved : "+scenarioDataDTO.getMap().get("totalreqtime").isImproved());
+            logger.info("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded() + ", isImproved : " + scenarioDataDTO.getMap().get("totalreqtime").isImproved());
         }
     }
 
@@ -80,13 +75,13 @@ public class SchedulerService {
 
         for (String scenarioName : scenarioNames) {
             logger.info("==============================================================================================");
-            logger.info("Started analysing scenario : "+scenarioName);
+            logger.info("Started analysing scenario : " + scenarioName);
             try {
                 analyseAScenarioMultipleBuilds(scenarioName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            logger.info("Completed analysing scenario : "+scenarioName);
+            logger.info("Completed analysing scenario : " + scenarioName);
             logger.info("==============================================================================================");
         }
     }
@@ -108,6 +103,7 @@ public class SchedulerService {
 
     /**
      * This method is meant for invoking as a rest service from browser.
+     *
      * @param scenarioName
      * @param currentBuildLabel
      * @param prpcVersion
@@ -134,7 +130,7 @@ public class SchedulerService {
 
         ScenarioDataDTO scenarioDataDTO = null;
 
-        if(isvalidrun.equalsIgnoreCase("true")) {
+        if (isvalidrun.equalsIgnoreCase("true")) {
             System.out.println("Test ran successfully.");
             scenarioDataDTO = perfStatService.callAScenario(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
             //perstatservice.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
@@ -144,13 +140,14 @@ public class SchedulerService {
             //scenarioDataDTO = perfStatService.doFailureAnalysisOnAScenario(scenarioName, prpcVersion, currentBuildLabel);
         }
 
-        logger.debug(scenarioDataDTO!=null?scenarioDataDTO.toString():"ScenarioDataDTO is null");
+        logger.debug(scenarioDataDTO != null ? scenarioDataDTO.toString() : "ScenarioDataDTO is null");
 
         return scenarioDataDTO;
     }
 
     /**
      * This is meant for printing the analysis logic in json format.
+     *
      * @param scenarioName
      * @param testBuildLabel
      * @param prpcVersion
@@ -177,7 +174,7 @@ public class SchedulerService {
     public void scheduleDailyRuns(String scenarioName, String startDate, Integer numberOfDays) {
         logger.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
 
-        if(startDate == null)
+        if (startDate == null)
             startDate = LocalDate.now().toString();
 
         List<String> dates = DateUtil.getDates(LocalDate.parse(startDate).toString(), numberOfDays);
@@ -198,9 +195,9 @@ public class SchedulerService {
     }
 
     public void runAnalysisOnDailyBuilds(String date, String scenarioName) {
-        logger.info("Running analysis on performance metrics on "+date+"...");
+        logger.info("Running analysis on performance metrics on " + date + "...");
         List<PerfStat> perfStats;
-        if(scenarioName == null) {
+        if (scenarioName == null) {
             perfStats = perfStatDAO.getBuilds(date);
         } else {
             perfStats = perfStatDAO.getBuilds(date, scenarioName);
@@ -211,14 +208,14 @@ public class SchedulerService {
     }
 
     public void runAnalysisOnGivenPerfStats(List<PerfStat> perfStats) {
-        logger.info("Number of builds for analysis : "+perfStats.size());
+        logger.info("Number of builds for analysis : " + perfStats.size());
         for (PerfStat perfstat : perfStats) {
             try {
-                logger.info("Started processing scenario : "+perfstat.getTestname()+", buildlabel : "+perfstat.getBuildlabel());
+                logger.info("Started processing scenario : " + perfstat.getTestname() + ", buildlabel : " + perfstat.getBuildlabel());
 
                 analyseAScenarioLatestBuild(perfstat.getTestname(), perfstat.getPrpcversion(), perfstat.getBuildlabel(), perfstat.getIsvalidrun());
 
-                logger.info("Completed processing scenario : "+perfstat.getTestname()+", buildlabel : "+perfstat.getBuildlabel());
+                logger.info("Completed processing scenario : " + perfstat.getTestname() + ", buildlabel : " + perfstat.getBuildlabel());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -228,6 +225,7 @@ public class SchedulerService {
     /**
      * Time attribute for junits is wallseconds. So this method replaces totalreqtime with wallseconds for all junit scenarios.
      * TODO : Make use of enum #JUnitScenarios.
+     *
      * @param paramList
      */
     public void fixTimeAttributeForJUnits(String scenarioName, List<String> paramList) {
@@ -237,8 +235,8 @@ public class SchedulerService {
         jUnitScenarios.add("DataEngineJUnit");
         jUnitScenarios.add("CallCenterJUnit");
 
-        if(jUnitScenarios.contains(scenarioName)) {
-            if(paramList.remove("totalreqtime"))
+        if (jUnitScenarios.contains(scenarioName)) {
+            if (paramList.remove("totalreqtime"))
                 paramList.add("wallseconds");
         }
     }

@@ -115,8 +115,10 @@ public class PerfStatService {
             int rank = baselineBuildParamDataDTO.getBaselineBuildPosition();
             Double accuracy = 0.0;
             if (baselineBuildParamDataDTO.isDegraded()) {
+                logger.trace("There is a degradation within last "+MIN_DATA_SIZE+" builds. Build : "+baselineBuildParamDataDTO.getBuildLabel());
                 accuracy = analyseWhenRecentBuildsHaveVariation(scenarioName, prpcVersion, currentBuildLabel, baselineBuildParamDataDTO.getBuildLabel(), performanceMetricName, rank, true);
             } else if (baselineBuildParamDataDTO.isImproved()) {
+                logger.trace("There is an improvement within last "+MIN_DATA_SIZE+" builds. Build : "+baselineBuildParamDataDTO.getBuildLabel());
                 accuracy = analyseWhenRecentBuildsHaveVariation(scenarioName, prpcVersion, currentBuildLabel, baselineBuildParamDataDTO.getBuildLabel(), performanceMetricName, rank, false);
             } else {
                 logger.trace("Though this param is neither improved nor degraded somehow this data got into database incorrectly.");

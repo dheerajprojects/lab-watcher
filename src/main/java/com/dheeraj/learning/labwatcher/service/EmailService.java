@@ -2,24 +2,14 @@ package com.dheeraj.learning.labwatcher.service;
 
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
-import com.dheeraj.learning.labwatcher.entity.ParamData;
-import com.dheeraj.learning.labwatcher.entity.ScenarioData;
 import com.dheeraj.learning.labwatcher.util.DataUtil;
 import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 @Service

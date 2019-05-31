@@ -4,7 +4,6 @@ import com.dheeraj.learning.labwatcher.dao.ParamDataDAO;
 import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.entity.ParamData;
-import com.dheeraj.learning.labwatcher.entity.ScenarioData;
 import com.dheeraj.learning.labwatcher.repository.ParamDataRepository;
 import com.dheeraj.learning.labwatcher.repository.ScenarioDataRepository;
 import com.dheeraj.learning.labwatcher.util.Mapper;

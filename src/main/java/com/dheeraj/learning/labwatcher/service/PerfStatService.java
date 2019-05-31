@@ -1,6 +1,5 @@
 package com.dheeraj.learning.labwatcher.service;
 
-import com.dheeraj.learning.labwatcher.InvalidInputCustomException;
 import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.PerfStatDTO;
@@ -17,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

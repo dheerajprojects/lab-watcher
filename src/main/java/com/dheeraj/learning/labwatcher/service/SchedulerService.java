@@ -66,7 +66,7 @@ public class SchedulerService {
 
         for (String buildLabel : validBuildLabels) {
             ScenarioDataDTO scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, buildLabel, true);
-            logger.info("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded() + ", isImproved : " + scenarioDataDTO.getMap().get("totalreqtime").isImproved());
+            logger.trace("BuildLabel : " + buildLabel + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded() + ", isImproved : " + scenarioDataDTO.getMap().get("totalreqtime").isImproved());
         }
     }
 
@@ -74,15 +74,15 @@ public class SchedulerService {
         List<String> scenarioNames = DataUtil.populateScenariosList();
 
         for (String scenarioName : scenarioNames) {
-            logger.info("==============================================================================================");
-            logger.info("Started analysing scenario : " + scenarioName);
+            logger.trace("==============================================================================================");
+            logger.trace("Started analysing scenario : " + scenarioName);
             try {
                 analyseAScenarioMultipleBuilds(scenarioName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            logger.info("Completed analysing scenario : " + scenarioName);
-            logger.info("==============================================================================================");
+            logger.trace("Completed analysing scenario : " + scenarioName);
+            logger.trace("==============================================================================================");
         }
     }
 
@@ -115,6 +115,36 @@ public class SchedulerService {
 
         ScenarioDataDTO scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildLabel, true);
         logger.debug(scenarioDataDTO.toString());
+
+        return scenarioDataDTO;
+    }
+
+    /**
+     * This method is analyses the latest build of a scenario with the last n builds
+     * and identifies if the latest build is degraded or not.
+     */
+    public ScenarioDataDTO analyseAScenarioGivenRelease(String scenarioName, String prpcVersion, String isvalidrun) {
+        List<String> paramList = configurationService.getPerformanceMetrics();
+
+        fixTimeAttributeForJUnits(scenarioName, paramList);
+
+        ScenarioDataDTO scenarioDataDTO = null;
+
+        List<String> validBuildLabels = perfStatService.getValidBuildLabelsForGivenRelease(scenarioName, prpcVersion);
+
+        for (String buildLabel : validBuildLabels) {
+            if (isvalidrun.equalsIgnoreCase("true")) {
+                logger.trace("Analyzing "+scenarioName+", "+prpcVersion+", "+buildLabel);
+                //TODO : Rename below method in a single commit.
+                scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, buildLabel, true);
+            } else {
+                logger.trace("Test failed.");
+                logger.trace("Yet to implement test failure analysis... ");
+                //scenarioDataDTO = perfStatService.doFailureAnalysisOnAScenario(scenarioName, prpcVersion, currentBuildLabel);
+            }
+        }
+
+        logger.debug(scenarioDataDTO != null ? scenarioDataDTO.toString() : "ScenarioDataDTO is null");
 
         return scenarioDataDTO;
     }
@@ -172,7 +202,7 @@ public class SchedulerService {
      * @param numberOfDays
      */
     public void scheduleDailyRuns(String scenarioName, String startDate, Integer numberOfDays) {
-        logger.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+        logger.info("Daily task - {}", dateTimeFormatter.format(LocalDateTime.now()));
 
         if (startDate == null)
             startDate = LocalDate.now().toString();

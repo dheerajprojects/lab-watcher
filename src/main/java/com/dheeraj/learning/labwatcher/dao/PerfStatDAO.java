@@ -104,6 +104,58 @@ public class PerfStatDAO {
     }
 
     /**
+     * SQL Query
+     * SELECT Max(teststart) AS maxteststart,
+     *        buildlabel,
+     *        trialtype,
+     *        runlevel,
+     *        testname,
+     *        isvalidrun,
+     *        prpcversion,
+     *        builddate
+     * FROM   data.pr_data_performancestats
+     * WHERE  trialtype = 'Performance'
+     *        AND runlevel = 'optimized'
+     *        AND testname = 'CCCASE'
+     *        AND prpcversion = '8.3.0'
+     *        AND isvalidrun = 'true'
+     *        AND buildlabel LIKE '%HEAD%'
+     * GROUP  BY trialtype,
+     *           runlevel,
+     *           testname,
+     *           isvalidrun,
+     *           prpcversion,
+     *           buildlabel,
+     *           builddate
+     * ORDER  BY builddate ASC;
+     *
+     * @param scenarioName
+     * @param prpcVersion
+     * @return
+     */
+    public List<String> getValidBuildLabelsForGivenRelease(String scenarioName, String prpcVersion) {
+        String sql = "select max(teststart) as maxteststart, buildlabel, trialtype, runlevel, testname, isvalidrun, prpcversion, builddate from PerfStat " +
+                "where trialtype='Performance' " +
+                "and runlevel='optimized' " +
+                "and testname='" + scenarioName + "' " +
+                "and prpcversion='" + prpcVersion + "' " +
+                "and isvalidrun='true' " +
+                "and buildlabel like '%HEAD%' " +
+                "group by trialtype, runlevel, testname, isvalidrun, prpcversion, buildlabel, builddate " +
+                "order by builddate asc";
+
+        Query query = em.createQuery(sql);
+        List<Object[]> rows = query.getResultList();
+        List<String> buildLabels = new ArrayList<>();
+        for (Object[] row :
+                rows) {
+            buildLabels.add(row[1] + "");
+        }
+
+        return buildLabels;
+    }
+
+    /**
      * Find an efficent way for this later.
      * ========================
      *

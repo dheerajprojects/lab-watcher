@@ -29,7 +29,9 @@ public class EmailService {
         ConfigurationService configurationService = new ConfigurationService();
         Properties emailProps = configurationService.getEmailProperties();
 
-        logger.info("Sending email to " + emailProps.getProperty("to_address") + " for degradation/improvement in " + scenarioDataDTO.getTestname() +
+        logger.info(scenarioDataDTO.getTestname()+" - "+scenarioDataDTO.getLatestbuild()+" is degraded/improved");
+
+        logger.trace("Sending email to " + emailProps.getProperty("to_address") + " for degradation/improvement in " + scenarioDataDTO.getTestname() +
                 " for build  " + scenarioDataDTO.getLatestbuild());
 
         subject = scenarioDataDTO.getTestname() + " is varied on build : " + scenarioDataDTO.getLatestbuild();

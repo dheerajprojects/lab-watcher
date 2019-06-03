@@ -64,7 +64,9 @@ public class DataUtil {
      * @param paramDataDTO
      */
     public static void printVariationMessage(ParamDataDTO paramDataDTO) {
-        logger.info("The scenario : " + paramDataDTO.getScenarioName() + " for build :" + paramDataDTO.getBuildLabel() +
+        logger.info(paramDataDTO.getScenarioName() + ", "+ paramDataDTO.getBuildLabel()+", "+paramDataDTO.getParamName() + " - " + paramDataDTO.getVariedBy());
+
+        logger.trace("The scenario : " + paramDataDTO.getScenarioName() + " for build :" + paramDataDTO.getBuildLabel() +
                 " is degraded/improved in terms of performance metric : " + paramDataDTO.getParamName() + " with " + paramDataDTO.getVariedBy() + " percentage.");
 
         logger.debug(paramDataDTO.toString());
@@ -238,7 +240,7 @@ public class DataUtil {
         try {
             val = decimalFormat.format(value);
         } catch (Exception e) {
-            logger.info("Converting the value :" + value + " into decimal format has thrown exception.");
+            logger.error("Converting the value :" + value + " into decimal format has thrown exception.");
             e.printStackTrace();
             //Not throwing exception as this is just throw e;
         }

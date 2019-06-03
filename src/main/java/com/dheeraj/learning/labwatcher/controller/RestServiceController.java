@@ -31,12 +31,33 @@ public class RestServiceController {
         return jsonString;
     }
 
-    /*@GetMapping("analysescenario/{scenarioName}/{prpcverison}/{testBuild}")
+    /**
+     * This can be used to test degradation on a single valid build.
+     *
+     * @param scenarioName The scenario name to be tested.
+     * @param prpcversion PRPCVersion of the build label.
+     * @param testBuild The scenario ran successfully in this build.
+     * @return
+     */
+    @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{testBuild}")
     public ScenarioDataDTO analyseAParticularBuild(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
                                                    @PathVariable("testBuild") String testBuild){
-        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, prpcversion, testBuild);
+        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, prpcversion, testBuild, "true");
         return scenarioDataDTO;
-    }*/
+    }
+
+    /**
+     * This can be used to analyze all degradations of a scenario in a release.
+     *
+     * @param scenarioName The scenario name to be tested.
+     * @param prpcversion PRPCVersion of the build label.
+     * @return
+     */
+    @GetMapping("analysescenario/{scenarioName}/{prpcverison}/")
+    public ScenarioDataDTO analyseARelease(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion){
+        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioGivenRelease(scenarioName, prpcversion, "true");
+        return scenarioDataDTO;
+    }
 
     @GetMapping("allscenarios/{currentDate}/{noOfPreviousDays}")
     public void analyseAParticularBuild(@PathVariable("currentDate") String currentDate, @PathVariable("noOfPreviousDays") String noOfPreviousDays) {

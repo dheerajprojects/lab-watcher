@@ -134,8 +134,6 @@ public class SchedulerService {
 
         for (String buildLabel : validBuildLabels) {
             if (isvalidrun.equalsIgnoreCase("true")) {
-                logger.trace("Analyzing "+scenarioName+", "+prpcVersion+", "+buildLabel);
-                //TODO : Rename below method in a single commit.
                 scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, buildLabel, true);
             } else {
                 logger.trace("Test failed.");

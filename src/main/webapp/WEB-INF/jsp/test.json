@@ -17,8 +17,16 @@
       "accuracy": 60,
       "improved": false,
       "degraded": true,
-      "buildLabels": ["HEAD-1", "HEAD-2", "HEAD-3"],
-      "buildValues": [10,11,10]
+      "buildLabels": [
+        "HEAD-1",
+        "HEAD-2",
+        "HEAD-3"
+      ],
+      "buildValues": [
+        10,
+        11,
+        10
+      ]
     }
   }
 }

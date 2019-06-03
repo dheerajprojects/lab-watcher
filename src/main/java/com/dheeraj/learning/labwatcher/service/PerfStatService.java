@@ -1,6 +1,5 @@
 package com.dheeraj.learning.labwatcher.service;
 
-import com.dheeraj.learning.labwatcher.InvalidInputCustomException;
 import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.PerfStatDTO;
@@ -18,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,10 +26,10 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * This is the main service method to do business logic on performance stats.
- *
+ * <p>
  * Methods plan
  * 1.getValidBuildLabelsBetweenGivenDates
- * 2.callAScenario
+ * 2.doDegradationAnalysis
  */
 @Service
 public class PerfStatService {
@@ -66,9 +63,8 @@ public class PerfStatService {
      * @param testBuild    The build for which degradation analysis to be done.
      * @return This an object which contains all the degradation details.
      */
-    public ScenarioDataDTO callAScenario(String scenarioName, List<String> paramList, String prpcVersion, String testBuild, boolean isHead) {
+    public ScenarioDataDTO doDegradationAnalysis(String scenarioName, List<String> paramList, String prpcVersion, String testBuild, boolean isHead) {
         //validateInputData(scenarioName, paramList, prpcVersion, testBuild);
-
         //TODO : Validate relevant database data. Whether user requested data exist in the database. Fire perfstat db with scenarioname, prpcversion, testbuild
         // and see if we get atleast one row. If not then throw error that the requested build doesn't exist.
         //TODO : Later we might give more information to the user whether scenario is invalid, prpcversion is invalid or build label is invalid.
@@ -77,16 +73,19 @@ public class PerfStatService {
         scenarioDataDTO.setTestname(scenarioName);
         scenarioDataDTO.setLatestbuild(testBuild);
 
-
-        Map<String, ParamDataDTO> currentBuildParamMap = analyseData(scenarioName, paramList, prpcVersion, testBuild, isHead);
+        Map<String, ParamDataDTO> currentBuildParamMap = new HashMap<>();
+        for (String perfMetric : paramList) {
+            ParamDataDTO paramDataDTO = analysePerfMetric(scenarioName, perfMetric, prpcVersion, testBuild, isHead);
+            currentBuildParamMap.put(paramDataDTO.getParamName(), paramDataDTO);
+        }
         scenarioDataDTO.setMap(currentBuildParamMap);
 
         //Saving only if atleast one parameter is degraded/improved;
         //Ensure that this works even if we rerun the analysis for the same build.
         boolean isVaried = DegradationIdentificationUtil.isAnyParamVaried(currentBuildParamMap);
-        if(isVaried) {
+        if (isVaried) {
             ScenarioData scenarioData = perfStatDAO.getScenarioData(scenarioName, testBuild);
-            if(scenarioData!= null)
+            if (scenarioData != null)
                 Mapper.map(scenarioDataDTO, scenarioData, paramList);
             else
                 scenarioData = Mapper.convert(scenarioDataDTO);
@@ -100,91 +99,88 @@ public class PerfStatService {
     /**
      * This method retrieves different baselines for each parameter and based on the position of the baseline build, it performs different tasks to identify the given build degradation.
      *
-     * @param scenarioName Performance scenario to be tested.
-     * @param paramList List of performance metrics to be analyzed for degradation or improvement.
-     * @param prpcVersion PrpcVersion for the #currentBuildLabel.
-     * @param currentBuildLabel Build to be tested.
-     *
+     * @param scenarioName          Performance scenario to be tested.
+     * @param performanceMetricName List of performance metrics to be analyzed for degradation or improvement.
+     * @param prpcVersion           PrpcVersion for the #currentBuildLabel.
+     * @param currentBuildLabel     Build to be tested.
      * @return A map of given performance metrics with analysis results.
      */
-    public Map<String, ParamDataDTO> analyseData(String scenarioName, List<String> paramList, String prpcVersion, String currentBuildLabel, boolean isHead) {
+    public ParamDataDTO analysePerfMetric(String scenarioName, String performanceMetricName, String prpcVersion, String currentBuildLabel, boolean isHead) {
+        logger.trace("Analyzing " + performanceMetricName+"...");
 
-        Map<String, ParamDataDTO> baselineBuildMap = getLatestBaselineBuildDetails(scenarioName, paramList, currentBuildLabel, prpcVersion, isHead);
-        Map<String, ParamDataDTO> currentBuildParamMap = createMapOfGivenParams(paramList, scenarioName, currentBuildLabel);
+        ParamDataDTO baselineBuildParamDataDTO = getBaselineBuild(scenarioName, performanceMetricName, currentBuildLabel, prpcVersion, isHead);
+        ParamDataDTO currentBuildParamDataDTO = new ParamDataDTO(performanceMetricName, scenarioName, currentBuildLabel);
 
-        List<CompletableFuture<ParamDataDTO>> list = new ArrayList<>();
-        //For loop over params
-        for (String param : currentBuildParamMap.keySet()) {
-            logger.debug("Processing parameter : "+param);
-            CompletableFuture<ParamDataDTO> futures = threadService.analysePerfMetric(scenarioName, prpcVersion, currentBuildLabel, isHead, baselineBuildMap,currentBuildParamMap, param);
-            list.add(futures);
-        }
-
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
-        CompletableFuture.allOf(allFutures);
-
-        for (CompletableFuture<ParamDataDTO> dto :
-                list) {
-            try {
-                currentBuildParamMap.put(dto.get().getParamName(), dto.get());
-            } catch (Exception e) {
-                e.printStackTrace();
+        //The second condition occurs below only when the first condition is false
+        if (baselineBuildParamDataDTO == null) {
+            analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamDataDTO, performanceMetricName, MAX_DATA_SIZE, MAX_DATA_ACCURACY);
+        } else if (baselineBuildParamDataDTO.getBaselineBuildPosition() > DECENT_DATA_SIZE) {
+            analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamDataDTO, performanceMetricName, baselineBuildParamDataDTO.getBaselineBuildPosition(), DECENT_DATA_ACCURACY);
+        } else if (baselineBuildParamDataDTO.getBaselineBuildPosition() >= MIN_DATA_SIZE && baselineBuildParamDataDTO.getBaselineBuildPosition() <= DECENT_DATA_SIZE) {
+            analyseWhenResultsAreStableForNBuilds(scenarioName, prpcVersion, currentBuildLabel, currentBuildParamDataDTO, performanceMetricName, baselineBuildParamDataDTO.getBaselineBuildPosition(), MIN_DATA_ACCURACY);
+        } else {
+            int rank = baselineBuildParamDataDTO.getBaselineBuildPosition();
+            Double accuracy = 0.0;
+            if (baselineBuildParamDataDTO.isDegraded()) {
+                logger.trace("There is a degradation within last "+MIN_DATA_SIZE+" builds. Build : "+baselineBuildParamDataDTO.getBuildLabel());
+                accuracy = analyseWhenRecentBuildsHaveVariation(scenarioName, prpcVersion, currentBuildLabel, baselineBuildParamDataDTO.getBuildLabel(), performanceMetricName, rank, true);
+            } else if (baselineBuildParamDataDTO.isImproved()) {
+                logger.trace("There is an improvement within last "+MIN_DATA_SIZE+" builds. Build : "+baselineBuildParamDataDTO.getBuildLabel());
+                accuracy = analyseWhenRecentBuildsHaveVariation(scenarioName, prpcVersion, currentBuildLabel, baselineBuildParamDataDTO.getBuildLabel(), performanceMetricName, rank, false);
+            } else {
+                logger.trace("Though this param is neither improved nor degraded somehow this data got into database incorrectly.");
             }
+            decideAndSendEmail(baselineBuildParamDataDTO, accuracy);
         }
 
-        return currentBuildParamMap;
+
+        return currentBuildParamDataDTO;
     }
 
     public void decideAndSendEmail(ParamDataDTO variedBuildParamDTO, Double accuracy) {
         boolean sendEmail = false;
         Integer rank = variedBuildParamDTO.getBaselineBuildPosition();
-        if(rank >= 3) {
-            if(rank == 3 && accuracy >= 90) {
+        if (rank >= 3) {
+            if (rank == 3 && accuracy >= 90) {
                 sendEmail = true;
             } else if (rank == 4 && accuracy >= 80) {
                 sendEmail = true;
             }
         }
-        if(sendEmail) {
+        if (sendEmail) {
             ScenarioData scenarioData = perfStatDAO.getScenarioData(variedBuildParamDTO.getScenarioName(), variedBuildParamDTO.getBuildLabel());
             ScenarioDataDTO scenarioDataDTO = Mapper.convert(scenarioData);
             EmailService.sendEmail(scenarioDataDTO);
         }
     }
 
-    private Double analyseWhenRecentBuildsHaveVariation(boolean isAverageRecentBuilds, String scenarioName, String prpcVersion, String currentBuildLabel, String degradedBuild, String param, Integer rank, boolean isForDegradationCheck) {
+    private Double analyseWhenRecentBuildsHaveVariation(String scenarioName, String prpcVersion, String currentBuildLabel, String baselineBuild, String performanceMetricName, Integer rank, boolean isForDegradationCheck) {
         Double currentParamValue;
-        if(isAverageRecentBuilds) {  //This logic takes the average of the last n (<5) builds and compare with the last degraded value.
-            List<PerfStat> perfStats = perfStatDAO.getPerfStatsBetweenBuilds(scenarioName, prpcVersion, degradedBuild, currentBuildLabel, rank);
+        //This logic just compares the current value with last degraded value.
+        PerfStat currentBuildPerfStat = perfStatDAO.getPerfStatForAGivenBuild(scenarioName, currentBuildLabel);
+        PerfStatDTO perfStatDTO = new PerfStatDTO();
+        BeanUtils.copyProperties(currentBuildPerfStat, perfStatDTO);
 
-            List<PerfStatDTO> perfStatDTOs = Mapper.copyResultsToDTO(perfStats);
-            Double consolidatedMean = DegradationIdentificationUtil.getMean(perfStatDTOs, param);
-            currentParamValue = consolidatedMean;
-        } else { //This logic just compares the current value with last degraded value.
-            PerfStat currentBuildPerfStat = perfStatDAO.getPerfStatForAGivenBuild(scenarioName, currentBuildLabel);
-            PerfStatDTO perfStatDTO = new PerfStatDTO();
-            BeanUtils.copyProperties(currentBuildPerfStat, perfStatDTO);
+        currentParamValue = perfStatDTO.getDouble(performanceMetricName);
 
-            currentParamValue = perfStatDTO.getDouble(param);
-        }
 
-        ParamData paramData = perfStatDAO.getParamDataForAGivenBuild(scenarioName, param, degradedBuild);
+        ParamData paramData = perfStatDAO.getParamDataForAGivenBuild(scenarioName, performanceMetricName, baselineBuild);
         ParamDataDTO paramDataDTO = Mapper.convert(paramData);
 
         double variationPercentage = (paramDataDTO.getMean() == 0 ? 0 : (((currentParamValue - paramDataDTO.getMean()) / paramDataDTO.getMean()) * 100));
         boolean isDegraded = DegradationIdentificationUtil.isDegraded(currentParamValue, paramDataDTO.getMean(), paramDataDTO.getStandardDeviation(), 2, true, variationPercentage);
         boolean isImproved = DegradationIdentificationUtil.isImproved(currentParamValue, paramDataDTO.getMean(), paramDataDTO.getStandardDeviation(), 2, true, variationPercentage);
-        logger.debug("ScenarioName : "+scenarioName+", currentBuildLabel : "+currentBuildLabel+" Variation status : isDegraded : "+isDegraded+", isImproved : "+isImproved);
+        logger.debug("ScenarioName : " + scenarioName + ", currentBuildLabel : " + currentBuildLabel + " Variation status : isDegraded : " + isDegraded + ", isImproved : " + isImproved);
 
         Double accuracy = 0.0;
         if ((isForDegradationCheck && isDegraded) || (!isForDegradationCheck && isImproved)) {
             paramDataDTO.setAccuracy(paramDataDTO.getAccuracy() + 10.0);
             accuracy = paramData.getAccuracy() + 10.0;
-            logger.debug("Accuracy increased for scenario : "+paramDataDTO.getScenarioName()+", build : "+paramDataDTO.getBuildLabel()+", param : "+paramDataDTO.getParamName());
+            logger.debug("Accuracy increased for scenario : " + paramDataDTO.getScenarioName() + ", build : " + paramDataDTO.getBuildLabel() + ", param : " + paramDataDTO.getParamName());
         } else {
             paramDataDTO.setAccuracy(paramDataDTO.getAccuracy() - 10.0);
             accuracy = paramData.getAccuracy() - 10.0;
-            logger.debug("Accuracy decreased for scenario : "+paramDataDTO.getScenarioName()+", build : "+paramDataDTO.getBuildLabel()+", param : "+paramDataDTO.getParamName());
+            logger.debug("Accuracy decreased for scenario : " + paramDataDTO.getScenarioName() + ", build : " + paramDataDTO.getBuildLabel() + ", param : " + paramDataDTO.getParamName());
         }
 
         //Send Email
@@ -192,12 +188,15 @@ public class PerfStatService {
 
         //Check if the last degradation/baseline is an outlier. If it is then remove/update it from database that it is not degraded.
         boolean isLastVariationInvalid = isLastVariationInvalid(rank, accuracy);
-        if(!isLastVariationInvalid) {
+        if (!isLastVariationInvalid) {
             perfStatDAO.findAndRemoveVariation(paramData);
             //Rerun later builds after this degradation. //TODO : Check if this is messing up the accuracy.
-            rerunLaterBuildsAfterDegradation(scenarioName, prpcVersion, rank, currentBuildLabel, paramData);
+            //TODO: Dont have to rerun for all the performance metrics. We can just rerun the specific performance metric.
+            rerunLaterBuildsAfterDegradation(scenarioName, prpcVersion, performanceMetricName, rank, currentBuildLabel);
         } else {
             //Can change this save logic later
+            //Better to update the accuracy based on the number of degraded builds in between than directly increasing the accuracy by 10 every time.
+            //Say if there are 2 degraded builds in between, we can mark the accuracy as 90 etc.
             perfStatDAO.findAndUpdate(paramData, accuracy);
         }
 
@@ -206,17 +205,16 @@ public class PerfStatService {
 
     /**
      * TODO Make use of rank attribute from the caller to cross check the data.
+     *
      * @param scenarioName
      * @param prpcVersion
      * @param rank
      * @param endBuildLabel
      */
-    public void rerunLaterBuildsAfterDegradation(String scenarioName, String prpcVersion, Integer rank, String endBuildLabel, ParamData paramData) {
-        List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, endBuildLabel, rank-1, true);
-        List<String> paramList = new ArrayList<>();
-        paramList.add(paramData.getParamName());
+    public void rerunLaterBuildsAfterDegradation(String scenarioName, String prpcVersion, String performanceMetricName, Integer rank, String endBuildLabel) {
+        List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, endBuildLabel, rank - 1, true);
         for (PerfStat perfstat : perfStats) {
-            callAScenario(scenarioName, paramList, prpcVersion, perfstat.getBuildlabel(), true);
+            analysePerfMetric(scenarioName, performanceMetricName, prpcVersion, perfstat.getBuildlabel(), true);
         }
     }
 
@@ -241,7 +239,7 @@ public class PerfStatService {
      * @return
      */
     public boolean isLastVariationInvalid(Integer rank, Double accuracy) {
-        if(accuracy >= (40+rank*10))
+        if (accuracy >= (40 + rank * 10))
             return true;
         else
             return false;
@@ -254,11 +252,11 @@ public class PerfStatService {
      * @param scenarioName
      * @param prpcVersion
      * @param currentBuildLabel
-     * @param currentBuildParamMap
+     * @param currentBuildParamDataDTO
      * @param param
      */
     private void analyseWhenResultsAreStableForNBuilds(String scenarioName, String prpcVersion, String currentBuildLabel,
-                                                       Map<String, ParamDataDTO> currentBuildParamMap, String param, Integer rank,
+                                                       ParamDataDTO currentBuildParamDataDTO, String param, Integer rank,
                                                        Double accuracy) {
         //TODO: Yet to write logic to identify if the build is HEAD or not.
         List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, currentBuildLabel, rank, true);
@@ -266,7 +264,7 @@ public class PerfStatService {
         List<PerfStatDTO> perfStatDTOs = Mapper.copyResultsToDTO(perfStats);
 
         //Calc mean and std
-        DegradationIdentificationUtil.calcStandardDeviation(perfStatDTOs, param, currentBuildParamMap.get(param));
+        DegradationIdentificationUtil.calcStandardDeviation(perfStatDTOs, param, currentBuildParamDataDTO);
 
         //Get latset bulid values
         PerfStat currentBuildPerfStat = perfStatDAO.getPerfStatForAGivenBuild(scenarioName, currentBuildLabel);
@@ -274,40 +272,39 @@ public class PerfStatService {
         BeanUtils.copyProperties(currentBuildPerfStat, currentBuildPerfStatDTO);
 
         //Compare
-        boolean isVaried = DegradationIdentificationUtil.isVaried(currentBuildParamMap.get(param), param, currentBuildPerfStatDTO.getDouble(param));
-        if(isVaried) {
-            currentBuildParamMap.get(param).setAccuracy(accuracy);
-            DataUtil.printVariationMessage(currentBuildParamMap.get(param));
+        boolean isVaried = DegradationIdentificationUtil.isVaried(currentBuildParamDataDTO, param, currentBuildPerfStatDTO.getDouble(param));
+        if (isVaried) {
+            currentBuildParamDataDTO.setAccuracy(accuracy);
+            DataUtil.printVariationMessage(currentBuildParamDataDTO);
         }
-    }
-
-    private static Map<String, ParamDataDTO> createMapOfGivenParams(List<String> paramList, String scenarioName, String buildLabel) {
-        Map<String, ParamDataDTO> currentBuildParamMap = new HashMap<>();
-        for (String param : paramList) {
-            currentBuildParamMap.put(param, new ParamDataDTO(param, scenarioName, buildLabel));
-        }
-        return currentBuildParamMap;
     }
 
     /**
      * This method retrieves the builds(#with ocmplete parameter data) which were degraded/improved earlier for the given scenario.
      * In other words this method returns latest baseline build for each parameter. How far is the
+     *
      * @param scenarioName
-     * @param paramList
+     * @param performanceMetricName
      * @param currentBuildLabel
      * @return
      */
-    private Map<String, ParamDataDTO> getLatestBaselineBuildDetails(String scenarioName, List<String> paramList, String currentBuildLabel, String prpcVersion, boolean isHead) {
-        Map<String, ParamDataDTO> baselineBuildMap = new HashMap<>();
-        for (String param : paramList) {
-            ParamData paramData = perfStatDAO.getVariedBuildRankDetails(scenarioName, param, currentBuildLabel, prpcVersion, isHead);
-            ParamDataDTO paramDataDTO = null;
-            if(paramData != null)
-                paramDataDTO = Mapper.convert(paramData);
+    private ParamDataDTO getBaselineBuild(String scenarioName, String performanceMetricName, String currentBuildLabel, String prpcVersion, boolean isHead) {
+        ParamData paramData = perfStatDAO.getBaselineBuild(scenarioName, performanceMetricName, currentBuildLabel, prpcVersion, isHead);
 
-            baselineBuildMap.put(param, paramDataDTO);
+        ParamDataDTO paramDataDTO = null;
+        if (paramData != null) {
+            paramDataDTO = Mapper.convert(paramData);
+
+            try {
+                logger.trace("Baseline build : " + paramData.getScenarioData().getBuildLabel());
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else {
+            logger.trace("No baseline build");
         }
-        return baselineBuildMap;
+
+        return paramDataDTO;
     }
 
     public List<String> getValidBuildLabelsBetweenGivenDates(String scenarioName, String prpcVersion, String startDate, String endDate) {
@@ -315,20 +312,9 @@ public class PerfStatService {
         return list;
     }
 
-    public void validateInputData(String scenarioName, List<String> paramList, String prpcVersion, String testBuild) {
-        if(StringUtils.isEmpty(scenarioName)) {
-            logger.info("Scenario name can't be empty : " + scenarioName);
-            throw new InvalidInputCustomException("Scenario name can't be empty : " + scenarioName);
-        } else if (CollectionUtils.isEmpty(paramList)) {
-            logger.info("Parameter list can't be empty : " + paramList);
-            throw new InvalidInputCustomException("Parameter list can't be empty : " + paramList);
-        } else if (StringUtils.isEmpty(prpcVersion)) {
-            logger.info("Prpc Version can't be empty : " + prpcVersion);
-            throw new InvalidInputCustomException("Prpc Version can't be empty : " + prpcVersion);
-        } else if (StringUtils.isEmpty(testBuild)) {
-            logger.info("Testbuild can't be empty : " + testBuild);
-            throw new InvalidInputCustomException("Testbuild can't be empty : " + testBuild);
-        }
+    public List<String> getValidBuildLabelsForGivenRelease(String scenarioName, String prpcVersion) {
+        List<String> list = perfStatDAO.getValidBuildLabelsForGivenRelease(scenarioName, prpcVersion);
+        return list;
     }
 }
 

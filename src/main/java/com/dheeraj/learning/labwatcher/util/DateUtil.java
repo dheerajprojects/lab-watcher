@@ -1,6 +1,8 @@
 package com.dheeraj.learning.labwatcher.util;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +36,7 @@ public class DateUtil {
         List<String> list = new ArrayList<>();
         LocalDate date = LocalDate.parse(startDate);
 
-        for(int i=numberOfPastDays;i>0;i--) {
+        for (int i = numberOfPastDays; i > 0; i--) {
             list.add(date.minusDays(i).toString());
         }
         list.add(date.toString());

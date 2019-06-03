@@ -29,8 +29,8 @@ public class ParamData {
     }
 
     public ParamData(String paramName, Double paramValue) {
-        this.paramName=paramName;
-        this.paramValue=paramValue;
+        this.paramName = paramName;
+        this.paramValue = paramValue;
     }
 
     public ParamData(String paramName) {
@@ -136,8 +136,8 @@ public class ParamData {
     @Override
     public String toString() {
         return "ParamData{" +
-                "buildLabel=" + (scenarioData==null?"":scenarioData.getBuildLabel()) +
-                ", testname="+ (scenarioData==null?"":scenarioData.getTestname()) +
+                "buildLabel=" + (scenarioData == null ? "" : scenarioData.getBuildLabel()) +
+                ", testname=" + (scenarioData == null ? "" : scenarioData.getTestname()) +
                 ", paramId=" + paramId +
                 ", paramName='" + paramName + '\'' +
                 ", mean=" + mean +

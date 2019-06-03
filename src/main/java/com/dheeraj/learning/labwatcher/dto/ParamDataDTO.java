@@ -4,10 +4,10 @@ package com.dheeraj.learning.labwatcher.dto;
 public class ParamDataDTO {
     String scenarioName;
     String paramName;
-    Double mean=0.0;
-    Double standardDeviation=0.0;
+    Double mean = 0.0;
+    Double standardDeviation = 0.0;
     String buildLabel;
-    Double paramValue=0.0;
+    Double paramValue = 0.0;
     //TODO : Change this to Integer
     Double noOfValidRecords = 0.0;
     transient Double tempsum = 0.0;
@@ -17,7 +17,7 @@ public class ParamDataDTO {
     /**
      * Last baseline build position from current build.
      */
-    int baselineBuildPosition =0;
+    int baselineBuildPosition = 0;
     boolean isDegraded;
     boolean isImproved;
 

@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ParamDataRepository  extends JpaRepository<ParamData, Integer> {
+public interface ParamDataRepository extends JpaRepository<ParamData, Integer> {
     List<ParamData> findByAccuracyGreaterThan(Double accuracy);
 }

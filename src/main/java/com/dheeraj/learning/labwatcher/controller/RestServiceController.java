@@ -19,38 +19,59 @@ public class RestServiceController {
 
     @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{testBuild}/{param}")
     public ScenarioDataDTO analyseAParticularBuildParticularParam(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
-                                                   @PathVariable("testBuild") String testBuild, @PathVariable("param") String param){
-        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, testBuild, prpcversion, param);
+                                                                  @PathVariable("testBuild") String testBuild, @PathVariable("param") String param) {
+        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuildGivenParam(scenarioName, testBuild, prpcversion, param);
         return scenarioDataDTO;
     }
 
     @GetMapping("analysescenario/stringresponse/{scenarioName}/{prpcverison}/{testBuild}/{param}")
     public String analyseAParticularBuildAndReturnString(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
-                                                @PathVariable("testBuild") String testBuild, @PathVariable("param") String param){
+                                                         @PathVariable("testBuild") String testBuild, @PathVariable("param") String param) {
         String jsonString = schedulerService.analyseAParticularBuildReturnString(scenarioName, testBuild, prpcversion, param);
         return jsonString;
     }
 
+    /**
+     * This can be used to test degradation on a single valid build.
+     *
+     * @param scenarioName The scenario name to be tested.
+     * @param prpcversion PRPCVersion of the build label.
+     * @param testBuild The scenario ran successfully in this build.
+     * @return
+     */
     @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{testBuild}")
     public ScenarioDataDTO analyseAParticularBuild(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
                                                    @PathVariable("testBuild") String testBuild){
-        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, prpcversion, testBuild);
+        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, prpcversion, testBuild, "true");
+        return scenarioDataDTO;
+    }
+
+    /**
+     * This can be used to analyze all degradations of a scenario in a release.
+     *
+     * @param scenarioName The scenario name to be tested.
+     * @param prpcversion PRPCVersion of the build label.
+     * @return
+     */
+    @GetMapping("analysescenario/{scenarioName}/{prpcverison}/")
+    public ScenarioDataDTO analyseARelease(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion){
+        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioGivenRelease(scenarioName, prpcversion, "true");
         return scenarioDataDTO;
     }
 
     @GetMapping("allscenarios/{currentDate}/{noOfPreviousDays}")
-    public void analyseAParticularBuild(@PathVariable("currentDate") String currentDate, @PathVariable("noOfPreviousDays") String noOfPreviousDays){
-        logger.info("Running performance metric analysis for all scenarios from last "+noOfPreviousDays+" days till "+currentDate);
-        logger.info("Current Date : "+currentDate);
-        logger.info("Number of previous days : "+noOfPreviousDays);
+    public void analyseAParticularBuild(@PathVariable("currentDate") String currentDate, @PathVariable("noOfPreviousDays") String noOfPreviousDays) {
+        logger.info("Running performance metric analysis for all scenarios from last " + noOfPreviousDays + " days till " + currentDate);
+        logger.info("Current Date : " + currentDate);
+        logger.info("Number of previous days : " + noOfPreviousDays);
 
-        schedulerService.scheduleDailyRuns(null,currentDate ,Integer.parseInt(noOfPreviousDays));
+        schedulerService.scheduleDailyRuns(null, currentDate, Integer.parseInt(noOfPreviousDays));
     }
 
     @GetMapping("completedBuild/analyzeResult/{prpcversion}/{buildlabel}")
-    public void analyzeCompletedBuildResults(@PathVariable("prpcversion") String prpcversion, @PathVariable("buildlabel") String buildlabel){
+    public void analyzeCompletedBuildResults(@PathVariable("prpcversion") String prpcversion, @PathVariable("buildlabel") String buildlabel) {
         logger.info("This rest service got triggered from jenkins job");
-        logger.info("Running performance metric analysis on build : "+buildlabel+", prpcversion : "+prpcversion);
+        logger.info("Running performance metric analysis on build : " + buildlabel + ", prpcversion : " + prpcversion);
         logger.info("Yet to implement the current service...");
     }
 }

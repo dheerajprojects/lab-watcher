@@ -1,19 +1,10 @@
 package com.dheeraj.learning.labwatcher.service;
 
 import com.dheeraj.learning.labwatcher.util.DataUtil;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -23,8 +14,8 @@ public class ConfigurationService {
     private Properties properties;
     private Properties emailProperties;
 
-    private String PROPERTIES_FILE_NAME="src/main/resources/scenarioConfiguration.properties";
-    private String EMAIL_PROPERTIES_FILE_NAME="src/main/resources/emailConfig.properties";
+    private String PROPERTIES_FILE_NAME = "src/main/resources/scenarioConfiguration.properties";
+    private String EMAIL_PROPERTIES_FILE_NAME = "src/main/resources/emailConfig.properties";
 
     private void loadScenarioConfigProperties() {
         properties = new Properties();

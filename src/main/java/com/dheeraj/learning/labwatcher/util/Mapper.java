@@ -74,12 +74,12 @@ public class Mapper {
 
         //Temporary map to easily access paramdata set.
         Map<String, ParamData> temporaryMap = new HashMap<>();
-        for (ParamData paramData: scenarioData.getSet()) {
+        for (ParamData paramData : scenarioData.getSet()) {
             temporaryMap.put(paramData.getParamName(), paramData);
         }
 
-        for (String paramName: paramList) {
-            if(temporaryMap.containsKey(paramName))
+        for (String paramName : paramList) {
+            if (temporaryMap.containsKey(paramName))
                 map(scenarioDataDTO.getMap().get(paramName), temporaryMap.get(paramName));
             else {
                 ParamData paramData = new ParamData();
@@ -109,10 +109,10 @@ public class Mapper {
         return paramDataDTO;
     }
 
-    public static List<ParamDataDTO> convertResultsToDTO(List<ParamData> paramDatas){
+    public static List<ParamDataDTO> convertResultsToDTO(List<ParamData> paramDatas) {
         List<ParamDataDTO> paramDataDTOs = new ArrayList<>();
         for (ParamData paramData : paramDatas) {
-            if(paramData.getScenarioData() != null)
+            if (paramData.getScenarioData() != null)
                 paramDataDTOs.add(convert(paramData));
         }
 

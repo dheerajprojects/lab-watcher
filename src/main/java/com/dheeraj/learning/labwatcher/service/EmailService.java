@@ -2,24 +2,14 @@ package com.dheeraj.learning.labwatcher.service;
 
 import com.dheeraj.learning.labwatcher.dto.ParamDataDTO;
 import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
-import com.dheeraj.learning.labwatcher.entity.ParamData;
-import com.dheeraj.learning.labwatcher.entity.ScenarioData;
 import com.dheeraj.learning.labwatcher.util.DataUtil;
 import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 @Service
@@ -39,8 +29,10 @@ public class EmailService {
         ConfigurationService configurationService = new ConfigurationService();
         Properties emailProps = configurationService.getEmailProperties();
 
-        logger.info("Sending email to "+emailProps.getProperty("to_address")+" for degradation/improvement in "+scenarioDataDTO.getTestname()+
-                " for build  "+scenarioDataDTO.getLatestbuild());
+        logger.info(scenarioDataDTO.getTestname()+" - "+scenarioDataDTO.getLatestbuild()+" is degraded/improved");
+
+        logger.trace("Sending email to " + emailProps.getProperty("to_address") + " for degradation/improvement in " + scenarioDataDTO.getTestname() +
+                " for build  " + scenarioDataDTO.getLatestbuild());
 
         subject = scenarioDataDTO.getTestname() + " is varied on build : " + scenarioDataDTO.getLatestbuild();
 
@@ -143,7 +135,7 @@ public class EmailService {
                 body2 += "<b>degradation</b> ";
             if (timeData.isImproved())
                 body2 += "<b>improvement</b> ";
-            body2 += " in <b>" + timeData.getBuildLabel() + "</b> build w.r.t <b>"+timeData.getParamName()+" </b>in <b>" + timeData.getScenarioName() + " </b>scenario.\n";
+            body2 += " in <b>" + timeData.getBuildLabel() + "</b> build w.r.t <b>" + timeData.getParamName() + " </b>in <b>" + timeData.getScenarioName() + " </b>scenario.\n";
         }
 
         String body3 = " <o:p></o:p>\n" +
@@ -318,7 +310,7 @@ public class EmailService {
                         "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;background:#D9E2F3;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
-                        status+
+                        status +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n";
@@ -377,7 +369,7 @@ public class EmailService {
                         "            <td width=89 valign=top style='width:100pt;border-top:none;border-left:none;border-bottom:solid #8EAADB 1.0pt;border-right:solid #8EAADB 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>\n" +
                         "                <p class=MsoNormal>\n" +
                         "                     <span lang=EN-US style='mso-fareast-language:EN-IN'>\n" +
-                        status+
+                        status +
                         "                     </span>\n" +
                         "                </p>\n" +
                         "            </td>\n";
@@ -416,6 +408,7 @@ public class EmailService {
 
     /**
      * Since totaltime is diff from junits to other scenarios, this method is needed.
+     *
      * @param scenarioDataDTO
      * @return
      */
@@ -428,7 +421,7 @@ public class EmailService {
         jUnitScenarios.add("CallCenterJUnit");
 
 
-        if(jUnitScenarios.contains(scenarioDataDTO.getTestname())) {
+        if (jUnitScenarios.contains(scenarioDataDTO.getTestname())) {
             return scenarioDataDTO.getMap().get("wallseconds");
         }
         return scenarioDataDTO.getMap().get("totalreqtime");

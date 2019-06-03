@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="DEV_HOME" value="logs" />
+    <property name="DEV_HOME" value="logs"/>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
@@ -17,11 +17,6 @@
 
     <appender name="FILE-INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${DEV_HOME}/application-info.log</file>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
                 %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
@@ -54,15 +49,15 @@
 
     <!-- Send logs to both console and file audit -->
     <logger name="com.dheeraj.learning.labwatcher" level="info" additivity="false">
-        <appender-ref ref="FILE-INFO" />
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE-INFO"/>
+        <appender-ref ref="STDOUT"/>
     </logger>
 
     <logger name="com.dheeraj.learning.labwatcher" level="trace" additivity="false">
-        <appender-ref ref="FILE-TRACE" />
+        <appender-ref ref="FILE-TRACE"/>
     </logger>
 
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

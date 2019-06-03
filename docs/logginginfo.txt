@@ -1,10 +1,3 @@
-How to run this application by command prompt.
-To compile
-mvn clean install -DskipTests=true
-To run
-mvn spring-boot:run
-
-
 Log configuration
 #Different log levels for file and console
 Add this to logback.xml and do the necessary changes
@@ -125,3 +118,12 @@ Add this to logback.xml and do the necessary changes
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
+
+
+Level	Description
+FATAL	Severe errors that cause premature termination. Expect these to be immediately visible on a status console.
+ERROR	Other runtime errors or unexpected conditions. Expect these to be immediately visible on a status console.
+WARNING	Use of deprecated APIs, poor use of API, 'almost' errors, other runtime situations that are undesirable or unexpected, but not necessarily "wrong". Expect these to be immediately visible on a status console.
+INFO	Interesting runtime events (startup/shutdown). Expect these to be immediately visible on a console, so be conservative and keep to a minimum.
+DEBUG	detailed information on the flow through the system. Expect these to be written to logs only.
+TRACE	more detailed information. Expect these to be written to logs only.

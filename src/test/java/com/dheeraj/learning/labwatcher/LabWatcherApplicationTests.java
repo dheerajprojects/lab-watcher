@@ -4,6 +4,7 @@ import com.dheeraj.learning.labwatcher.dao.ParamDataDAO;
 import com.dheeraj.learning.labwatcher.dao.PerfStatDAO;
 import com.dheeraj.learning.labwatcher.entity.ParamData;
 import com.dheeraj.learning.labwatcher.entity.PerfStat;
+import com.dheeraj.learning.labwatcher.repository.FlatPerformanceTestsRepository;
 import com.dheeraj.learning.labwatcher.repository.ParamDataRepository;
 import com.dheeraj.learning.labwatcher.repository.ScenarioDataRepository;
 import com.dheeraj.learning.labwatcher.service.ConfigurationService;
@@ -41,12 +42,16 @@ public class LabWatcherApplicationTests {
     @Autowired
     ParamDataDAO paramDataDAO;
 
+    @Autowired
+    FlatPerformanceTestsRepository flatPerformanceTestsRepository;
+
+
     public void contextLoads() {
         //TODO : Remove DTOs and use only Entity objects everywhere.
-        schedulerService.scheduleDailyRuns(null,"2019-04-17" ,0);
+        schedulerService.scheduleDailyRuns(null, "2019-04-17", 0);
     }
 
-    @Test
+    //@Test
     public void testEmail() {
         EmailService.sendEmail(DataUtil.getScenarioDataDTO());
     }
@@ -74,7 +79,7 @@ public class LabWatcherApplicationTests {
         List<PerfStat> perfStats = perfStatDAO.getBuilds("2019-03-26");
         System.out.println(perfStats.size());
         for (PerfStat perfStat : perfStats) {
-            System.out.println("BuildLabel : "+perfStat.getBuildlabel()+", ScenarioName : "+perfStat.getTestname());
+            System.out.println("BuildLabel : " + perfStat.getBuildlabel() + ", ScenarioName : " + perfStat.getTestname());
         }
     }
 
@@ -108,5 +113,10 @@ public class LabWatcherApplicationTests {
     //@Test
     public void criteriaTest() {
         paramDataDAO.researchOnCriteria();
+    }
+
+    @Test
+    public void testCollidersDB() {
+        System.out.println(flatPerformanceTestsRepository.findById(44957));
     }
 }

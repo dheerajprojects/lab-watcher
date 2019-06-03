@@ -73,7 +73,7 @@ public class ThreadService {
             decideAndSendEmail(baselineBuildParamDataDTO, accuracy);
         }
 
-        logger.info("Completed new thread for performance metric : " + performanceMetricName);
+        logger.trace("Completed new thread for performance metric : " + performanceMetricName);
         return CompletableFuture.completedFuture(currentBuildParamDataDTO);
     }
 

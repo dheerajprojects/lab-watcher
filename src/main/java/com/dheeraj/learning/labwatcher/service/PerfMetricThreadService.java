@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-public class ThreadService {
-    private static final Logger logger = LoggerFactory.getLogger(ThreadService.class);
+public class PerfMetricThreadService {
+    private static final Logger logger = LoggerFactory.getLogger(PerfMetricThreadService.class);
 
     private static Integer MAX_DATA_SIZE = 50;
     private static Integer DECENT_DATA_SIZE = 20;

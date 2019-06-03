@@ -37,7 +37,7 @@ public class PerfStatService {
     private ScenarioDataRepository scenarioDataRepository;
 
     @Autowired
-    private ThreadService threadService;
+    private PerfMetricThreadService perfMetricThreadService;
 
     /**
      * This method analyzes last n (maxResults #50 for now) perfstats(previous to the #testBuild} and calculates mean and
@@ -66,7 +66,7 @@ public class PerfStatService {
         Map<String, ParamDataDTO> currentBuildParamMap = new HashMap<>();
         List<CompletableFuture<ParamDataDTO>> list = new ArrayList<>();
         for (String perfMetric : paramList) {
-            CompletableFuture<ParamDataDTO> futures = threadService.analysePerfMetric(scenarioName, perfMetric, prpcVersion, testBuild, isHead);
+            CompletableFuture<ParamDataDTO> futures = perfMetricThreadService.analysePerfMetric(scenarioName, perfMetric, prpcVersion, testBuild, isHead);
             list.add(futures);
         }
 

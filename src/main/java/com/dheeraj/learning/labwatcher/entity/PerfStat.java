@@ -3,6 +3,7 @@ package com.dheeraj.learning.labwatcher.entity;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 @Table(name = "pr_data_performancestats")
@@ -136,6 +137,16 @@ public class PerfStat {
     private String commitid;
     private String mprid;
     private String testrunstatus;
+
+    public PerfStat(Date teststart, String trialtype, String runlevel, String testname, String isvalidrun, String prpcversion, String buildinfo) {
+        this.teststart = new Timestamp(teststart.getTime());
+        this.trialtype = trialtype;
+        this.runlevel = runlevel;
+        this.testname = testname;
+        this.isvalidrun = isvalidrun;
+        this.prpcversion = prpcversion;
+        this.buildinfo = buildinfo;
+    }
 
     @Basic
     @Column(name = "testname", nullable = false, length = 32)

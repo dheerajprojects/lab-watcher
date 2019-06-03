@@ -151,6 +151,36 @@ public class SchedulerService {
      * This method is analyses the latest build of a scenario with the last n builds
      * and identifies if the latest build is degraded or not.
      */
+    public ScenarioDataDTO analyseARelease(String prpcVersion) {
+        List<String> paramList = configurationService.getPerformanceMetrics();
+
+        ScenarioDataDTO scenarioDataDTO = null;
+
+        List<String> validBuildLabels = perfStatService.getValidBuildLabelsForGivenRelease(prpcVersion);
+
+        for (String buildLabel : validBuildLabels) {
+            List<PerfStat> perfStatList = perfStatDAO.getLatestPerfStatsForAGivenBuild(prpcVersion, buildLabel);
+            for (PerfStat perfStat : perfStatList) {
+                fixTimeAttributeForJUnits(perfStat.getTestname(), paramList);
+                if ("true".equalsIgnoreCase(perfStat.getIsvalidrun())) {
+                    scenarioDataDTO = perfStatService.doDegradationAnalysis(perfStat.getTestname(), paramList, prpcVersion, buildLabel, true);
+                } else {
+                    logger.trace("Test failed.");
+                    logger.trace("Yet to implement test failure analysis... ");
+                    //scenarioDataDTO = perfStatService.doFailureAnalysisOnAScenario(scenarioName, prpcVersion, currentBuildLabel);
+                }
+            }
+        }
+
+        logger.debug(scenarioDataDTO != null ? scenarioDataDTO.toString() : "ScenarioDataDTO is null");
+
+        return scenarioDataDTO;
+    }
+
+    /**
+     * This method is analyses the latest build of a scenario with the last n builds
+     * and identifies if the latest build is degraded or not.
+     */
     public ScenarioDataDTO analyseAScenarioLatestBuild(String scenarioName, String prpcVersion, String currentBuildLabel, String isvalidrun) {
         List<String> paramList = configurationService.getPerformanceMetrics();
 

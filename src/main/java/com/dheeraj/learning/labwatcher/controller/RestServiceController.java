@@ -54,8 +54,20 @@ public class RestServiceController {
      * @return
      */
     @GetMapping("analysescenario/{scenarioName}/{prpcverison}/")
-    public ScenarioDataDTO analyseARelease(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion){
+    public ScenarioDataDTO analyseAScenarioInARelease(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion){
         ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioGivenRelease(scenarioName, prpcversion, "true");
+        return scenarioDataDTO;
+    }
+
+    /**
+     * This can be used to analyze all degradations of a scenario in a release.
+     *
+     * @param prpcversion PRPCVersion of the build label.
+     * @return
+     */
+    @GetMapping("analyse/{prpcverison}/")
+    public ScenarioDataDTO analyseARelease(@PathVariable("prpcverison") String prpcversion){
+        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseARelease(prpcversion);
         return scenarioDataDTO;
     }
 

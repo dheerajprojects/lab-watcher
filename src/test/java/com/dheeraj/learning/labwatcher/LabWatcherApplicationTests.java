@@ -110,12 +110,15 @@ public class LabWatcherApplicationTests {
         }
     }
 
-    //@Test
-    public void criteriaTest() {
-        paramDataDAO.researchOnCriteria();
-    }
-
     @Test
+    public void criteriaTest() {
+        //paramDataDAO.researchOnCriteria();
+        List<PerfStat> perfStats = perfStatDAO.getLatestPerfStatsForAGivenBuild("8.3.0", "HEAD-6759");
+        for (PerfStat perfStat : perfStats) {
+            System.out.println(perfStat);
+        }
+    }
+    //@Test
     public void testCollidersDB() {
         System.out.println(flatPerformanceTestsRepository.findById(44957));
     }

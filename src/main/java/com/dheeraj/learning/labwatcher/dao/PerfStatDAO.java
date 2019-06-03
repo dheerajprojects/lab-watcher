@@ -14,6 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.AbstractQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +50,51 @@ public class PerfStatDAO {
 
         List<PerfStat> list = query.getResultList();
         return list.get(0);
+    }
+
+    /**
+     * This retrieves the all scenario results for a given build with given prpcversion.
+     * When the same scenario for a spcecific build is run multiple times, this will retrieve the lastest result.
+     * @param prpcversion
+     * @param buildinfo
+     * @return
+     */
+    public List<PerfStat> getLatestPerfStatsForAGivenBuild(String prpcversion, String buildinfo) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        AbstractQuery<PerfStat> aq = cb.createQuery(PerfStat.class);
+        Root<PerfStat> root = aq.from(PerfStat.class);
+
+        CriteriaQuery<PerfStat> select = ((CriteriaQuery<PerfStat>)aq).multiselect(cb.max(root.get("teststart")),
+                root.get("trialtype"),
+                root.get("runlevel"),
+                root.get("testname"),
+                root.get("isvalidrun"),
+                root.get("prpcversion"),
+                root.get("buildinfo")
+        );
+
+        //Where clause
+        aq.where(cb.equal(root.get("trialtype"), "Performance"),
+                cb.equal(root.get("runlevel"),"optimized"),
+                cb.equal(root.get("prpcversion"),prpcversion),
+                cb.equal(root.get("buildinfo"), buildinfo));
+
+
+        select.groupBy(root.get("trialtype"),
+                root.get("runlevel"),
+                root.get("testname"),
+                root.get("isvalidrun"),
+                root.get("prpcversion"),
+                root.get("buildinfo")
+                );
+
+        select.orderBy(cb.asc(root.get("testname")));
+
+        TypedQuery<PerfStat> q = em.createQuery(select);
+
+        List<PerfStat> list = q.getResultList();
+
+        return list;
     }
 
     public List<PerfStat> getPerfStatsForLastNBuilds(String scenarioName, String prpcVersion, String endBuildLabel, int maxResults, boolean isHead) {
@@ -142,6 +192,53 @@ public class PerfStatDAO {
                 "and isvalidrun='true' " +
                 "and buildlabel like '%HEAD%' " +
                 "group by trialtype, runlevel, testname, isvalidrun, prpcversion, buildlabel, builddate " +
+                "order by builddate asc";
+
+        Query query = em.createQuery(sql);
+        List<Object[]> rows = query.getResultList();
+        List<String> buildLabels = new ArrayList<>();
+        for (Object[] row :
+                rows) {
+            buildLabels.add(row[1] + "");
+        }
+
+        return buildLabels;
+    }
+
+    /**
+     * SQL Query
+     * SELECT Max(teststart) AS maxteststart,
+     *        buildlabel,
+     *        trialtype,
+     *        runlevel,
+     *        isvalidrun,
+     *        prpcversion,
+     *        builddate
+     * FROM   data.pr_data_performancestats
+     * WHERE  trialtype = 'Performance'
+     *        AND runlevel = 'optimized'
+     *        AND prpcversion = '8.3.0'
+     *        AND isvalidrun = 'true'
+     *        AND buildlabel LIKE '%HEAD%'
+     * GROUP  BY trialtype,
+     *           runlevel,
+     *           isvalidrun,
+     *           prpcversion,
+     *           buildlabel,
+     *           builddate
+     * ORDER  BY builddate ASC;
+     *
+     * @param prpcVersion
+     * @return
+     */
+    public List<String> getValidBuildLabelsForGivenRelease(String prpcVersion) {
+        String sql = "select max(teststart) as maxteststart, buildlabel, trialtype, runlevel, isvalidrun, prpcversion, builddate from PerfStat " +
+                "where trialtype='Performance' " +
+                "and runlevel='optimized' " +
+                "and prpcversion='" + prpcVersion + "' " +
+                "and isvalidrun='true' " +
+                "and buildlabel like '%HEAD%' " +
+                "group by trialtype, runlevel, isvalidrun, prpcversion, buildlabel, builddate " +
                 "order by builddate asc";
 
         Query query = em.createQuery(sql);

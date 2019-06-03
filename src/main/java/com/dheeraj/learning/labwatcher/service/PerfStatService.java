@@ -108,5 +108,10 @@ public class PerfStatService {
         List<String> list = perfStatDAO.getValidBuildLabelsForGivenRelease(scenarioName, prpcVersion);
         return list;
     }
+
+    public List<String> getValidBuildLabelsForGivenRelease(String prpcVersion) {
+        List<String> list = perfStatDAO.getValidBuildLabelsForGivenRelease(prpcVersion);
+        return list;
+    }
 }
 

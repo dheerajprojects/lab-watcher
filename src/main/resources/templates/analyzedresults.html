@@ -38,8 +38,8 @@
     <h2>Degradations or Improvements identified by LabWatcher</h2>
     <table id="results">
         <tr>
-            <th>ScenarioName</th>
-            <th>BuildLabel</th>
+            <th>Scenario Name</th>
+            <th>Build Name</th>
             <th>Performance Metric</th>
             <th>Mean</th>
             <th>Standard Deviation</th>
@@ -50,7 +50,7 @@
         </tr>
         <tr th:each="result : ${analyzedresults}">
             <td th:text="${result.scenarioName}"></td>
-            <td th:text="${result.buildLabel}"></td>
+            <td th:text="${result.buildInfo}"></td>
             <td th:text="${result.paramName}"></td>
             <td th:text="${#numbers.formatDecimal(result.mean,2,2)}"></td>
             <td th:text="${#numbers.formatDecimal(result.standardDeviation,2,2)}"></td>

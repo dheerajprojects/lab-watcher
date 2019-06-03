@@ -42,7 +42,7 @@ public class DataUtil {
         paramData2.setAccuracy(60.0);
 
         ScenarioData scenarioData = new ScenarioData();
-        scenarioData.setBuildLabel("PRPC-HEAD-5577");
+        scenarioData.setBuildInfo("PRPC-HEAD-5577");
         scenarioData.setTestname("CCCASE");
         scenarioData.addParam(paramData1);
         scenarioData.addParam(paramData2);
@@ -64,9 +64,9 @@ public class DataUtil {
      * @param paramDataDTO
      */
     public static void printVariationMessage(ParamDataDTO paramDataDTO) {
-        logger.info(paramDataDTO.getScenarioName() + ", "+ paramDataDTO.getBuildLabel()+", "+paramDataDTO.getParamName() + " - " + paramDataDTO.getVariedBy());
+        logger.info(paramDataDTO.getScenarioName() + ", "+ paramDataDTO.getBuildInfo()+", "+paramDataDTO.getParamName() + " - " + paramDataDTO.getVariedBy());
 
-        logger.trace("The scenario : " + paramDataDTO.getScenarioName() + " for build :" + paramDataDTO.getBuildLabel() +
+        logger.trace("The scenario : " + paramDataDTO.getScenarioName() + " for build :" + paramDataDTO.getBuildInfo() +
                 " is degraded/improved in terms of performance metric : " + paramDataDTO.getParamName() + " with " + paramDataDTO.getVariedBy() + " percentage.");
 
         logger.debug(paramDataDTO.toString());

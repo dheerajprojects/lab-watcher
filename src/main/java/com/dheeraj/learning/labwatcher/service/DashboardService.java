@@ -38,8 +38,8 @@ public class DashboardService {
         return paramDataDTOs;
     }
 
-    public List<ParamDataDTO> getDataOnGivenBuild(String buildLabel) {
-        List<ParamData> paramDatas = paramDataDAO.getDataOnGivenBuild(buildLabel);
+    public List<ParamDataDTO> getDataOnGivenBuild(String buildInfo) {
+        List<ParamData> paramDatas = paramDataDAO.getDataOnGivenBuild(buildInfo);
         List<ParamDataDTO> paramDataDTOs = Mapper.convertResultsToDTO(paramDatas);
         return paramDataDTOs;
     }

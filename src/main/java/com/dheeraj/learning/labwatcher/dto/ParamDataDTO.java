@@ -6,7 +6,7 @@ public class ParamDataDTO {
     String paramName;
     Double mean = 0.0;
     Double standardDeviation = 0.0;
-    String buildLabel;
+    String buildInfo;
     Double paramValue = 0.0;
     //TODO : Change this to Integer
     Double noOfValidRecords = 0.0;
@@ -33,18 +33,18 @@ public class ParamDataDTO {
         this.paramName = paramName;
     }
 
-    public ParamDataDTO(String paramName, String scenarioName, String buildLabel) {
+    public ParamDataDTO(String paramName, String scenarioName, String buildInfo) {
         this.paramName = paramName;
         this.scenarioName = scenarioName;
-        this.buildLabel = buildLabel;
+        this.buildInfo = buildInfo;
     }
 
-    public String getBuildLabel() {
-        return buildLabel;
+    public String getBuildInfo() {
+        return buildInfo;
     }
 
-    public void setBuildLabel(String buildLabel) {
-        this.buildLabel = buildLabel;
+    public void setBuildInfo(String buildInfo) {
+        this.buildInfo = buildInfo;
     }
 
     public String getScenarioName() {
@@ -166,7 +166,7 @@ public class ParamDataDTO {
                 ", paramName='" + paramName + '\'' +
                 ", mean=" + mean +
                 ", standardDeviation=" + standardDeviation +
-                ", buildLabel='" + buildLabel + '\'' +
+                ", buildInfo='" + buildInfo + '\'' +
                 ", paramValue=" + paramValue +
                 ", noOfValidRecords=" + noOfValidRecords +
                 ", tempsum=" + tempsum +

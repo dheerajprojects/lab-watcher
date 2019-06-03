@@ -17,17 +17,17 @@ public class RestServiceController {
     @Autowired
     private SchedulerService schedulerService;
 
-    @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{testBuild}/{param}")
+    @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{buildInfo}/{param}")
     public ScenarioDataDTO analyseAParticularBuildParticularParam(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
-                                                                  @PathVariable("testBuild") String testBuild, @PathVariable("param") String param) {
-        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuildGivenParam(scenarioName, testBuild, prpcversion, param);
+                                                                  @PathVariable("buildInfo") String buildInfo, @PathVariable("param") String param) {
+        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuildGivenParam(scenarioName, buildInfo, prpcversion, param);
         return scenarioDataDTO;
     }
 
-    @GetMapping("analysescenario/stringresponse/{scenarioName}/{prpcverison}/{testBuild}/{param}")
+    @GetMapping("analysescenario/stringresponse/{scenarioName}/{prpcverison}/{buildInfo}/{param}")
     public String analyseAParticularBuildAndReturnString(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
-                                                         @PathVariable("testBuild") String testBuild, @PathVariable("param") String param) {
-        String jsonString = schedulerService.analyseAParticularBuildReturnString(scenarioName, testBuild, prpcversion, param);
+                                                         @PathVariable("buildInfo") String buildInfo, @PathVariable("param") String param) {
+        String jsonString = schedulerService.analyseAParticularBuildReturnString(scenarioName, buildInfo, prpcversion, param);
         return jsonString;
     }
 
@@ -39,10 +39,10 @@ public class RestServiceController {
      * @param testBuild The scenario ran successfully in this build.
      * @return
      */
-    @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{testBuild}")
+    @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{buildInfo}")
     public ScenarioDataDTO analyseAParticularBuild(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
-                                                   @PathVariable("testBuild") String testBuild){
-        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, prpcversion, testBuild, "true");
+                                                   @PathVariable("buildInfo") String buildInfo){
+        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseAScenarioLatestBuild(scenarioName, prpcversion, buildInfo, "true");
         return scenarioDataDTO;
     }
 
@@ -65,10 +65,10 @@ public class RestServiceController {
      * @param prpcversion PRPCVersion of the build label.
      * @return
      */
-    @GetMapping("analyse/{prpcverison}/")
-    public ScenarioDataDTO analyseARelease(@PathVariable("prpcverison") String prpcversion){
-        ScenarioDataDTO scenarioDataDTO = schedulerService.analyseARelease(prpcversion);
-        return scenarioDataDTO;
+    @GetMapping("analyse/{prpcversion}")
+    public String analyseARelease(@PathVariable("prpcversion") String prpcversion){
+        schedulerService.analyseARelease(prpcversion);
+        return "Analysis for entire release is completed";
     }
 
     @GetMapping("allscenarios/{currentDate}/{noOfPreviousDays}")
@@ -80,10 +80,10 @@ public class RestServiceController {
         schedulerService.scheduleDailyRuns(null, currentDate, Integer.parseInt(noOfPreviousDays));
     }
 
-    @GetMapping("completedBuild/analyzeResult/{prpcversion}/{buildlabel}")
-    public void analyzeCompletedBuildResults(@PathVariable("prpcversion") String prpcversion, @PathVariable("buildlabel") String buildlabel) {
+    @GetMapping("completedBuild/analyzeResult/{prpcversion}/{buildInfo}")
+    public void analyzeCompletedBuildResults(@PathVariable("prpcversion") String prpcversion, @PathVariable("buildInfo") String buildInfo) {
         logger.info("This rest service got triggered from jenkins job");
-        logger.info("Running performance metric analysis on build : " + buildlabel + ", prpcversion : " + prpcversion);
+        logger.info("Running performance metric analysis on build : " + buildInfo + ", prpcversion : " + prpcversion);
         logger.info("Yet to implement the current service...");
     }
 }

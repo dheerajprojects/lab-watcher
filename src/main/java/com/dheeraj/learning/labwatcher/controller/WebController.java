@@ -15,7 +15,7 @@ import java.util.List;
  * Shows dashboards based on the given input.
  * /analyzedresults/                        --all scenario all builds
  * /analyzedresults/scenarios/scenarioname  --all builds for the given scenario
- * /analyzedresults/builds/buildlabel       --all scenarios for the given build
+ * /analyzedresults/builds/buildInfo       --all scenarios for the given build
  */
 @Controller
 public class WebController {
@@ -50,9 +50,9 @@ public class WebController {
         return "analyzedresults";
     }
 
-    @RequestMapping(value = "/analyzedresults/builds/{buildlabel}", method = RequestMethod.GET)
-    public String getBuildResults(@PathVariable("buildlabel") String buildlabel, Model model) {
-        List<ParamDataDTO> paramDataDTOs = dashboardService.getDataOnGivenBuild(buildlabel);
+    @RequestMapping(value = "/analyzedresults/builds/{buildInfo}", method = RequestMethod.GET)
+    public String getBuildResults(@PathVariable("buildInfo") String buildInfo, Model model) {
+        List<ParamDataDTO> paramDataDTOs = dashboardService.getDataOnGivenBuild(buildInfo);
         model.addAttribute("analyzedresults", paramDataDTOs);
         return "analyzedresults";
     }

@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
  * This is the main service method to do business logic on performance stats.
  * <p>
  * Methods plan
- * 1.getValidBuildLabelsBetweenGivenDates
+ * 1.getValidBuildsBetweenGivenDates
  * 2.doDegradationAnalysis
  */
 @Service
@@ -52,16 +52,18 @@ public class PerfStatService {
 
         List<String> paramList = configurationService.getPerformanceMetrics();
         ScenarioDataDTO scenarioDataDTO = null;
-        List<String> validBuildLabels = perfStatDAO.getValidBuildLabelsForGivenRelease(prpcVersion);
+        List<String> validBuildInfo = perfStatDAO.getValidBuildsForGivenRelease(prpcVersion);
 
-        for (String buildLabel : validBuildLabels) {
-            List<PerfStat> perfStatList = perfStatDAO.getLatestPerfStatsForAGivenBuild(prpcVersion, buildLabel);
+        for (String buildInfo : validBuildInfo) {
+            List<PerfStat> perfStatList = perfStatDAO.getLatestPerfStatsForAGivenBuild(prpcVersion, buildInfo);
+            logger.trace(buildInfo+", Number of scenarios : "+perfStatList.size());
+
             List<CompletableFuture<ScenarioDataDTO>> list = new ArrayList<>();
             for (PerfStat perfStat : perfStatList) {
                 DataUtil.fixTimeAttributeForJUnits(perfStat.getTestname(), paramList);
                 CompletableFuture<ScenarioDataDTO> futures = null;
                 if ("true".equalsIgnoreCase(perfStat.getIsvalidrun())) {
-                    futures = buildThreadService.doDegradationAnalysis(perfStat.getTestname(), paramList, prpcVersion, buildLabel, true);
+                    futures = buildThreadService.doDegradationAnalysis(perfStat.getTestname(), paramList, prpcVersion, buildInfo, true);
                     list.add(futures);
                 } else {
                     logger.trace("Test failed.");
@@ -144,18 +146,18 @@ public class PerfStatService {
     }
 
 
-    public List<String> getValidBuildLabelsBetweenGivenDates(String scenarioName, String prpcVersion, String startDate, String endDate) {
-        List<String> list = perfStatDAO.getValidBuildLabelsBetweenGivenDates(scenarioName, prpcVersion, startDate, endDate);
+    public List<String> getValidBuildsBetweenGivenDates(String scenarioName, String prpcVersion, String startDate, String endDate) {
+        List<String> list = perfStatDAO.getValidBuildsBetweenGivenDates(scenarioName, prpcVersion, startDate, endDate);
         return list;
     }
 
-    public List<String> getValidBuildLabelsForGivenRelease(String scenarioName, String prpcVersion) {
-        List<String> list = perfStatDAO.getValidBuildLabelsForGivenRelease(scenarioName, prpcVersion);
+    public List<String> getValidBuildsForGivenRelease(String scenarioName, String prpcVersion) {
+        List<String> list = perfStatDAO.getValidBuildsForGivenRelease(scenarioName, prpcVersion);
         return list;
     }
 
-    public List<String> getValidBuildLabelsForGivenRelease(String prpcVersion) {
-        List<String> list = perfStatDAO.getValidBuildLabelsForGivenRelease(prpcVersion);
+    public List<String> getValidBuildsForGivenRelease(String prpcVersion) {
+        List<String> list = perfStatDAO.getValidBuildsForGivenRelease(prpcVersion);
         return list;
     }
 }

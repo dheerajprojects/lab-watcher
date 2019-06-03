@@ -6,13 +6,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "SCENARIODATA")
+@Table(name = "SCENARIODATA1")
 public class ScenarioData {
     @Id
     @GeneratedValue
     int id;
     String testname;
-    String buildLabel;
+    String buildInfo;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "scenarioData")
     private Set<ParamData> set;
@@ -33,12 +33,12 @@ public class ScenarioData {
         this.testname = testname;
     }
 
-    public String getBuildLabel() {
-        return buildLabel;
+    public String getBuildInfo() {
+        return buildInfo;
     }
 
-    public void setBuildLabel(String latestbuild) {
-        this.buildLabel = latestbuild;
+    public void setBuildInfo(String latestbuild) {
+        this.buildInfo = latestbuild;
     }
 
     public void addParam(String paramName) {
@@ -64,7 +64,7 @@ public class ScenarioData {
         return "ScenarioData{" +
                 "id=" + id +
                 ", testname='" + testname + '\'' +
-                ", buildLabel='" + buildLabel + '\'' +
+                ", buildInfo='" + buildInfo + '\'' +
                 ", set=" + set +
                 '}';
     }

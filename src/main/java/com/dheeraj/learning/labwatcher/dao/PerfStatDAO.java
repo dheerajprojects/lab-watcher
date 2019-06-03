@@ -37,13 +37,13 @@ public class PerfStatDAO {
     @Autowired
     ScenarioDataRepository scenarioDataRepository;
 
-    public PerfStat getPerfStatForAGivenBuild(String scenarioName, String buildLabel) {
+    public PerfStat getPerfStatForAGivenBuild(String scenarioName, String buildInfo) {
         String sql = "FROM PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and testname='" + scenarioName + "' " +
                 "and isvalidrun='true'" +
-                "and buildlabel = '" + buildLabel + "' " +
+                "and buildinfo = '" + buildInfo + "' " +
                 "order by teststart desc";
 
         Query query = em.createQuery(sql);
@@ -97,7 +97,7 @@ public class PerfStatDAO {
         return list;
     }
 
-    public List<PerfStat> getPerfStatsForLastNBuilds(String scenarioName, String prpcVersion, String endBuildLabel, int maxResults, boolean isHead) {
+    public List<PerfStat> getPerfStatsForLastNBuilds(String scenarioName, String prpcVersion, String buildInfo, int maxResults, boolean isHead) {
         String sql = "FROM PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
@@ -106,7 +106,7 @@ public class PerfStatDAO {
                 "and isvalidrun='true'" +
                 "and builddate < ( " +
                 "select max(builddate) from PerfStat " +
-                "where buildlabel='" + endBuildLabel + "' " +
+                "where buildInfo='" + buildInfo + "' " +
                 "and trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and isvalidrun='true' ";
@@ -129,34 +129,34 @@ public class PerfStatDAO {
         return list;
     }
 
-    public List<String> getValidBuildLabelsBetweenGivenDates(String scenarioName, String prpcVersion, String startDate, String endDate) {
-        String sql = "select max(teststart) as maxteststart, buildlabel, trialtype, runlevel, testname, isvalidrun, prpcversion from PerfStat " +
+    public List<String> getValidBuildsBetweenGivenDates(String scenarioName, String prpcVersion, String startDate, String endDate) {
+        String sql = "select max(teststart) as maxteststart, buildinfo, trialtype, runlevel, testname, isvalidrun, prpcversion from PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and testname='" + scenarioName + "' " +
                 "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true' " +
-                "and buildlabel like '%HEAD%' " +
+                "and buildinfo like '%HEAD%' " +
                 "and teststart > '" + startDate + "' " +
                 "and teststart < '" + endDate + "' " +
-                "group by trialtype, runlevel, testname, isvalidrun, prpcversion, buildlabel " +
-                "order by buildlabel asc";
+                "group by trialtype, runlevel, testname, isvalidrun, prpcversion, buildinfo " +
+                "order by buildinfo asc";
 
         Query query = em.createQuery(sql);
         List<Object[]> rows = query.getResultList();
-        List<String> buildLabels = new ArrayList<>();
+        List<String> buildInfos = new ArrayList<>();
         for (Object[] row :
                 rows) {
-            buildLabels.add(row[1] + "");
+            buildInfos.add(row[1] + "");
         }
 
-        return buildLabels;
+        return buildInfos;
     }
 
     /**
      * SQL Query
      * SELECT Max(teststart) AS maxteststart,
-     *        buildlabel,
+     *        buildinfo,
      *        trialtype,
      *        runlevel,
      *        testname,
@@ -169,13 +169,13 @@ public class PerfStatDAO {
      *        AND testname = 'CCCASE'
      *        AND prpcversion = '8.3.0'
      *        AND isvalidrun = 'true'
-     *        AND buildlabel LIKE '%HEAD%'
+     *        AND buildinfo LIKE '%HEAD%'
      * GROUP  BY trialtype,
      *           runlevel,
      *           testname,
      *           isvalidrun,
      *           prpcversion,
-     *           buildlabel,
+     *           buildinfo,
      *           builddate
      * ORDER  BY builddate ASC;
      *
@@ -183,32 +183,32 @@ public class PerfStatDAO {
      * @param prpcVersion
      * @return
      */
-    public List<String> getValidBuildLabelsForGivenRelease(String scenarioName, String prpcVersion) {
-        String sql = "select max(teststart) as maxteststart, buildlabel, trialtype, runlevel, testname, isvalidrun, prpcversion, builddate from PerfStat " +
+    public List<String> getValidBuildsForGivenRelease(String scenarioName, String prpcVersion) {
+        String sql = "select max(teststart) as maxteststart, buildinfo, trialtype, runlevel, testname, isvalidrun, prpcversion, builddate from PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and testname='" + scenarioName + "' " +
                 "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true' " +
-                "and buildlabel like '%HEAD%' " +
-                "group by trialtype, runlevel, testname, isvalidrun, prpcversion, buildlabel, builddate " +
+                "and buildinfo like '%HEAD%' " +
+                "group by trialtype, runlevel, testname, isvalidrun, prpcversion, buildinfo, builddate " +
                 "order by builddate asc";
 
         Query query = em.createQuery(sql);
         List<Object[]> rows = query.getResultList();
-        List<String> buildLabels = new ArrayList<>();
+        List<String> buildInfos = new ArrayList<>();
         for (Object[] row :
                 rows) {
-            buildLabels.add(row[1] + "");
+            buildInfos.add(row[1] + "");
         }
 
-        return buildLabels;
+        return buildInfos;
     }
 
     /**
      * SQL Query
      * SELECT Max(teststart) AS maxteststart,
-     *        buildlabel,
+     *        buildinfo,
      *        trialtype,
      *        runlevel,
      *        isvalidrun,
@@ -219,37 +219,37 @@ public class PerfStatDAO {
      *        AND runlevel = 'optimized'
      *        AND prpcversion = '8.3.0'
      *        AND isvalidrun = 'true'
-     *        AND buildlabel LIKE '%HEAD%'
+     *        AND buildinfo LIKE '%HEAD%'
      * GROUP  BY trialtype,
      *           runlevel,
      *           isvalidrun,
      *           prpcversion,
-     *           buildlabel,
+     *           buildinfo,
      *           builddate
      * ORDER  BY builddate ASC;
      *
      * @param prpcVersion
      * @return
      */
-    public List<String> getValidBuildLabelsForGivenRelease(String prpcVersion) {
-        String sql = "select max(teststart) as maxteststart, buildlabel, trialtype, runlevel, isvalidrun, prpcversion, builddate from PerfStat " +
+    public List<String> getValidBuildsForGivenRelease(String prpcVersion) {
+        String sql = "select max(teststart) as maxteststart, buildinfo, trialtype, runlevel, isvalidrun, prpcversion, builddate from PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true' " +
-                "and buildlabel like '%HEAD%' " +
-                "group by trialtype, runlevel, isvalidrun, prpcversion, buildlabel, builddate " +
+                "and buildinfo like '%HEAD%' " +
+                "group by trialtype, runlevel, isvalidrun, prpcversion, buildinfo, builddate " +
                 "order by builddate asc";
 
         Query query = em.createQuery(sql);
         List<Object[]> rows = query.getResultList();
-        List<String> buildLabels = new ArrayList<>();
+        List<String> buildInfos = new ArrayList<>();
         for (Object[] row :
                 rows) {
-            buildLabels.add(row[1] + "");
+            buildInfos.add(row[1] + "");
         }
 
-        return buildLabels;
+        return buildInfos;
     }
 
     /**
@@ -258,17 +258,17 @@ public class PerfStatDAO {
      *
      * @param scenarioName
      * @param performanceMetricName
-     * @param currentBuildLabel
+     * @param currentBuildInfo
      */
-    public ParamData getBaselineBuild(String scenarioName, String performanceMetricName, String currentBuildLabel, String prpcVersion, boolean isHead) {
+    public ParamData getBaselineBuild(String scenarioName, String performanceMetricName, String currentBuildInfo, String prpcVersion, boolean isHead) {
         //TODO : Add prpcVersion to ParamData too.
         String sql = "FROM ParamData pd " +
                 "where pd.scenarioData.testname='" + scenarioName + "' " +
                 "and pd.paramName = '" + performanceMetricName + "' " +
-                "and pd.scenarioData.buildLabel < '" + currentBuildLabel + "' " +
+                "and pd.scenarioData.buildInfo < '" + currentBuildInfo + "' " +
                 "and pd.accuracy >= 50 " +
                 "and ( pd.isDegraded = true or pd.isImproved = true ) " +
-                "order by pd.scenarioData.buildLabel desc";
+                "order by pd.scenarioData.buildInfo desc";
         Query query = em.createQuery(sql);
         List<ParamData> list = query.getResultList();
         if (list.size() == 0)
@@ -292,9 +292,9 @@ public class PerfStatDAO {
             if (isHead)
                 sql2 += "and buildinfo like '%HEAD%' ";
 
-            sql2 += "and buildLabel >= '" + paramData.getScenarioData().getBuildLabel() + "' " +
-                    "and buildLabel < '" + currentBuildLabel + "' " +
-                    "order by buildlabel desc";
+            sql2 += "and buildinfo >= '" + paramData.getScenarioData().getBuildInfo() + "' " +
+                    "and buildinfo < '" + currentBuildInfo + "' " +
+                    "order by buildinfo desc";
 
 
             Query query2 = em.createQuery(sql2);
@@ -306,12 +306,12 @@ public class PerfStatDAO {
     }
 
     //TODO: PRPCVERSION HAS TO BE INCLUDED AND IT IS BETTER TO HAVE A BUILDDATE AS WELL AS SOMETIMES BUILD LABELS ARE GETTING MODIFIED.
-    public ParamData getParamDataForAGivenBuild(String scenarioName, String paramName, String currentBuildLabel) {
+    public ParamData getParamDataForAGivenBuild(String scenarioName, String paramName, String buildInfo) {
         String sql = "FROM ParamData pd " +
                 "where pd.scenarioData.testname='" + scenarioName + "' " +
                 "and pd.paramName = '" + paramName + "' " +
-                "and pd.scenarioData.buildLabel = '" + currentBuildLabel + "' " +
-                "order by pd.scenarioData.buildLabel desc";
+                "and pd.scenarioData.buildInfo = '" + buildInfo + "' " +
+                "order by pd.scenarioData.buildInfo desc";
         Query query = em.createQuery(sql);
         List<ParamData> list = query.getResultList();
         return list.get(0);
@@ -328,11 +328,11 @@ public class PerfStatDAO {
         attachedParamData.setImproved(false);
     }
 
-    public ScenarioData getScenarioData(String scenarioName, String buildLabel) {
+    public ScenarioData getScenarioData(String scenarioName, String buildInfo) {
         //TODO : Add prpcversion later if required.
         String sql = "from ScenarioData sd " +
                 "where sd.testname = '" + scenarioName + "' " +
-                "and sd.buildLabel = '" + buildLabel + "' ";
+                "and sd.buildInfo = '" + buildInfo + "' ";
 
         Query query = em.createQuery(sql);
         List<ScenarioData> list = query.getResultList();
@@ -340,7 +340,7 @@ public class PerfStatDAO {
             return null;
 
         if (list.size() > 1) {
-            logger.debug("There are duplicates in scenario data. Scenario name : " + scenarioName + ", buildLabel : " + buildLabel + ", List size : " + list.size());
+            logger.debug("There are duplicates in scenario data. Scenario name : " + scenarioName + ", buildInfo : " + buildInfo + ", List size : " + list.size());
         }
 
         return list.get(0);
@@ -359,7 +359,7 @@ public class PerfStatDAO {
                 "and isvalidrun='true' " +
                 "and buildinfo like '%HEAD%' " +
                 "and cast(teststart as date) = '" + date + "' " +
-                "order by buildlabel asc";
+                "order by buildinfo asc";
 
         Query query = em.createQuery(sql);
         List<PerfStat> list = query.getResultList();
@@ -381,7 +381,7 @@ public class PerfStatDAO {
                 "and cast(teststart as date) = '" + date + "' " +
                 "and testname = '" + scenarioName + "' " +
                 "and prpcversion <> null " +
-                "order by buildlabel asc";
+                "order by buildinfo asc";
 
         Query query = em.createQuery(sql);
         List<PerfStat> list = query.getResultList();
@@ -403,22 +403,22 @@ public class PerfStatDAO {
                 "and cast(teststart as date) > '" + startDate + "' " +
                 "and cast(teststart as date) <= '" + endDate + "' " +
                 "and prpcversion <> null " +
-                "order by buildlabel asc";
+                "order by buildinfo asc";
 
         Query query = em.createQuery(sql);
         List<PerfStat> list = query.getResultList();
         return list;
     }
 
-    public List<PerfStat> getPerfStatsBetweenBuilds(String scenarioName, String prpcVersion, String startBuildLabel, String endBuildLabel, int maxResults) {
+    public List<PerfStat> getPerfStatsBetweenBuilds(String scenarioName, String prpcVersion, String startBuildInfo, String endBuildInfo, int maxResults) {
         String sql = "FROM PerfStat " +
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and testname='" + scenarioName + "' " +
                 "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true'" +
-                "and buildlabel >= '" + startBuildLabel + "' " +
-                "and buildlabel <= '" + endBuildLabel + "' " +
+                "and buildinfo >= '" + startBuildInfo + "' " +
+                "and buildinfo <= '" + endBuildInfo + "' " +
                 "order by teststart desc";
 
         Query query = em.createQuery(sql);

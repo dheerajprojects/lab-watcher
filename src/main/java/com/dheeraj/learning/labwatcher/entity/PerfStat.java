@@ -138,6 +138,9 @@ public class PerfStat {
     private String mprid;
     private String testrunstatus;
 
+    PerfStat() {
+    }
+
     public PerfStat(Date teststart, String trialtype, String runlevel, String testname, String isvalidrun, String prpcversion, String buildinfo) {
         this.teststart = new Timestamp(teststart.getTime());
         this.trialtype = trialtype;

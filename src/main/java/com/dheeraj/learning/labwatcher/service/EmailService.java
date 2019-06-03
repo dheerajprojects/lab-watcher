@@ -135,7 +135,7 @@ public class EmailService {
                 body2 += "<b>degradation</b> ";
             if (timeData.isImproved())
                 body2 += "<b>improvement</b> ";
-            body2 += " in <b>" + timeData.getBuildLabel() + "</b> build w.r.t <b>" + timeData.getParamName() + " </b>in <b>" + timeData.getScenarioName() + " </b>scenario.\n";
+            body2 += " in <b>" + timeData.getBuildInfo() + "</b> build w.r.t <b>" + timeData.getParamName() + " </b>in <b>" + timeData.getScenarioName() + " </b>scenario.\n";
         }
 
         String body3 = " <o:p></o:p>\n" +

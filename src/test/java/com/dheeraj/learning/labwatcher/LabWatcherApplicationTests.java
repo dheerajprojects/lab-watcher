@@ -57,15 +57,15 @@ public class LabWatcherApplicationTests {
     }
 
     //@Test
-    public void testGetValidBuildLabelsBetweenGivenDates() {
+    public void testGetValidBuildsBetweenGivenDates() {
         String scenarioName = "MultiChannel";
         String prpcVersion = "8.2.0";
         String startDate = "2018-10-24";
         String endDate = "2019-03-31";
 
-        List<String> validBuildLabels = perfStatDAO.getValidBuildLabelsBetweenGivenDates(scenarioName, prpcVersion, startDate, endDate);
+        List<String> buildInfos = perfStatDAO.getValidBuildsBetweenGivenDates(scenarioName, prpcVersion, startDate, endDate);
 
-        System.out.println(validBuildLabels);
+        System.out.println(buildInfos);
     }
 
 
@@ -79,7 +79,7 @@ public class LabWatcherApplicationTests {
         List<PerfStat> perfStats = perfStatDAO.getBuilds("2019-03-26");
         System.out.println(perfStats.size());
         for (PerfStat perfStat : perfStats) {
-            System.out.println("BuildLabel : " + perfStat.getBuildlabel() + ", ScenarioName : " + perfStat.getTestname());
+            System.out.println("Build : " + perfStat.getBuildinfo() + ", ScenarioName : " + perfStat.getTestname());
         }
     }
 

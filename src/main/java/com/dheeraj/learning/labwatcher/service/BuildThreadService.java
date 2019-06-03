@@ -52,8 +52,7 @@ public class BuildThreadService {
      */
     @Async
     public CompletableFuture<ScenarioDataDTO> doDegradationAnalysis(String scenarioName, List<String> paramList, String prpcVersion, String testBuild, boolean isHead) {
-
-        logger.trace("Analyzing " + scenarioName + ", " + prpcVersion + ", " + testBuild);
+        logger.trace("Analyzing " + scenarioName + ", " + prpcVersion + ", " + testBuild + "...");
         ScenarioDataDTO scenarioDataDTO = new ScenarioDataDTO();
         scenarioDataDTO.setTestname(scenarioName);
         scenarioDataDTO.setLatestbuild(testBuild);

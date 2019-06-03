@@ -42,7 +42,7 @@ public class Mapper {
     public static ScenarioData convert(ScenarioDataDTO scenarioDataDTO) {
         ScenarioData scenarioData = new ScenarioData();
         scenarioData.setTestname(scenarioDataDTO.getTestname());
-        scenarioData.setBuildLabel(scenarioDataDTO.getLatestbuild());
+        scenarioData.setBuildInfo(scenarioDataDTO.getLatestbuild());
 
         Set<ParamData> set = new HashSet<>();
         set.addAll(copyResultsToEntity(scenarioDataDTO.getMap().values(), scenarioData));
@@ -55,7 +55,7 @@ public class Mapper {
     public static ScenarioDataDTO convert(ScenarioData scenarioData) {
         ScenarioDataDTO scenarioDataDTO = new ScenarioDataDTO();
         scenarioDataDTO.setTestname(scenarioData.getTestname());
-        scenarioDataDTO.setLatestbuild(scenarioData.getBuildLabel());
+        scenarioDataDTO.setLatestbuild(scenarioData.getBuildInfo());
 
         Map<String, ParamDataDTO> paramDataDTOMap = new HashMap<>();
         Set<ParamData> paramDataSet = scenarioData.getSet();
@@ -70,7 +70,7 @@ public class Mapper {
 
     public static ScenarioData map(ScenarioDataDTO scenarioDataDTO, ScenarioData scenarioData, List<String> paramList) {
         scenarioData.setTestname(scenarioDataDTO.getTestname());
-        scenarioData.setBuildLabel(scenarioDataDTO.getLatestbuild());
+        scenarioData.setBuildInfo(scenarioDataDTO.getLatestbuild());
 
         //Temporary map to easily access paramdata set.
         Map<String, ParamData> temporaryMap = new HashMap<>();
@@ -104,7 +104,7 @@ public class Mapper {
 
         paramDataDTO.setBaselineBuildPosition(paramData.getVariedBuildRank());
         paramDataDTO.setScenarioName(paramData.getScenarioData().getTestname());
-        paramDataDTO.setBuildLabel(paramData.getScenarioData().getBuildLabel());
+        paramDataDTO.setBuildInfo(paramData.getScenarioData().getBuildInfo());
 
         return paramDataDTO;
     }

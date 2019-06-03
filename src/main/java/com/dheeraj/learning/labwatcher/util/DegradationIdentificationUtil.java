@@ -82,7 +82,7 @@ public class DegradationIdentificationUtil {
         logger.debug("List of builds considered are : ");
         for (PerfStatDTO perfstatDTO : perfStatDTOs) {
             if (perfstatDTO.getDouble(param) != null) {
-                listOfBuilds += perfstatDTO.getBuildlabel() + " : " + perfstatDTO.getDouble(param) + ", ";
+                listOfBuilds += perfstatDTO.getBuildinfo() + " : " + perfstatDTO.getDouble(param) + ", ";
                 sum += perfstatDTO.getDouble(param);
                 noOfRecords++;
             }

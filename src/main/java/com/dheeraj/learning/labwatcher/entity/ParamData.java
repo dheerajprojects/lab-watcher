@@ -3,7 +3,7 @@ package com.dheeraj.learning.labwatcher.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "PARAMDATA")
+@Table(name = "PARAMDATA1")
 public class ParamData {
     @Id
     @GeneratedValue
@@ -136,7 +136,7 @@ public class ParamData {
     @Override
     public String toString() {
         return "ParamData{" +
-                "buildLabel=" + (scenarioData == null ? "" : scenarioData.getBuildLabel()) +
+                "buildName =" + (scenarioData == null ? "" : scenarioData.getBuildInfo()) +
                 ", testname=" + (scenarioData == null ? "" : scenarioData.getTestname()) +
                 ", paramId=" + paramId +
                 ", paramName='" + paramName + '\'' +

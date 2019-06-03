@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * * /analyzedresults/scenarios/              --all scenario
  * * /analyzedresults/scenarios/scenarioname  --given scenario
- * * /analyzedresults/builds/buildlabel       --all scenarios for the given build
+ * * /analyzedresults/builds/buildInfo       --all scenarios for the given build
  */
 @Repository
 @Transactional
@@ -29,15 +29,15 @@ public class ParamDataDAO {
     EntityManager em;
 
 
-    public List<ParamData> getAll(Double accuracy, String scenarioName, String buildLabel, String perfMetric, Boolean isDegraded) {
+    public List<ParamData> getAll(Double accuracy, String scenarioName, String buildInfo, String perfMetric, Boolean isDegraded) {
         String sql = "FROM ParamData pd " +
                 "where pd.scenarioData.testname is not NULL ";
         if (accuracy != null)
             sql += "and pd.accuracy >= " + accuracy + " ";
         if (scenarioName != null)
             sql += "and pd.scenarioData.testname='" + scenarioName + "' ";
-        if (buildLabel != null)
-            sql += "and pd.scenarioData.buildLabel = '" + buildLabel + "' ";
+        if (buildInfo != null)
+            sql += "and pd.scenarioData.buildInfo = '" + buildInfo + "' ";
         if (perfMetric != null)
             sql += "and pd.paramName = '" + perfMetric + "' ";
         if (isDegraded != null) {
@@ -48,7 +48,7 @@ public class ParamDataDAO {
         }
 
 
-        sql += "order by pd.scenarioData.buildLabel desc";
+        sql += "order by pd.scenarioData.buildInfo desc";
 
         Query query = em.createQuery(sql);
         List<ParamData> list = query.getResultList();
@@ -63,8 +63,8 @@ public class ParamDataDAO {
         return getAll(100.0, scenarioName, null, null, null);
     }
 
-    public List<ParamData> getDataOnGivenBuild(String buildLabel) {
-        return getAll(100.0, null, buildLabel, null, null);
+    public List<ParamData> getDataOnGivenBuild(String buildInfo) {
+        return getAll(100.0, null, buildInfo, null, null);
     }
 
     public List<ParamData> getDataOnGivenPerfMetric(String perfMetric) {

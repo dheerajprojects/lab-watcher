@@ -28,7 +28,7 @@ public class LabWatcherApplication {
         executor.setCorePoolSize(Integer.parseInt(env.getProperty("thread.corepoolsize")));
         executor.setMaxPoolSize(Integer.parseInt(env.getProperty("thread.maxpoolsize")));
         executor.setQueueCapacity(Integer.parseInt(env.getProperty("thread.queuecapacity")));
-        executor.setThreadNamePrefix(env.getProperty("thread.corepoolsize"));
+        executor.setThreadNamePrefix(env.getProperty("thread.nameprefix"));
         executor.initialize();
         return executor;
     }

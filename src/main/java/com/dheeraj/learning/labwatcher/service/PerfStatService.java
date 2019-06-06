@@ -74,7 +74,9 @@ public class PerfStatService {
                 try {
                     scenarioDataDTO = futures.get();
                 } catch (Exception e) {
-                    e.printStackTrace();                }
+                    logger.trace("Got exception here : scenarioName :" + perfStat.getTestname() + ", BuildInfo : " + perfStat.getBuildinfo());
+                    logger.trace(e.toString());
+                }
 
                 logger.debug(scenarioDataDTO != null ? scenarioDataDTO.toString() : "ScenarioDataDTO is null");
             }

@@ -69,18 +69,19 @@ public class PerfStatService {
                     logger.trace("Yet to implement test failure analysis... ");
                     //scenarioDataDTO = perfStatService.doFailureAnalysisOnAScenario(scenarioName, prpcVersion, currentBuildLabel);
                 }
-
-                try {
-                    scenarioDataDTO = futures.get();
-                } catch (Exception e) {
-                    logger.trace("Got exception here : scenarioName :" + perfStat.getTestname() + ", BuildInfo : " + perfStat.getBuildinfo());
-                    logger.trace(e.toString());
-                }
-
-                logger.debug(scenarioDataDTO != null ? scenarioDataDTO.toString() : "ScenarioDataDTO is null");
             }
             CompletableFuture<Void> allFutures = CompletableFuture.allOf(list.toArray(new CompletableFuture[list.size()]));
             CompletableFuture.allOf(allFutures);
+
+            for (CompletableFuture<ScenarioDataDTO> dto : list) {
+                try {
+                    scenarioDataDTO = dto.get();
+                    logger.debug(scenarioDataDTO != null ? scenarioDataDTO.toString() : "ScenarioDataDTO is null");
+                } catch (Exception e) {
+                    logger.trace("Got exception here : scenarioName :" + scenarioDataDTO.getTestname() + ", BuildInfo : " + scenarioDataDTO.getLatestbuild());
+                    logger.trace(e.toString());
+                }
+            }
         }
 
         logger.info("Analysis done for the release : "+prpcVersion);

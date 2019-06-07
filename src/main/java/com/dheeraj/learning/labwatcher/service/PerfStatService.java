@@ -48,7 +48,7 @@ public class PerfStatService {
     private PerfMetricThreadService perfMetricThreadService;
 
     public void analyseARelease(String prpcVersion) {
-        logger.info("Analysis started for release : "+prpcVersion);
+        logger.info("Analysis release : "+prpcVersion);
 
         List<String> paramList = configurationService.getPerformanceMetrics();
         ScenarioDataDTO scenarioDataDTO = null;
@@ -105,8 +105,8 @@ public class PerfStatService {
      * @return This an object which contains all the degradation details.
      */
     public ScenarioDataDTO doDegradationAnalysis(String scenarioName, List<String> paramList, String prpcVersion, String testBuild, boolean isHead) {
+        logger.trace("Analyzing " + prpcVersion + ", " + testBuild + ", " + scenarioName);
 
-        logger.trace("Analyzing " + scenarioName + ", " + prpcVersion + ", " + testBuild);
         ScenarioDataDTO scenarioDataDTO = new ScenarioDataDTO();
         scenarioDataDTO.setTestname(scenarioName);
         scenarioDataDTO.setLatestbuild(testBuild);

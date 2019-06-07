@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -155,7 +156,10 @@ public class SchedulerService {
      * and identifies if the latest build is degraded or not.
      */
     public void analyseARelease(String prpcVersion) {
+        LocalDateTime startTime = LocalDateTime.now();
         perfStatService.analyseARelease(prpcVersion);
+        LocalDateTime endTime = LocalDateTime.now();
+        logger.info("Analysing "+prpcVersion+" release took "+Duration.between(startTime, endTime)+" amount of time");
     }
 
     /**

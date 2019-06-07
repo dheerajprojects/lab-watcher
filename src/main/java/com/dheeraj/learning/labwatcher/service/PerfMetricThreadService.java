@@ -45,6 +45,7 @@ public class PerfMetricThreadService {
      */
     @Async
     public CompletableFuture<ParamDataDTO> analysePerfMetric(String scenarioName, String performanceMetricName, String prpcVersion, String currentbuildInfo, boolean isHead) {
+        performanceMetricName = DataUtil.fixTimeAttributeForJUnits(scenarioName, performanceMetricName);
         logger.trace("Started new thread for performance metric : " + performanceMetricName);
         logger.trace("Analyzing " + performanceMetricName + "...");
 

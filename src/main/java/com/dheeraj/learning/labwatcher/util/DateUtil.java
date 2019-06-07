@@ -10,7 +10,7 @@ public class DateUtil {
     public static void main(String[] args) {
         //getDates("2019-11-11", 10);
 
-        System.out.println(Duration.between(LocalDate.now().atStartOfDay(), LocalDate.parse("2018-10-24").atStartOfDay()).toDays());
+        System.out.println(Duration.between(LocalDateTime.parse("2019-06-03T10:10:10"), LocalDate.now().atStartOfDay()));
         System.out.println(LocalDate.now().toString());
 
         /*LocalDate startDate = LocalDate.now();

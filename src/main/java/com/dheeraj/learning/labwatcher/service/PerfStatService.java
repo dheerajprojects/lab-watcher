@@ -60,7 +60,6 @@ public class PerfStatService {
 
             List<CompletableFuture<ScenarioDataDTO>> list = new ArrayList<>();
             for (PerfStat perfStat : perfStatList) {
-                DataUtil.fixTimeAttributeForJUnits(perfStat.getTestname(), paramList);
                 CompletableFuture<ScenarioDataDTO> futures = null;
                 if ("true".equalsIgnoreCase(perfStat.getIsvalidrun())) {
                     futures = buildThreadService.doDegradationAnalysis(perfStat.getTestname(), paramList, prpcVersion, buildInfo, true);

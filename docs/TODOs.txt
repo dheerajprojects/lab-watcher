@@ -1,2 +1,11 @@
 TODO
-1. Remove head release dependency.
+1. Make sending email an async process.
+    While sending email, specify if it is degraded or not.
+    Send emails only for degraded parameters.
+2. Remove head release dependency.
+3. Reduce number of DB queries to increase the execution speed.
+    When we can analyze an entire release in a few minutes, then people start using this tool extensively.
+4. Put an informative email subject
+5. Work on email templates so that email view can be changed on the fly.
+6. Analyse all params but send email only when there is degradation in time.
+7. Create a status columns to update about the baseline build and other info in it while processing.

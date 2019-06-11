@@ -157,6 +157,7 @@ public class SchedulerService {
      */
     public void analyseARelease(String prpcVersion) {
         LocalDateTime startTime = LocalDateTime.now();
+        logger.info("Analysing started for release "+prpcVersion);
         perfStatService.analyseARelease(prpcVersion);
         LocalDateTime endTime = LocalDateTime.now();
         logger.info("Analysing "+prpcVersion+" release took "+Duration.between(startTime, endTime)+" amount of time");

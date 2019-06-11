@@ -84,6 +84,7 @@ public class Mapper {
             else {
                 ParamData paramData = new ParamData();
                 BeanUtils.copyProperties(scenarioDataDTO.getMap().get(paramName), paramData);
+                paramData.setScenarioData(scenarioData);
                 scenarioData.getSet().add(paramData);
             }
         }

@@ -1,0 +1,12 @@
+spring:
+  mail:
+    default-encoding: UTF-8
+    host: EXINTOPEN.rpega.com
+    protocol: smtp
+    port: 25
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: true

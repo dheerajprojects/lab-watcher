@@ -6,7 +6,6 @@ import com.dheeraj.learning.labwatcher.dto.ScenarioDataDTO;
 import com.dheeraj.learning.labwatcher.entity.PerfStat;
 import com.dheeraj.learning.labwatcher.entity.ScenarioData;
 import com.dheeraj.learning.labwatcher.repository.ScenarioDataRepository;
-import com.dheeraj.learning.labwatcher.util.DataUtil;
 import com.dheeraj.learning.labwatcher.util.DegradationIdentificationUtil;
 import com.dheeraj.learning.labwatcher.util.Mapper;
 import org.slf4j.Logger;
@@ -44,6 +43,10 @@ public class PerfStatService {
 
     @Autowired
     private ScenarioDataRepository scenarioDataRepository;
+
+    @Autowired
+    @Qualifier(value= "emailServiceImpl")
+    private EmailService emailService;
 
     @Autowired
     private PerfMetricThreadService perfMetricThreadService;

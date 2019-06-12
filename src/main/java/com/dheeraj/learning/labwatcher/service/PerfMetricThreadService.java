@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,10 @@ public class PerfMetricThreadService {
 
     @Autowired
     private PerfStatDAO perfStatDAO;
+
+    @Autowired
+    @Qualifier(value= "emailServiceImpl")
+    private EmailService emailService;
 
     /**
      * This method retrieves different baselines for each parameter and based on the position of the baseline build, it performs different tasks to identify the given build degradation.
@@ -218,7 +223,7 @@ public class PerfMetricThreadService {
         if (sendEmail) {
             ScenarioData scenarioData = perfStatDAO.getScenarioData(variedBuildParamDTO.getScenarioName(), variedBuildParamDTO.getBuildInfo());
             ScenarioDataDTO scenarioDataDTO = Mapper.convert(scenarioData);
-            EmailService.sendEmail(scenarioDataDTO);
+            emailService.sendEmail(scenarioDataDTO);
         }
     }
 

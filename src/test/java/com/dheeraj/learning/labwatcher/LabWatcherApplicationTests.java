@@ -9,6 +9,7 @@ import com.dheeraj.learning.labwatcher.repository.ParamDataRepository;
 import com.dheeraj.learning.labwatcher.repository.ScenarioDataRepository;
 import com.dheeraj.learning.labwatcher.service.ConfigurationService;
 import com.dheeraj.learning.labwatcher.service.EmailService;
+import com.dheeraj.learning.labwatcher.service.EmailService2;
 import com.dheeraj.learning.labwatcher.service.SchedulerService;
 import com.dheeraj.learning.labwatcher.util.DataUtil;
 import com.dheeraj.learning.labwatcher.util.DateUtil;
@@ -47,12 +48,19 @@ public class LabWatcherApplicationTests {
     FlatPerformanceTestsRepository flatPerformanceTestsRepository;
 
 
+    @Autowired
+    @Qualifier(value= "emailServiceImpl")
+    EmailService emailService;
+
+    @Autowired
+    EmailService2 emailService2;
+
     public void contextLoads() {
         //TODO : Remove DTOs and use only Entity objects everywhere.
         schedulerService.scheduleDailyRuns(null, "2019-04-17", 0);
     }
 
-    //@Test
+    @Test
     public void testEmail() {
         //emailService.sendEmail(DataUtil.getScenarioDataDTO());
         emailService2.composeMessage();
@@ -112,7 +120,7 @@ public class LabWatcherApplicationTests {
         }
     }
 
-    @Test
+    //@Test
     public void criteriaTest() {
         //paramDataDAO.researchOnCriteria();
         List<PerfStat> perfStats = perfStatDAO.getLatestPerfStatsForAGivenBuild("8.3.0", "HEAD-6759");

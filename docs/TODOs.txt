@@ -9,3 +9,4 @@ TODO
 5. Work on email templates so that email view can be changed on the fly.
 6. Analyse all params but send email only when there is degradation in time.
 7. Create a status columns to update about the baseline build and other info in it while processing.
+8. Mark the confidence level to max 100. Currently it can go beyond 100.

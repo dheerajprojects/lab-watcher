@@ -4,6 +4,11 @@ mvn clean install -DskipTests=true
 To run
 mvn spring-boot:run
 
+TODO : Check the below page for installing email templates using thymeleaf
+https://memorynotfound.com/spring-mail-sending-email-thymeleaf-html-template-example/
+
+Can check here for all spring application.properties
+https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 
 Create an entity using hibernate database.
 1.Add hibernate module

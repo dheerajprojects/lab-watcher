@@ -185,7 +185,6 @@ public class PerfStatDAO {
                 "and testname='" + scenarioName + "' " +
                 "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true' " +
-                "and buildinfo like '%HEAD%' " +
                 "and teststart > '" + startDate + "' " +
                 "and teststart < '" + endDate + "' " +
                 "group by trialtype, runlevel, testname, isvalidrun, prpcversion, buildinfo " +
@@ -217,8 +216,7 @@ public class PerfStatDAO {
      *        AND runlevel = 'optimized'
      *        AND testname = 'CCCASE'
      *        AND prpcversion = '8.3.0'
-     *        AND isvalidrun = 'true'
-     *        AND buildinfo LIKE '%HEAD%'
+     *        AND isvalidrun = 'true'     *
      * GROUP  BY trialtype,
      *           runlevel,
      *           testname,
@@ -239,7 +237,6 @@ public class PerfStatDAO {
                 "and testname='" + scenarioName + "' " +
                 "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true' " +
-                "and buildinfo like '%HEAD%' " +
                 "group by trialtype, runlevel, testname, isvalidrun, prpcversion, buildinfo, builddate " +
                 "order by builddate asc";
 
@@ -267,8 +264,7 @@ public class PerfStatDAO {
      * WHERE  trialtype = 'Performance'
      *        AND runlevel = 'optimized'
      *        AND prpcversion = '8.3.0'
-     *        AND isvalidrun = 'true'
-     *        AND buildinfo LIKE '%HEAD%'
+     *        AND isvalidrun = 'true'     *
      * GROUP  BY trialtype,
      *           runlevel,
      *           isvalidrun,
@@ -286,7 +282,6 @@ public class PerfStatDAO {
                 "and runlevel='optimized' " +
                 "and prpcversion='" + prpcVersion + "' " +
                 "and isvalidrun='true' " +
-                "and buildinfo like '%HEAD%' " +
                 "group by trialtype, runlevel, isvalidrun, prpcversion, buildinfo, builddate " +
                 "order by builddate asc";
 
@@ -404,7 +399,6 @@ public class PerfStatDAO {
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and isvalidrun='true' " +
-                "and buildinfo like '%HEAD%' " +
                 "and cast(teststart as date) = '" + date + "' " +
                 "order by buildinfo asc";
 
@@ -424,7 +418,6 @@ public class PerfStatDAO {
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and isvalidrun='true' " +
-                "and buildinfo like '%HEAD%' " +
                 "and cast(teststart as date) = '" + date + "' " +
                 "and testname = '" + scenarioName + "' " +
                 "and prpcversion <> null " +
@@ -446,7 +439,6 @@ public class PerfStatDAO {
                 "where trialtype='Performance' " +
                 "and runlevel='optimized' " +
                 "and isvalidrun='true' " +
-                "and buildinfo like '%HEAD%' " +
                 "and cast(teststart as date) > '" + startDate + "' " +
                 "and cast(teststart as date) <= '" + endDate + "' " +
                 "and prpcversion <> null " +

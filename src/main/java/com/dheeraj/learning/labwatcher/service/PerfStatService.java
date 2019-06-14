@@ -62,7 +62,7 @@ public class PerfStatService {
             for (PerfStat perfStat : perfStatList) {
                 CompletableFuture<ScenarioDataDTO> futures = null;
                 if ("true".equalsIgnoreCase(perfStat.getIsvalidrun())) {
-                    futures = buildThreadService.doDegradationAnalysis(perfStat.getTestname(), paramList, prpcVersion, buildInfo, true);
+                    futures = buildThreadService.doDegradationAnalysis(perfStat.getTestname(), paramList, prpcVersion, buildInfo);
                     list.add(futures);
                 } else {
                     logger.trace("Test failed.");
@@ -104,7 +104,7 @@ public class PerfStatService {
      * @param testBuild    The build for which degradation analysis to be done.
      * @return This an object which contains all the degradation details.
      */
-    public ScenarioDataDTO doDegradationAnalysis(String scenarioName, List<String> paramList, String prpcVersion, String testBuild, boolean isHead) {
+    public ScenarioDataDTO doDegradationAnalysis(String scenarioName, List<String> paramList, String prpcVersion, String testBuild) {
         logger.trace("Analyzing " + prpcVersion + ", " + testBuild + ", " + scenarioName);
 
         ScenarioDataDTO scenarioDataDTO = new ScenarioDataDTO();
@@ -114,7 +114,7 @@ public class PerfStatService {
         Map<String, ParamDataDTO> currentBuildParamMap = new HashMap<>();
         List<CompletableFuture<ParamDataDTO>> list = new ArrayList<>();
         for (String perfMetric : paramList) {
-            CompletableFuture<ParamDataDTO> futures = perfMetricThreadService.analysePerfMetric(scenarioName, perfMetric, prpcVersion, testBuild, isHead);
+            CompletableFuture<ParamDataDTO> futures = perfMetricThreadService.analysePerfMetric(scenarioName, perfMetric, prpcVersion, testBuild);
             list.add(futures);
         }
 

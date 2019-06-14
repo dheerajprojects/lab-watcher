@@ -51,7 +51,7 @@ public class BuildThreadService {
      * @return This an object which contains all the degradation details.
      */
     @Async
-    public CompletableFuture<ScenarioDataDTO> doDegradationAnalysis(String scenarioName, List<String> paramList, String prpcVersion, String testBuild, boolean isHead) {
+    public CompletableFuture<ScenarioDataDTO> doDegradationAnalysis(String scenarioName, List<String> paramList, String prpcVersion, String testBuild) {
         logger.trace("Analyzing " + prpcVersion + ", " + testBuild + ", " + scenarioName);
 
         ScenarioDataDTO scenarioDataDTO = new ScenarioDataDTO();
@@ -61,7 +61,7 @@ public class BuildThreadService {
         Map<String, ParamDataDTO> currentBuildParamMap = new HashMap<>();
         List<CompletableFuture<ParamDataDTO>> list = new ArrayList<>();
         for (String perfMetric : paramList) {
-            CompletableFuture<ParamDataDTO> futures = perfMetricThreadService.analysePerfMetric(scenarioName, perfMetric, prpcVersion, testBuild, isHead);
+            CompletableFuture<ParamDataDTO> futures = perfMetricThreadService.analysePerfMetric(scenarioName, perfMetric, prpcVersion, testBuild);
             list.add(futures);
         }
 

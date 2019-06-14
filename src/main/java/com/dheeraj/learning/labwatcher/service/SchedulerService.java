@@ -54,7 +54,7 @@ public class SchedulerService {
         String prpcVersion = "8.3.0";
         String currentBuildInfo = "HEAD-6813";
 
-        buildThreadService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildInfo, true);
+        buildThreadService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildInfo);
     }
 
     /**
@@ -69,7 +69,7 @@ public class SchedulerService {
 
 
         for (String buildName : validBuilds) {
-            ScenarioDataDTO scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, buildName, true);
+            ScenarioDataDTO scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, buildName);
             logger.trace("Build : " + buildName + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded() + ", isImproved : " + scenarioDataDTO.getMap().get("totalreqtime").isImproved());
         }
     }
@@ -100,7 +100,7 @@ public class SchedulerService {
         List<String> validBuilds = DataUtil.buildArrayList("PRPC-HEAD-6575,PRPC-HEAD-6577,PRPC-HEAD-6578,PRPC-HEAD-6580,PRPC-HEAD-6583,PRPC-HEAD-6585,PRPC-HEAD-6586,PRPC-HEAD-6587");
 
         for (String buildName : validBuilds) {
-            ScenarioDataDTO scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, buildName, true);
+            ScenarioDataDTO scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, buildName);
             logger.debug("Build : " + buildName + ", isDegraded : " + scenarioDataDTO.getMap().get("totalreqtime").isDegraded());
         }
     }
@@ -117,7 +117,7 @@ public class SchedulerService {
     public ScenarioDataDTO analyseAScenarioLatestBuildGivenParam(String scenarioName, String currentBuildInfo, String prpcVersion, String param) {
         List<String> paramList = DataUtil.populateGivenParamsList(param);
 
-        ScenarioDataDTO scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildInfo, true);
+        ScenarioDataDTO scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildInfo);
         logger.debug(scenarioDataDTO.toString());
 
         return scenarioDataDTO;
@@ -138,7 +138,7 @@ public class SchedulerService {
 
         for (String buildName : validBuilds) {
             if (isvalidrun.equalsIgnoreCase("true")) {
-                scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, buildName, true);
+                scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, buildName);
             } else {
                 logger.trace("Test failed.");
                 logger.trace("Yet to implement test failure analysis... ");
@@ -177,7 +177,7 @@ public class SchedulerService {
         if (isvalidrun.equalsIgnoreCase("true")) {
             logger.trace("Test ran successfully.");
             //TODO : Rename below method in a single commit.
-            scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildInfo, true);
+            scenarioDataDTO = perfStatService.doDegradationAnalysis(scenarioName, paramList, prpcVersion, currentBuildInfo);
         } else {
             logger.trace("Test failed.");
             logger.trace("Yet to implement test failure analysis... ");

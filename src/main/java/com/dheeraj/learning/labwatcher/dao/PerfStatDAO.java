@@ -129,7 +129,9 @@ public class PerfStatDAO {
 
     /**
      *
-     * TODO
+     * TODO 1
+     *  Remove duplicate records while retrieving. refer getValidBuildsForGivenRelease for ideas.
+     * TODO 2
      * //Selected columns only to increase the performance. Add other parameters if required.
      *         /*CriteriaQuery<PerfStat> select = ((CriteriaQuery<PerfStat>)aq).multiselect(root.get("buildinfo"),
      *                 root.get("totalreqtime"),

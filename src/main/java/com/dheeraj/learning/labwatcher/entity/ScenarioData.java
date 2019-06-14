@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "SCENARIODATA1")
+@Table(name = "SCENARIODATA5")
 public class ScenarioData {
     @Id
     @GeneratedValue

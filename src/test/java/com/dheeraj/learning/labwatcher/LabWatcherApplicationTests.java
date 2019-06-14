@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -49,6 +50,24 @@ public class LabWatcherApplicationTests {
     public void contextLoads() {
         //TODO : Remove DTOs and use only Entity objects everywhere.
         schedulerService.scheduleDailyRuns(null, "2019-04-17", 0);
+    }
+
+
+    public void testGetBaselineBuild() {
+        ParamData paramData = perfStatDAO.getBaselineBuild("Offline", "totalreqtime", "HEAD-6710", "8.3.0");
+        System.out.println(paramData);
+    }
+
+    @Test
+    public void testGetPerfStatsForLastNBuilds() {
+        List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds("Offline", "8.3.0", "HEAD-6714", 10);
+        System.out.println(perfStats);
+    }
+
+
+    public void testGetBuildDate() {
+        Timestamp timestamp = perfStatDAO.getBuildDate("HEAD-6742");
+        System.out.println(timestamp);
     }
 
     //@Test
@@ -110,7 +129,7 @@ public class LabWatcherApplicationTests {
         }
     }
 
-    @Test
+    //@Test
     public void criteriaTest() {
         //paramDataDAO.researchOnCriteria();
         List<PerfStat> perfStats = perfStatDAO.getLatestPerfStatsForAGivenBuild("8.3.0", "HEAD-6759");

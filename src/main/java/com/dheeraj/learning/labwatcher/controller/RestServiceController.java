@@ -17,6 +17,26 @@ public class RestServiceController {
     @Autowired
     private SchedulerService schedulerService;
 
+    /**
+     * Analyses all releases, all scenarios, all performance metrics.
+     */
+    @GetMapping("analyse/releases/scenarios/perfmetrics")
+    public String analyseAll(){
+        return "Not yet implemented";
+    }
+
+    /**
+     * Analyses a given release, all scenarios, all performance metrics.
+     *
+     * @param prpcversion PRPCVersion of the build label.
+     * @return
+     */
+    @GetMapping("analyse/releases/{prpcversion}/scenarios/perfmetrics")
+    public String analyseARelease(@PathVariable("prpcversion") String prpcversion){
+        schedulerService.analyseARelease(prpcversion);
+        return "Analysis for entire release is completed";
+    }
+
     @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{buildInfo}/{param}")
     public ScenarioDataDTO analyseAParticularBuildParticularParam(@PathVariable("scenarioName") String scenarioName, @PathVariable("prpcverison") String prpcversion,
                                                                   @PathVariable("buildInfo") String buildInfo, @PathVariable("param") String param) {
@@ -59,17 +79,7 @@ public class RestServiceController {
         return scenarioDataDTO;
     }
 
-    /**
-     * This can be used to analyze all degradations of a scenario in a release.
-     *
-     * @param prpcversion PRPCVersion of the build label.
-     * @return
-     */
-    @GetMapping("analyse/{prpcversion}")
-    public String analyseARelease(@PathVariable("prpcversion") String prpcversion){
-        schedulerService.analyseARelease(prpcversion);
-        return "Analysis for entire release is completed";
-    }
+
 
     @GetMapping("allscenarios/{currentDate}/{noOfPreviousDays}")
     public void analyseAParticularBuild(@PathVariable("currentDate") String currentDate, @PathVariable("noOfPreviousDays") String noOfPreviousDays) {

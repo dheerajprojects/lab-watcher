@@ -19,6 +19,7 @@ import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class PerfStatDAO {
 
     /**
      * This retrieves the all scenario results for a given build with given prpcversion.
-     * When the same scenario for a spcecific build is run multiple times, this will retrieve the lastest result.
+     * When the same scenario for a specific build is run multiple times, this will retrieve the latest result.
      * @param prpcversion
      * @param buildinfo
      * @return
@@ -97,35 +98,83 @@ public class PerfStatDAO {
         return list;
     }
 
-    public List<PerfStat> getPerfStatsForLastNBuilds(String scenarioName, String prpcVersion, String buildInfo, int maxResults, boolean isHead) {
-        String sql = "FROM PerfStat " +
-                "where trialtype='Performance' " +
-                "and runlevel='optimized' " +
-                "and testname='" + scenarioName + "' " +
-                "and prpcversion='" + prpcVersion + "' " +
-                "and isvalidrun='true'" +
-                "and builddate < ( " +
-                "select max(builddate) from PerfStat " +
-                "where buildInfo='" + buildInfo + "' " +
-                "and trialtype='Performance' " +
-                "and runlevel='optimized' " +
-                "and isvalidrun='true' ";
-        if (isHead)
-            sql += "and buildinfo like '%HEAD%' ";
+    /**
+     * Retrieves builddate for given build. Check if prpc version is also needed.
+     *
+     * @param buildinfo
+     * @return
+     */
+    public Timestamp getBuildDate(String buildinfo) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        AbstractQuery<Timestamp> aq = cb.createQuery(Timestamp.class);
+        Root<PerfStat> root = aq.from(PerfStat.class);
 
-        //This is remaining of the subquery
-        sql += "and testname = '" + scenarioName + "' " +
-                ")";
+        //Select clause
+        CriteriaQuery<Timestamp> select = ((CriteriaQuery<Timestamp>) aq).select(root.get("builddate")).distinct(true);
 
-        if (isHead)
-            sql += "and buildinfo like '%HEAD%' ";
+        //Where clause
+        aq.where(cb.equal(root.get("isvalidrun"), "true"),
+                cb.equal(root.get("buildinfo"), buildinfo));
 
-        //This is remaining of main query
-        sql += "order by teststart desc";
+        TypedQuery<Timestamp> q = em.createQuery(select);
 
-        Query query = em.createQuery(sql);
-        query.setMaxResults(maxResults);
-        List<PerfStat> list = query.getResultList();
+        List<Timestamp> list = q.getResultList();
+        if(list.size() > 1)
+            logger.warn("There are multiple build dates for the same build : "+buildinfo);
+
+        Timestamp timestamp = list.get(0);
+
+        return timestamp;
+    }
+
+    /**
+     *
+     * TODO
+     * //Selected columns only to increase the performance. Add other parameters if required.
+     *         /*CriteriaQuery<PerfStat> select = ((CriteriaQuery<PerfStat>)aq).multiselect(root.get("buildinfo"),
+     *                 root.get("totalreqtime"),
+     *                 root.get("totalreqcpu"),
+     *                 root.get("rdbiocount"),
+     *                 root.get("commitcount"),
+     *                 root.get("activitycount"),
+     *                 root.get("alertcount"),
+     *                 root.get("commitcount"),
+     *                 root.get("errorcount"),
+     *                 root.get("testelapsedminutes")
+     *         );
+     *
+     * @param scenarioName
+     * @param prpcVersion
+     * @param buildInfo
+     * @param maxResults     *
+     * @return
+     */
+    public List<PerfStat> getPerfStatsForLastNBuilds(String scenarioName, String prpcVersion, String buildInfo, int maxResults) {
+        Timestamp buildDate = getBuildDate(buildInfo);
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        AbstractQuery<PerfStat> aq = cb.createQuery(PerfStat.class);
+        Root<PerfStat> root = aq.from(PerfStat.class);
+
+        //Select all columns
+        CriteriaQuery<PerfStat> select = ((CriteriaQuery<PerfStat>) aq).select(root);
+
+        //Where clause
+        aq.where(cb.equal(root.get("trialtype"), "Performance"),
+                cb.equal(root.get("runlevel"),"optimized"),
+                cb.equal(root.get("isvalidrun"),"true"),
+                cb.equal(root.get("runlevel"),"optimized"),
+                cb.equal(root.get("prpcversion"),prpcVersion),
+                cb.equal(root.get("testname"), scenarioName),
+                cb.lessThan(root.get("builddate"), buildDate));
+
+        select.orderBy(cb.desc(root.get("teststart")));
+
+        TypedQuery<PerfStat> q = em.createQuery(select);
+        q.setMaxResults(maxResults);
+
+        List<PerfStat> list = q.getResultList();
+
         return list;
     }
 
@@ -260,7 +309,7 @@ public class PerfStatDAO {
      * @param performanceMetricName
      * @param currentBuildInfo
      */
-    public ParamData getBaselineBuild(String scenarioName, String performanceMetricName, String currentBuildInfo, String prpcVersion, boolean isHead) {
+    public ParamData getBaselineBuild(String scenarioName, String performanceMetricName, String currentBuildInfo, String prpcVersion) {
         //TODO : Add prpcVersion to ParamData too.
         String sql = "FROM ParamData pd " +
                 "where pd.scenarioData.testname='" + scenarioName + "' " +
@@ -289,8 +338,6 @@ public class PerfStatDAO {
                     "and ps1.prpcversion=ps2.prpcversion " +
                     "and ps1.buildinfo=ps2.buildinfo " +
                     "and ps1.buildlabel=ps2.buildlabel ) ";
-            if (isHead)
-                sql2 += "and buildinfo like '%HEAD%' ";
 
             sql2 += "and buildinfo >= '" + paramData.getScenarioData().getBuildInfo() + "' " +
                     "and buildinfo < '" + currentBuildInfo + "' " +

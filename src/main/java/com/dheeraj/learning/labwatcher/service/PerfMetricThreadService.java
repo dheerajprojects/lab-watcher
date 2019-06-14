@@ -44,13 +44,13 @@ public class PerfMetricThreadService {
      * @return A map of given performance metrics with analysis results.
      */
     @Async
-    public CompletableFuture<ParamDataDTO> analysePerfMetric(String scenarioName, String performanceMetricName, String prpcVersion, String currentbuildInfo, boolean isHead) {
+    public CompletableFuture<ParamDataDTO> analysePerfMetric(String scenarioName, String performanceMetricName, String prpcVersion, String currentbuildInfo) {
         logger.trace("Analyzing " + prpcVersion + ", " + currentbuildInfo + ", " + scenarioName + ", " + performanceMetricName);
         performanceMetricName = DataUtil.fixTimeAttributeForJUnits(scenarioName, performanceMetricName);
         logger.trace("Started new thread for performance metric : " + performanceMetricName);
         logger.trace("Analyzing " + performanceMetricName + "...");
 
-        ParamDataDTO baselineBuildParamDataDTO = getBaselineBuild(scenarioName, performanceMetricName, currentbuildInfo, prpcVersion, isHead);
+        ParamDataDTO baselineBuildParamDataDTO = getBaselineBuild(scenarioName, performanceMetricName, currentbuildInfo, prpcVersion);
         ParamDataDTO currentBuildParamDataDTO = new ParamDataDTO(performanceMetricName, scenarioName, currentbuildInfo);
 
         //The second condition occurs below only when the first condition is false
@@ -88,8 +88,8 @@ public class PerfMetricThreadService {
      * @param currentBuildInfo
      * @return
      */
-    private ParamDataDTO getBaselineBuild(String scenarioName, String performanceMetricName, String currentBuildInfo, String prpcVersion, boolean isHead) {
-        ParamData paramData = perfStatDAO.getBaselineBuild(scenarioName, performanceMetricName, currentBuildInfo, prpcVersion, isHead);
+    private ParamDataDTO getBaselineBuild(String scenarioName, String performanceMetricName, String currentBuildInfo, String prpcVersion) {
+        ParamData paramData = perfStatDAO.getBaselineBuild(scenarioName, performanceMetricName, currentBuildInfo, prpcVersion);
 
         ParamDataDTO paramDataDTO = null;
         if (paramData != null) {
@@ -121,7 +121,7 @@ public class PerfMetricThreadService {
                                                        ParamDataDTO currentBuildParamDataDTO, String param, Integer rank,
                                                        Double accuracy) {
         //TODO: Yet to write logic to identify if the build is HEAD or not.
-        List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, buildInfo, rank, true);
+        List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, buildInfo, rank);
 
         List<PerfStatDTO> perfStatDTOs = Mapper.copyResultsToDTO(perfStats);
 
@@ -199,9 +199,9 @@ public class PerfMetricThreadService {
      * @param endBuildInfo
      */
     public void rerunLaterBuildsAfterDegradation(String scenarioName, String prpcVersion, String performanceMetricName, Integer rank, String endBuildInfo) {
-        List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, endBuildInfo, rank - 1, true);
+        List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, endBuildInfo, rank - 1);
         for (PerfStat perfstat : perfStats) {
-            analysePerfMetric(scenarioName, performanceMetricName, prpcVersion, perfstat.getBuildinfo(), true);
+            analysePerfMetric(scenarioName, performanceMetricName, prpcVersion, perfstat.getBuildinfo());
         }
     }
 

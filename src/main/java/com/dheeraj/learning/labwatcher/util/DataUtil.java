@@ -276,19 +276,19 @@ public class DataUtil {
      * Time attribute for junits is wallseconds. So this method replaces totalreqtime with wallseconds for all junit scenarios.
      * TODO : Make use of enum #JUnitScenarios.
      *
-     * @param timeParameter
+     * @param performanceMetricName
      */
-    public static String fixTimeAttributeForJUnits(String scenarioName, String timeParameter) {
+    public static String fixTimeAttributeForJUnits(String scenarioName, String performanceMetricName) {
         List<String> jUnitScenarios = new ArrayList<>();
         jUnitScenarios.add("PerfClip");
         jUnitScenarios.add("DevPerfJUnit");
         jUnitScenarios.add("DataEngineJUnit");
         jUnitScenarios.add("CallCenterJUnit");
 
-        if (jUnitScenarios.contains(scenarioName)) {
+        if ("totalreqtime".equalsIgnoreCase(performanceMetricName) && jUnitScenarios.contains(scenarioName)) {
             return "wallseconds";
         }
 
-        return "totalreqtime";
+        return performanceMetricName;
     }
 }

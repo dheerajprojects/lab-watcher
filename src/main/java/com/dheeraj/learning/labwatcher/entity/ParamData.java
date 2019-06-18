@@ -3,7 +3,7 @@ package com.dheeraj.learning.labwatcher.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "PARAMDATA5")
+@Table(name = "PARAMDATA")
 public class ParamData {
     @Id
     @GeneratedValue

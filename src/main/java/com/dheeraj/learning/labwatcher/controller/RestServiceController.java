@@ -56,7 +56,7 @@ public class RestServiceController {
      *
      * @param scenarioName The scenario name to be tested.
      * @param prpcversion PRPCVersion of the build label.
-     * @param testBuild The scenario ran successfully in this build.
+     * @param buildInfo The scenario ran successfully in this build.
      * @return
      */
     @GetMapping("analysescenario/{scenarioName}/{prpcverison}/{buildInfo}")

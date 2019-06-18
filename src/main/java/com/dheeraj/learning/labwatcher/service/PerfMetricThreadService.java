@@ -122,6 +122,8 @@ public class PerfMetricThreadService {
                                                        Double accuracy) {
         //TODO: Yet to write logic to identify if the build is HEAD or not.
         List<PerfStat> perfStats = perfStatDAO.getPerfStatsForLastNBuilds(scenarioName, prpcVersion, buildInfo, rank);
+        //TODO : Add a check if the results are less than N (Say 5) and discard further process and return from this method.
+        //TODO : This is to avoid analyzing data when there is less data.
 
         List<PerfStatDTO> perfStatDTOs = Mapper.copyResultsToDTO(perfStats);
 
